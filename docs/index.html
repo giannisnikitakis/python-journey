@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ημέρα 2 — Τύποι Δεδομένων &amp; Strings · Programming Lessons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700;800&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — a school notebook: ballpoint ink on graph paper.
+   Every pen colour has a job. Nothing here is decoration.
+   ============================================================ */
+:root{
+  --paper:      #FCFCFA;
+  --paper-2:    #F4F6F8;
+  --grid:       #E4EAF0;
+  --grid-major: #D6DFE8;
+
+  --ink:        #17263B;   /* blue-black ballpoint  */
+  --ink-soft:   #5A6B80;
+  --ink-faint:  #94A3B4;
+
+  --pen-blue:   #2A4FC4;   /* links, active state   */
+  --pen-red:    #C63B32;   /* errors, warnings      */
+  --pen-green:  #1B7A4C;   /* correct               */
+  --marker:     #FFE9A8;   /* highlighter           */
+  --marker-2:   #FFF6DC;
+
+  --rule:       #DDE4EC;
+  --shadow:     0 1px 0 var(--rule);
+
+  --nav-h:      60px;
+  --side-w:     288px;
+
+  --f-ui:   'Commissioner', 'Helvetica Neue', Arial, sans-serif;
+  --f-body: 'Alegreya', Georgia, 'Times New Roman', serif;
+  --f-code: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
+body{
+  margin:0;
+  font-family:var(--f-body);
+  font-size:18px;
+  line-height:1.72;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:26px 26px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.nav{
+  position:fixed;inset:0 0 auto 0;height:var(--nav-h);z-index:60;
+  display:flex;align-items:center;gap:16px;padding:0 20px;
+  background:rgba(252,252,250,.94);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.nav__burger{
+  display:none;width:38px;height:38px;flex:0 0 auto;
+  border:1px solid var(--rule);border-radius:8px;background:var(--paper);
+  color:var(--ink);cursor:pointer;align-items:center;justify-content:center;
+}
+.nav__mark{
+  width:30px;height:30px;flex:0 0 auto;border-radius:7px;
+  background:var(--ink);color:var(--paper);
+  display:grid;place-items:center;
+  font-family:var(--f-code);font-size:15px;font-weight:700;
+}
+.nav__title{
+  font-family:var(--f-ui);font-weight:700;font-size:17px;
+  letter-spacing:-.01em;margin:0;white-space:nowrap;
+}
+.nav__spacer{flex:1}
+.nav__progress{display:flex;align-items:center;gap:10px}
+.nav__progress span{
+  font-family:var(--f-ui);font-size:13px;font-weight:500;color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+}
+.bar{width:110px;height:7px;border-radius:4px;background:var(--paper-2);
+  border:1px solid var(--rule);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--pen-green);
+  transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.side{
+  position:fixed;top:var(--nav-h);bottom:0;left:0;width:var(--side-w);z-index:50;
+  overflow-y:auto;padding:20px 14px 60px;
+  background:var(--paper);border-right:1px solid var(--rule);
+  font-family:var(--f-ui);
+}
+.side__label{
+  font-family:var(--f-ui);font-size:12px;font-weight:600;color:var(--ink-faint);
+  margin:0 0 12px 10px;
+}
+.day{border-bottom:1px solid var(--rule)}
+.day:last-child{border-bottom:0}
+.day > summary{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:center;gap:10px;
+  padding:11px 10px;border-radius:8px;
+  font-size:14.5px;font-weight:500;color:var(--ink);
+}
+.day > summary::-webkit-details-marker{display:none}
+.day > summary:hover{background:var(--paper-2)}
+.day > summary:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.day__n{
+  flex:0 0 auto;width:26px;height:26px;border-radius:6px;
+  display:grid;place-items:center;
+  font-family:var(--f-code);font-size:12px;font-weight:600;
+  background:var(--paper-2);color:var(--ink-soft);border:1px solid var(--rule);
+}
+.day__t{flex:1;line-height:1.35}
+.day__chev{flex:0 0 auto;color:var(--ink-faint);transition:transform .2s}
+.day[open] > summary > .day__chev{transform:rotate(90deg)}
+
+.day--now > summary{background:var(--marker-2)}
+.day--now .day__n{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.day--done .day__n{background:var(--pen-green);color:#fff;border-color:var(--pen-green)}
+.day--soon > summary{color:var(--ink-faint);cursor:default}
+.day--soon .day__n{color:var(--ink-faint)}
+
+.day ul{list-style:none;margin:0 0 10px;padding:2px 0 2px 22px}
+.day li a{
+  display:block;padding:6px 10px;border-radius:6px;
+  font-size:14px;color:var(--ink-soft);text-decoration:none;
+  border-left:2px solid var(--rule);
+}
+.day li a:hover{color:var(--ink);background:var(--paper-2)}
+.day li a:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.day li a.is-active{
+  color:var(--pen-blue);font-weight:600;
+  border-left-color:var(--pen-blue);background:var(--paper-2);
+}
+.day li a .tag{
+  font-family:var(--f-code);font-size:10.5px;font-weight:600;
+  color:var(--pen-blue);margin-left:6px;
+}
+.day__soon{
+  padding:4px 10px 12px 32px;font-size:13px;color:var(--ink-faint);font-style:italic;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.main{margin:var(--nav-h) 0 0 var(--side-w);padding:0 0 100px}
+.wrap{max-width:760px;margin:0 auto;padding:0 28px}
+
+/* ============================================================
+   HERO — the day's goal, running.
+   ============================================================ */
+.hero{
+  border-bottom:1px solid var(--rule);
+  background:linear-gradient(180deg,var(--marker-2) 0%,rgba(255,246,220,0) 100%);
+  padding:44px 0 40px;margin-bottom:44px;
+}
+.hero__meta{
+  font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--ink-soft);
+  display:flex;gap:14px;align-items:center;margin-bottom:10px;
+}
+.hero__meta b{
+  font-family:var(--f-code);font-size:12px;font-weight:700;
+  color:var(--paper);background:var(--ink);padding:3px 7px;border-radius:5px;
+}
+.hero h1{
+  font-family:var(--f-ui);font-weight:800;font-size:clamp(30px,5.2vw,44px);
+  line-height:1.1;letter-spacing:-.025em;margin:0 0 14px;
+}
+.hero__sub{font-size:19px;color:var(--ink-soft);margin:0 0 28px;max-width:56ch}
+
+.term{
+  border:1px solid var(--ink);border-radius:10px;overflow:hidden;
+  background:var(--ink);box-shadow:0 6px 22px rgba(23,38,59,.16);
+}
+.term__bar{
+  display:flex;align-items:center;gap:7px;padding:9px 13px;
+  border-bottom:1px solid rgba(255,255,255,.13);
+}
+.term__bar i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.26)}
+.term__bar span{
+  margin-left:8px;font-family:var(--f-code);font-size:11.5px;
+  color:rgba(255,255,255,.55);
+}
+.term pre{
+  margin:0;padding:18px 16px;min-height:186px;
+  font-family:var(--f-code);font-size:13.5px;line-height:1.75;
+  color:#DCE6F2;white-space:pre-wrap;word-break:break-word;
+}
+.term .u{color:#8FE3B4}
+.term .r{color:#FFD98A;font-weight:600}
+.term .caret{
+  display:inline-block;width:8px;height:15px;vertical-align:-2px;
+  background:#8FE3B4;animation:blink 1.05s step-end infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+section{margin:0 0 52px;scroll-margin-top:calc(var(--nav-h) + 16px)}
+h2{
+  font-family:var(--f-ui);font-weight:700;font-size:26px;letter-spacing:-.02em;
+  line-height:1.25;margin:0 0 6px;padding-top:6px;
+  display:flex;align-items:baseline;gap:12px;
+}
+h2 .h2n{
+  font-family:var(--f-code);font-size:13px;font-weight:600;color:var(--ink-faint);
+  flex:0 0 auto;
+}
+h3{font-family:var(--f-ui);font-weight:600;font-size:18.5px;margin:30px 0 8px}
+.lead{color:var(--ink-soft);margin:0 0 20px;font-size:17px}
+p{margin:0 0 16px}
+a{color:var(--pen-blue)}
+strong{font-weight:700}
+
+.rule{height:1px;background:var(--rule);border:0;margin:0 0 34px}
+
+/* inline + block code */
+code{
+  font-family:var(--f-code);font-size:.855em;
+  background:var(--paper-2);border:1px solid var(--rule);
+  padding:1px 5px;border-radius:4px;white-space:nowrap;
+}
+.codewrap{position:relative;margin:0 0 20px}
+.codewrap pre{
+  margin:0;padding:16px 18px;overflow-x:auto;
+  background:var(--ink);border-radius:9px;
+  font-family:var(--f-code);font-size:13.5px;line-height:1.68;
+  color:#DCE6F2;
+}
+.codewrap pre code{
+  background:none;border:0;padding:0;font-size:inherit;white-space:pre;
+}
+.copy{
+  position:absolute;top:9px;right:9px;
+  font-family:var(--f-ui);font-size:11.5px;font-weight:600;
+  color:rgba(255,255,255,.62);background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;
+  padding:4px 9px;cursor:pointer;opacity:0;transition:opacity .15s;
+}
+.codewrap:hover .copy,.copy:focus-visible{opacity:1}
+.copy:hover{color:#fff;background:rgba(255,255,255,.17)}
+.copy.ok{color:#8FE3B4;border-color:rgba(143,227,180,.4)}
+.tok-k{color:#9DB8FF;font-weight:500}
+.tok-s{color:#8FE3B4}
+.tok-c{color:#8394AB;font-style:italic}
+.tok-n{color:#FFC98A}
+.tok-b{color:#E7B4FF}
+
+/* callouts */
+.note{
+  border-left:3px solid var(--pen-blue);background:var(--paper-2);
+  padding:14px 18px;border-radius:0 8px 8px 0;margin:0 0 20px;font-size:16.5px;
+}
+.note--warn{border-left-color:var(--pen-red)}
+.note--key{border-left-color:#E8B92E;background:var(--marker-2)}
+.note p:last-child{margin-bottom:0}
+.note b{font-family:var(--f-ui);font-size:15px}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;margin:0 0 22px;font-size:16px}
+.tbl th{
+  font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--ink-soft);
+  text-align:left;padding:8px 12px;border-bottom:2px solid var(--rule);
+}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl code{white-space:nowrap}
+
+/* big ideas */
+.ideas{display:grid;gap:12px;margin:0 0 24px}
+.idea{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--marker-2);border:1px solid #F0DFA8;border-radius:9px;padding:15px 17px;
+}
+.idea__n{
+  flex:0 0 auto;width:27px;height:27px;border-radius:50%;
+  background:var(--ink);color:var(--paper);display:grid;place-items:center;
+  font-family:var(--f-code);font-size:13px;font-weight:700;margin-top:2px;
+}
+.idea p{margin:0;font-size:16.5px}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz{border:1px solid var(--rule);border-radius:11px;background:var(--paper);overflow:hidden}
+.quiz__head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 18px;border-bottom:1px solid var(--rule);background:var(--paper-2);
+}
+.quiz__head h4{font-family:var(--f-ui);font-size:15px;font-weight:600;margin:0}
+.quiz__score{
+  font-family:var(--f-code);font-size:13px;font-weight:600;color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+}
+.q{padding:20px 18px;border-bottom:1px solid var(--rule)}
+.q:last-child{border-bottom:0}
+.q__p{font-family:var(--f-ui);font-size:16px;font-weight:600;margin:0 0 13px;line-height:1.5}
+.q__p .qn{font-family:var(--f-code);font-size:13px;color:var(--ink-faint);margin-right:7px}
+.opts{display:grid;gap:7px}
+.opt{
+  display:flex;align-items:center;gap:11px;width:100%;text-align:right;
+  font-family:var(--f-body);font-size:16.5px;color:var(--ink);
+  background:var(--paper);border:1px solid var(--rule);border-radius:8px;
+  padding:10px 13px;cursor:pointer;transition:background .13s,border-color .13s;
+}
+.opt:hover:not(:disabled){background:var(--paper-2);border-color:var(--ink-faint)}
+.opt:focus-visible{outline:2px solid var(--pen-blue);outline-offset:1px}
+.opt:disabled{cursor:default}
+.opt__k{
+  flex:0 0 auto;width:23px;height:23px;border-radius:50%;
+  border:1px solid var(--rule);display:grid;place-items:center;
+  font-family:var(--f-code);font-size:11.5px;font-weight:600;color:var(--ink-soft);
+}
+.opt__t{flex:1;text-align:left}
+.opt.is-right{border-color:var(--pen-green);background:#EFF8F2}
+.opt.is-right .opt__k{background:var(--pen-green);color:#fff;border-color:var(--pen-green)}
+.opt.is-wrong{border-color:var(--pen-red);background:#FDF0EF}
+.opt.is-wrong .opt__k{background:var(--pen-red);color:#fff;border-color:var(--pen-red)}
+.q__fb{
+  display:none;margin-top:12px;padding:12px 14px;border-radius:8px;
+  font-size:16px;background:var(--paper-2);border-left:3px solid var(--ink-faint);
+}
+.q__fb.show{display:block}
+.q__fb.good{border-left-color:var(--pen-green)}
+.q__fb.bad{border-left-color:var(--pen-red)}
+.q__fb b{font-family:var(--f-ui);font-size:15px}
+.q__hintbtn{
+  margin-top:11px;font-family:var(--f-ui);font-size:13px;font-weight:600;
+  color:var(--pen-blue);background:none;border:0;padding:0;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.q__hint{display:none;margin-top:9px;font-size:16px;color:var(--ink-soft);font-style:italic}
+.q__hint.show{display:block}
+
+/* ============================================================
+   EXERCISES
+   ============================================================ */
+.ex{border:1px solid var(--rule);border-radius:11px;margin:0 0 14px;background:var(--paper);overflow:hidden}
+.ex__head{display:flex;align-items:flex-start;gap:13px;padding:16px 18px}
+.ex__n{
+  flex:0 0 auto;font-family:var(--f-code);font-size:12px;font-weight:700;
+  color:var(--paper);background:var(--ink);border-radius:5px;padding:3px 7px;margin-top:3px;
+}
+.ex__b{flex:1}
+.ex__b h4{font-family:var(--f-ui);font-size:16.5px;font-weight:600;margin:0 0 6px}
+.ex__b p{margin:0 0 8px;font-size:16.5px}
+.ex__out{
+  font-family:var(--f-code);font-size:13px;color:var(--ink-soft);
+  background:var(--paper-2);border:1px dashed var(--rule);border-radius:6px;
+  padding:8px 11px;margin:8px 0 0;
+}
+.ex details{border-top:1px solid var(--rule)}
+.ex details summary{
+  list-style:none;cursor:pointer;padding:11px 18px;
+  font-family:var(--f-ui);font-size:13.5px;font-weight:600;color:var(--pen-blue);
+}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary:hover{background:var(--paper-2)}
+.ex details summary:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.ex details[open] summary{border-bottom:1px solid var(--rule)}
+.ex details .body{padding:15px 18px}
+.ex details .body p:last-child,.ex details .body .codewrap:last-child{margin-bottom:0}
+
+/* ============================================================
+   CHECKLIST
+   ============================================================ */
+.check{border:1px solid var(--rule);border-radius:11px;padding:8px 6px;background:var(--paper)}
+.check label{
+  display:flex;align-items:flex-start;gap:12px;padding:9px 13px;border-radius:8px;
+  cursor:pointer;font-size:16.5px;
+}
+.check label:hover{background:var(--paper-2)}
+.check input{
+  flex:0 0 auto;width:19px;height:19px;margin-top:4px;
+  accent-color:var(--pen-green);cursor:pointer;
+}
+.check input:checked + span{color:var(--ink-faint);text-decoration:line-through}
+
+/* turtle figure */
+.turtle{
+  display:block;margin:0 auto 20px;max-width:280px;width:100%;
+  background:var(--paper);border:1px solid var(--rule);border-radius:9px;padding:10px;
+}
+
+/* footer */
+.foot{
+  border-top:1px solid var(--rule);margin-top:56px;padding-top:24px;
+  font-family:var(--f-ui);font-size:13.5px;color:var(--ink-faint);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.foot a{color:var(--ink-soft);text-decoration:none}
+.foot a:hover{color:var(--pen-blue);text-decoration:underline}
+
+/* scrim for mobile drawer */
+.scrim{
+  display:none;position:fixed;inset:var(--nav-h) 0 0 0;z-index:45;
+  background:rgba(23,38,59,.35);
+}
+.scrim.show{display:block}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:960px){
+  :root{--side-w:280px}
+  .nav__burger{display:flex}
+  .side{transform:translateX(-100%);transition:transform .24s cubic-bezier(.4,0,.2,1);
+    box-shadow:2px 0 18px rgba(23,38,59,.12)}
+  .side.open{transform:none}
+  .main{margin-left:0}
+  .nav__progress span{display:none}
+}
+@media (max-width:600px){
+  body{font-size:17px}
+  .wrap{padding:0 18px}
+  .hero{padding:30px 0 28px;margin-bottom:32px}
+  h2{font-size:22px}
+  .bar{width:70px}
+  .opt{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ NAVBAR ══════════════════ -->
+<header class="nav">
+  <button class="nav__burger" id="burger" aria-label="Άνοιγμα μενού" aria-expanded="false">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M2 4.5h14M2 9h14M2 13.5h14"/>
+    </svg>
+  </button>
+  <div class="nav__mark">Py</div>
+  <p class="nav__title">Programming Lessons</p>
+  <div class="nav__spacer"></div>
+  <div class="nav__progress">
+    <span id="progText">0 / 8</span>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<nav class="side" id="side" aria-label="Περιεχόμενα μαθημάτων">
+  <p class="side__label">Beginner · Ημέρες 1–14</p>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">01</span>
+      <span class="day__t">Μεταβλητές &amp; Variables</span>
+    </summary>
+    <div class="day__soon">Ολοκληρώθηκε. Σύντομα και εδώ.</div>
+  </details>
+
+  <details class="day day--now" open>
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">02</span>
+      <span class="day__t">Τύποι Δεδομένων &amp; Strings</span>
+    </summary>
+    <ul>
+      <li><a href="#stoxoi">Στόχοι της ημέρας</a></li>
+      <li><a href="#typoi">Οι τύποι δεδομένων</a></li>
+      <li><a href="#quiz1">Έλεγχος 1 <span class="tag">quiz</span></a></li>
+      <li><a href="#casting">Type conversion</a></li>
+      <li><a href="#subscripting">Subscripting</a></li>
+      <li><a href="#praxeis">Μαθηματικές πράξεις</a></li>
+      <li><a href="#fstrings">round() &amp; f-strings</a></li>
+      <li><a href="#quiz2">Έλεγχος 2 <span class="tag">quiz</span></a></li>
+      <li><a href="#project">Tip Calculator <span class="tag">project</span></a></li>
+      <li><a href="#askiseis">Ασκήσεις <span class="tag">6</span></a></li>
+      <li><a href="#poster">Turtle Poster <span class="tag">art</span></a></li>
+      <li><a href="#ai">AI Corner</a></li>
+      <li><a href="#lathi">Συχνά λάθη</a></li>
+      <li><a href="#recap">Ανακεφαλαίωση</a></li>
+    </ul>
+  </details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">03</span><span class="day__t">Control Flow &amp; Logical Operators</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">04</span><span class="day__t">Randomisation &amp; Lists</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">05</span><span class="day__t">Python Loops</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">06</span><span class="day__t">Functions &amp; Karel</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">07</span><span class="day__t">Hangman</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">08</span><span class="day__t">Parameters &amp; Caesar Cipher</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">09</span><span class="day__t">Dictionaries &amp; Secret Auction</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">10</span><span class="day__t">Functions with Outputs</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">11</span><span class="day__t">Blackjack Capstone</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">12</span><span class="day__t">Scope &amp; Number Guessing</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">13</span><span class="day__t">Debugging</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">14</span><span class="day__t">Higher Lower Game</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+</nav>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main class="main">
+
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero__meta"><b>ΗΜΕΡΑ 02</b> <span>Beginner</span> <span>·</span> <span>2 ώρες 30′</span></div>
+      <h1>Τύποι Δεδομένων &amp; Strings</h1>
+      <p class="hero__sub">Σήμερα φτιάχνεις έναν Tip Calculator που μοιράζει τον λογαριασμό μιας ταβέρνας. Ορίστε τι θα τρέχει στο τέλος της ημέρας:</p>
+
+      <div class="term">
+        <div class="term__bar"><i></i><i></i><i></i><span>tip_calculator.py</span></div>
+        <pre id="termOut"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- ─── ΣΤΟΧΟΙ ─── -->
+    <section id="stoxoi">
+      <h2><span class="h2n">§1</span> Στόχοι της ημέρας</h2>
+      <p class="lead">Στο τέλος του μαθήματος θα μπορείς να κάνεις όλα τα παρακάτω χωρίς βοήθεια.</p>
+      <ul>
+        <li>Να ξεχωρίζεις τους τέσσερις βασικούς τύπους: <code>str</code>, <code>int</code>, <code>float</code>, <code>bool</code></li>
+        <li>Να μετατρέπεις έναν τύπο σε άλλον με <code>int()</code>, <code>float()</code>, <code>str()</code></li>
+        <li>Να παίρνεις συγκεκριμένα γράμματα από ένα string με <em>subscripting</em></li>
+        <li>Να χρησιμοποιείς όλους τους μαθηματικούς τελεστές, με τη σωστή σειρά</li>
+        <li>Να μορφοποιείς αριθμούς με <code>round()</code> και f-strings</li>
+        <li>Να φτιάξεις τον Tip Calculator και το δικό σου Turtle poster</li>
+      </ul>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΤΥΠΟΙ ─── -->
+    <section id="typoi">
+      <h2><span class="h2n">§2</span> Οι τύποι δεδομένων</h2>
+      <p>Κάθε τιμή στην Python έχει έναν <strong>type</strong>. Ο τύπος καθορίζει τι μπορείς να κάνεις μαζί της — γι' αυτό δεν προσθέτεις κείμενο σε αριθμό.</p>
+
+      <table class="tbl">
+        <thead><tr><th>Type</th><th>Τι είναι</th><th>Παράδειγμα</th></tr></thead>
+        <tbody>
+          <tr><td><code>str</code></td><td><em>String</em> — κείμενο, πάντα μέσα σε εισαγωγικά</td><td><code>"Οδυσσέας"</code></td></tr>
+          <tr><td><code>int</code></td><td><em>Integer</em> — ακέραιος αριθμός</td><td><code>13</code></td></tr>
+          <tr><td><code>float</code></td><td>Δεκαδικός αριθμός</td><td><code>1.62</code></td></tr>
+          <tr><td><code>bool</code></td><td><em>Boolean</em> — μόνο <code>True</code> ή <code>False</code></td><td><code>True</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Πρόβλεψε πριν τρέξεις</h3>
+      <p>Πριν πατήσεις Run, πες δυνατά τι νομίζεις ότι θα τυπώσει <strong>κάθε γραμμή</strong>. Μετά τρέξ' το και δες πόσα βρήκες.</p>
+
+      <div class="codewrap"><pre><code>name = "Odysseas"
+age = 13
+height = 1.62
+is_student = True
+
+print(type(name))
+print(type(age))
+print(type(height))
+print(type(is_student))
+
+print(len(name))
+print(name[0])
+print(name[3])
+print(name[-1])</code></pre></div>
+
+      <div class="note note--warn">
+        <p><b>Προσοχή:</b> το <code>"13"</code> <strong>δεν</strong> είναι ο αριθμός 13. Είναι κείμενο. Δεν κάνεις πράξεις μαζί του.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── QUIZ 1 ─── -->
+    <section id="quiz1">
+      <h2><span class="h2n">§3</span> Έλεγχος 1 — Τύποι δεδομένων</h2>
+      <p class="lead">Χωρίς σημειώσεις. Θέλεις 3 στα 4 πριν προχωρήσεις.</p>
+      <div class="quiz" data-quiz="q1"></div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── CASTING ─── -->
+    <section id="casting">
+      <h2><span class="h2n">§4</span> Type conversion (casting)</h2>
+      <p>Η <code>input()</code> σου δίνει <strong>πάντα</strong> <code>str</code> — ακόμα κι αν πληκτρολογήσεις αριθμό. Αν θέλεις να κάνεις πράξεις, πρέπει πρώτα να μετατρέψεις.</p>
+
+      <div class="codewrap"><pre><code># Αυτό ΣΚΑΕΙ:
+age = input("Πόσων χρονών είσαι; ")
+print(age + 1)          # TypeError!
+
+# Αυτό δουλεύει:
+age = int(input("Πόσων χρονών είσαι; "))
+print(age + 1)</code></pre></div>
+
+      <h3>Δύο errors που μοιάζουν αλλά δεν είναι ίδια</h3>
+      <table class="tbl">
+        <thead><tr><th>Error</th><th>Πότε συμβαίνει</th></tr></thead>
+        <tbody>
+          <tr><td><code>TypeError</code></td><td>Ο τύπος είναι λάθος για την πράξη — <code>"5" + 5</code></td></tr>
+          <tr><td><code>ValueError</code></td><td>Ο τύπος είναι σωστός, η <em>τιμή</em> όχι — <code>int("abc")</code></td></tr>
+        </tbody>
+      </table>
+
+      <p>Δοκίμασε να το σπάσεις επίτηδες: τρέξε το από πάνω και γράψε <code>abc</code> αντί για αριθμό. Ποιο error βγαίνει;</p>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── SUBSCRIPTING ─── -->
+    <section id="subscripting">
+      <h2><span class="h2n">§5</span> Subscripting — πιάνω ένα γράμμα</h2>
+      <p>Η αρίθμηση <strong>ξεκινάει από το 0</strong>, όχι από το 1. Αυτό είναι το πιο συχνό μπέρδεμα των πρώτων εβδομάδων.</p>
+
+      <div class="codewrap"><pre><code>word = "Python"
+#       012345
+
+print(word[0])     # P   το πρώτο γράμμα
+print(word[2])     # t
+print(word[-1])    # n   το τελευταίο
+print(len(word))   # 6   πόσα γράμματα έχει</code></pre></div>
+
+      <div class="note note--key">
+        <p><b>Το κόλπο:</b> ο αριθμός δεν λέει <em>«ποιο γράμμα»</em>, λέει <em>«πόσα βήματα από την αρχή»</em>. Το πρώτο γράμμα είναι 0 βήματα μακριά.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΠΡΑΞΕΙΣ ─── -->
+    <section id="praxeis">
+      <h2><span class="h2n">§6</span> Μαθηματικές πράξεις</h2>
+
+      <div class="codewrap"><pre><code>print(7 + 3)     # 10
+print(7 - 3)     # 4
+print(7 * 3)     # 21
+print(7 / 3)     # 2.3333...  δίνει ΠΑΝΤΑ float
+print(7 // 3)    # 2          floor division, κόβει τα δεκαδικά
+print(7 % 3)     # 1          modulo, το υπόλοιπο
+print(7 ** 3)    # 343        δύναμη</code></pre></div>
+
+      <h3>Σειρά πράξεων</h3>
+      <p>Πρώτα <code>**</code>, μετά <code>*</code> και <code>/</code>, στο τέλος <code>+</code> και <code>-</code>. Ακριβώς όπως στα μαθηματικά. Οι παρενθέσεις έχουν πάντα προτεραιότητα.</p>
+
+      <div class="codewrap"><pre><code>print(3 * 3 + 3 / 3 - 3)     # πρόβλεψέ το πριν το τρέξεις</code></pre></div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── F-STRINGS ─── -->
+    <section id="fstrings">
+      <h2><span class="h2n">§7</span> round() και f-strings</h2>
+
+      <div class="codewrap"><pre><code>score = 8 / 3
+
+print(score)                       # 2.6666666666666665
+print(round(score, 2))             # 2.67
+print(f"Έχεις {score:.2f} πόντους")  # Έχεις 2.67 πόντους
+
+name = "Odysseas"
+age = 13
+print(f"Ο {name} είναι {age} χρονών")</code></pre></div>
+
+      <div class="note note--key">
+        <p><b>Η διαφορά που μετράει:</b> το <code>round()</code> αλλάζει τον <em>αριθμό</em>. Το <code>f"{x:.2f}"</code> αλλάζει μόνο το <em>πώς φαίνεται</em>. Για χρήματα θέλεις πάντα το δεύτερο — αλλιώς τα €15.30 τυπώνονται ως 15.3.</p>
+      </div>
+
+      <div class="note note--warn">
+        <p><b>Μην ξεχάσεις το <code>f</code></b> πριν από τα εισαγωγικά. Είναι το λάθος που θα κάνεις τις επόμενες τέσσερις εβδομάδες.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── QUIZ 2 ─── -->
+    <section id="quiz2">
+      <h2><span class="h2n">§8</span> Έλεγχος 2 — Πράξεις &amp; μορφοποίηση</h2>
+      <p class="lead">Πρόβλεψε πρώτα, μετά επιβεβαίωσε στο Thonny.</p>
+      <div class="quiz" data-quiz="q2"></div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── PROJECT ─── -->
+    <section id="project">
+      <h2><span class="h2n">§9</span> Project — Tip Calculator</h2>
+      <p class="lead">Φτιάξ' το σε τέσσερα στάδια. Τρέξ' το μετά από <strong>κάθε</strong> στάδιο.</p>
+
+      <h3>Στάδιο 1 — μάζεψε τα δεδομένα</h3>
+      <div class="codewrap"><pre><code>print("Welcome to the tip calculator!")
+bill = float(input("What was the total bill? €"))
+tip = int(input("What percentage tip? 10, 12, or 15? "))
+people = int(input("How many people to split the bill? "))</code></pre></div>
+      <p>Γιατί <code>float()</code> για τον λογαριασμό αλλά <code>int()</code> για τα άτομα;</p>
+
+      <h3>Στάδιο 2 — κάνε τις πράξεις</h3>
+      <div class="codewrap"><pre><code>tip_as_percent = tip / 100
+total_tip_amount = bill * tip_as_percent
+total_bill = bill + total_tip_amount</code></pre></div>
+
+      <h3>Στάδιο 3 — μοίρασέ το</h3>
+      <div class="codewrap"><pre><code>bill_per_person = total_bill / people
+print(bill_per_person)</code></pre></div>
+      <p>Θα δεις κάτι σαν <code>17.733333333333334</code>. Άσχημο. Πώς το φτιάχνεις;</p>
+
+      <h3>Στάδιο 4 — καθαρό αποτέλεσμα</h3>
+      <div class="codewrap"><pre><code>print(f"Each person should pay: €{bill_per_person:.2f}")</code></pre></div>
+
+      <div class="note">
+        <p><b>Δύο παραξενιές που αξίζει να δεις:</b> το <code>round(2.5)</code> δίνει <code>2</code>, όχι <code>3</code> — η Python στρογγυλοποιεί στο πλησιέστερο ζυγό. Και το <code>round(15.30, 2)</code> τυπώνει <code>15.3</code>. Οι υπολογιστές είναι μερικές φορές περίεργοι.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΑΣΚΗΣΕΙΣ ─── -->
+    <section id="askiseis">
+      <h2><span class="h2n">§10</span> Ασκήσεις</h2>
+      <p class="lead">Κάνε την Α0 οπωσδήποτε, μετά διάλεξε δύο ακόμα. Αν κολλήσεις: <strong>διάβασε το error δυνατά</strong> πριν ζητήσεις βοήθεια.</p>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α0</span>
+          <div class="ex__b">
+            <h4>Average Speed</h4>
+            <p>Ζήτα μια απόσταση σε χιλιόμετρα και έναν χρόνο σε ώρες, και τα δύο δεκαδικά. Τύπωσε τη μέση ταχύτητα με 1 δεκαδικό ψηφίο.</p>
+            <p class="ex__out">Your average speed is 12.4 km/h.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Χρειάζεσαι δύο <code>float()</code>, μία διαίρεση και ένα f-string με <code>:.1f</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>distance = float(input("Distance in km: "))
+time = float(input("Time in hours: "))
+speed = distance / time
+print(f"Your average speed is {speed:.1f} km/h.")</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α1</span>
+          <div class="ex__b">
+            <h4>Life in Weeks</h4>
+            <p>Ζήτα την ηλικία σου και τύπωσε πόσες μέρες, εβδομάδες και μήνες σου μένουν αν ζήσεις μέχρι τα 90.</p>
+            <p class="ex__out">You have 28105 days, 4004 weeks, and 924 months left.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Βρες πρώτα πόσα χρόνια μένουν. Μετά: 365 μέρες, 52 εβδομάδες και 12 μήνες τον χρόνο. Θέλεις ακέραιους — σκέψου <code>//</code> ή <code>round()</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>age = int(input("What is your current age? "))
+years_left = 90 - age
+days = years_left * 365
+weeks = years_left * 52
+months = years_left * 12
+print(f"You have {days} days, {weeks} weeks, and {months} months left.")</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α2</span>
+          <div class="ex__b">
+            <h4>Pizza night</h4>
+            <p>Η πίτσα κοστίζει €8.50, κάθε extra topping €1.20, το delivery €2.50. Ζήτα πόσες πίτσες, πόσα toppings συνολικά και πόσα άτομα. Τύπωσε πόσα πληρώνει ο καθένας, με 2 δεκαδικά.</p>
+            <p class="ex__out">Each person pays €11.33</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Το delivery μπαίνει <strong>μία</strong> φορά, όχι μία ανά πίτσα. Πρόσεξε τη σειρά των πράξεων.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>pizzas = int(input("How many pizzas? "))
+toppings = int(input("How many toppings in total? "))
+people = int(input("How many people? "))
+
+total = pizzas * 8.50 + toppings * 1.20 + 2.50
+per_person = total / people
+print(f"Each person pays €{per_person:.2f}")</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α3</span>
+          <div class="ex__b">
+            <h4>Initials</h4>
+            <p>Ζήτα το όνομα και το επώνυμο ξεχωριστά, και τύπωσε μόνο τα αρχικά με τελείες.</p>
+            <p class="ex__out">O.N.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Subscripting. Ποιο index είναι το πρώτο γράμμα;</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>first = input("First name: ")
+last = input("Last name: ")
+print(f"{first[0]}.{last[0]}.")</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α4</span>
+          <div class="ex__b">
+            <h4>Seconds alive</h4>
+            <p>Ζήτα την ηλικία σου σε χρόνια και τύπωσε περίπου πόσα δευτερόλεπτα ζεις. Βάλε κόμματα στους χιλιάδες.</p>
+            <p class="ex__out">You have been alive for 409,968,000 seconds.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>365 × 24 × 60 × 60 δευτερόλεπτα τον χρόνο. Για τα κόμματα: <code>f"{seconds:,}"</code></p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>age = int(input("Your age in years: "))
+seconds = age * 365 * 24 * 60 * 60
+print(f"You have been alive for {seconds:,} seconds.")</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α5</span>
+          <div class="ex__b">
+            <h4>Century club</h4>
+            <p>Ζήτα όνομα και ηλικία, και τύπωσε τη χρονιά που το άτομο θα γίνει 100.</p>
+            <p class="ex__out">Odysseas will turn 100 in the year 2113.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Πόσα χρόνια μένουν μέχρι τα 100; Πρόσθεσέ τα στη φετινή χρονιά.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>name = input("Your name: ")
+age = int(input("Your age: "))
+year = 2026 + (100 - age)
+print(f"{name} will turn 100 in the year {year}.")</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="note">
+        <p><b>Θέλεις κι άλλες;</b> <a href="https://codingbat.com/python" target="_blank" rel="noopener">CodingBat → String-1</a> για strings, και <a href="https://www.practicepython.org" target="_blank" rel="noopener">PracticePython</a> για μεγαλύτερες ασκήσεις. Και τα δύο δωρεάν, χωρίς λογαριασμό.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── POSTER ─── -->
+    <section id="poster">
+      <h2><span class="h2n">§11</span> Turtle poster</h2>
+      <p class="lead">Ό,τι έμαθες σήμερα, αλλά το αποτέλεσμα το σχεδιάζεις εσύ.</p>
+
+      <svg class="turtle" viewBox="0 0 260 200" role="img" aria-label="Τετράγωνο σχεδιασμένο με turtle πάνω σε μιλιμετρέ χαρτί">
+        <defs><pattern id="gp" width="13" height="13" patternUnits="userSpaceOnUse">
+          <path d="M13 0H0V13" fill="none" stroke="#E4EAF0" stroke-width="1"/></pattern></defs>
+        <rect width="260" height="200" fill="url(#gp)"/>
+        <rect x="78" y="30" width="104" height="104" fill="none" stroke="#5B3FD9" stroke-width="3.5"
+              stroke-linejoin="round" stroke-dasharray="416" stroke-dashoffset="416">
+          <animate attributeName="stroke-dashoffset" from="416" to="0" dur="2.2s" begin="0.4s" fill="freeze"/>
+        </rect>
+        <circle cx="78" cy="30" r="4.5" fill="#5B3FD9" opacity="0">
+          <animate attributeName="opacity" from="0" to="1" dur=".3s" begin="2.6s" fill="freeze"/></circle>
+        <text x="130" y="166" text-anchor="middle" font-family="JetBrains Mono, monospace"
+              font-size="13" fill="#17263B" opacity="0">
+          <animate attributeName="opacity" from="0" to="1" dur=".5s" begin="2.8s" fill="freeze"/>
+          your name · 104px</text>
+      </svg>
+
+      <div class="codewrap"><pre><code>import turtle
+
+name = input("What is your name? ")
+favourite_number = int(input("Favourite number (1-20)? "))
+
+side = favourite_number * 10
+
+pen = turtle.Turtle()
+pen.pensize(4)
+pen.color("purple")
+
+pen.forward(side)
+pen.left(90)
+pen.forward(side)
+pen.left(90)
+pen.forward(side)
+pen.left(90)
+pen.forward(side)
+pen.left(90)
+
+pen.penup()
+pen.goto(-100, -120)
+pen.pendown()
+pen.write(f"{name} · {side}px", font=("Arial", 18, "normal"))
+
+turtle.done()</code></pre></div>
+
+      <div class="note note--key">
+        <p><b>Τώρα είναι δικό σου.</b> Άλλαξε το χρώμα, το σχήμα, τη γραμματοσειρά, το μήνυμα, το τι ελέγχει ο αριθμός. Σπάσ' το. Δεν υπάρχει λάθος απάντηση εδώ.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── AI ─── -->
+    <section id="ai">
+      <h2><span class="h2n">§12</span> AI Corner — πώς «βλέπει» ένα AI το κείμενο</h2>
+      <p>Σήμερα είδες ότι η Python κόβει ένα string σε μεμονωμένα γράμματα: <code>word[0]</code>, <code>word[1]</code>. Τα AI language models κάνουν κάτι παρόμοιο, αλλά κόβουν το κείμενο σε μεγαλύτερα κομμάτια που λέγονται <strong>tokens</strong>. Κάθε token γίνεται ένας αριθμός.</p>
+      <p>Αυτό είναι όλο το κόλπο: το μοντέλο δεν βλέπει ποτέ γράμματα. Βλέπει μόνο αριθμούς.</p>
+
+      <div class="note">
+        <p><b>Δοκίμασέ το:</b> άνοιξε έναν <a href="https://tiktokenizer.vercel.app" target="_blank" rel="noopener">tokenizer</a> και γράψε το όνομά σου, μετά μια πρόταση στα ελληνικά, μετά μια στα αγγλικά.</p>
+        <p><b>Η ερώτηση:</b> γιατί τα ελληνικά χρειάζονται περισσότερα tokens από τα αγγλικά για την ίδια πρόταση; Η απάντηση σου λέει κάτι σημαντικό για το τι διάβασαν αυτά τα μοντέλα όταν εκπαιδεύτηκαν.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΛΑΘΗ ─── -->
+    <section id="lathi">
+      <h2><span class="h2n">§13</span> Συχνά λάθη</h2>
+      <p class="lead">Όταν σκάσει κάτι, ψάξ' το εδώ πρώτα.</p>
+      <table class="tbl">
+        <thead><tr><th>Error</th><th>Τι φταίει</th></tr></thead>
+        <tbody>
+          <tr><td><code>TypeError</code></td><td>Πρόσθεσες αριθμό σε κείμενο. Τι τύπος είναι κάθε πλευρά του <code>+</code>;</td></tr>
+          <tr><td><code>ValueError</code></td><td><code>int("abc")</code> ή <code>int("4.5")</code>. Διάβασε τι ακριβώς έλαβε.</td></tr>
+          <tr><td><code>IndexError</code></td><td>Ζήτησες <code>name[8]</code> σε λέξη με 5 γράμματα.</td></tr>
+          <tr><td>Τυπώνει <code>15.3</code> αντί για <code>15.30</code></td><td>Το <code>round()</code> κόβει τα μηδενικά. Χρησιμοποίησε <code>:.2f</code>.</td></tr>
+          <tr><td>Τυπώνει <code>{name}</code> αυτούσιο</td><td>Ξέχασες το <code>f</code> πριν τα εισαγωγικά.</td></tr>
+          <tr><td><code>SyntaxError</code> στο <code>print</code></td><td>Λείπει παρένθεση στην <strong>προηγούμενη</strong> γραμμή. Κοίτα μία πάνω.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── RECAP ─── -->
+    <section id="recap">
+      <h2><span class="h2n">§14</span> Ανακεφαλαίωση</h2>
+      <p class="lead">Κράτησέ το. Θα το χρειαστείς στις Ημέρες 3, 4 και 5 — όλες πατάνε πάνω σε αυτό.</p>
+
+      <h3>Οι τρεις μεγάλες ιδέες</h3>
+      <div class="ideas">
+        <div class="idea"><span class="idea__n">1</span><p>Κάθε τιμή έχει έναν <strong>type</strong>, και ο τύπος καθορίζει τι μπορείς να κάνεις μαζί της.</p></div>
+        <div class="idea"><span class="idea__n">2</span><p>Η <code>input()</code> δίνει <strong>πάντα</strong> <code>str</code>. Θέλεις πράξεις; Μετάτρεψε πρώτα.</p></div>
+        <div class="idea"><span class="idea__n">3</span><p>Το <code>round()</code> αλλάζει τον αριθμό. Το <code>:.2f</code> αλλάζει μόνο το πώς φαίνεται.</p></div>
+      </div>
+
+      <h3>Κάρτα αναφοράς</h3>
+      <div class="codewrap"><pre><code># ΤΥΠΟΙ
+"κείμενο"   # str        42          # int
+3.14        # float      True        # bool
+type(42)    # μου λέει τον τύπο
+
+# ΜΕΤΑΤΡΟΠΗ
+int("42")       float("3.14")       str(42)
+
+# STRINGS
+word = "Python"
+word[0]     # "P"   ξεκινάει από το 0
+word[-1]    # "n"   το τελευταίο
+len(word)   # 6
+
+# ΠΡΑΞΕΙΣ
+10 / 3      # 3.333...  πάντα float
+10 // 3     # 3         χωρίς δεκαδικά
+10 % 3      # 1         το υπόλοιπο
+10 ** 3     # 1000      δύναμη
+
+# ΕΜΦΑΝΙΣΗ
+round(3.14159, 2)      # 3.14
+f"Έχω {n} πόντους"     # μην ξεχάσεις το f
+f"€{price:.2f}"        # 2 δεκαδικά, πάντα</code></pre></div>
+
+      <h3>Μπορώ να…</h3>
+      <p>Τσέκαρε μόνο ό,τι μπορείς να κάνεις <strong>χωρίς</strong> να κοιτάξεις σημειώσεις. Η πρόοδος αποθηκεύεται σε αυτόν τον υπολογιστή.</p>
+      <div class="check" id="checklist">
+        <label><input type="checkbox" data-ck="c1"><span>…πω τους 4 βασικούς τύπους δεδομένων</span></label>
+        <label><input type="checkbox" data-ck="c2"><span>…εξηγήσω γιατί το <code>"5" + 5</code> δίνει error</span></label>
+        <label><input type="checkbox" data-ck="c3"><span>…μετατρέψω ένα <code>input()</code> σε αριθμό</span></label>
+        <label><input type="checkbox" data-ck="c4"><span>…πάρω το πρώτο και το τελευταίο γράμμα μιας λέξης</span></label>
+        <label><input type="checkbox" data-ck="c5"><span>…εξηγήσω τη διαφορά <code>/</code> και <code>//</code></span></label>
+        <label><input type="checkbox" data-ck="c6"><span>…γράψω ένα f-string με μια μεταβλητή μέσα</span></label>
+        <label><input type="checkbox" data-ck="c7"><span>…στρογγυλοποιήσω ένα ποσό σε 2 δεκαδικά</span></label>
+        <label><input type="checkbox" data-ck="c8"><span>…φτιάξω τον Tip Calculator από την αρχή, μόνος μου</span></label>
+      </div>
+
+      <h3>Λέξεις που έμαθα σήμερα</h3>
+      <p><code>data type</code> <code>str</code> <code>int</code> <code>float</code> <code>bool</code> <code>type()</code> <code>casting</code> <code>subscripting</code> <code>index</code> <code>len()</code> <code>floor division</code> <code>modulo</code> <code>exponent</code> <code>round()</code> <code>f-string</code> <code>TypeError</code> <code>ValueError</code> <code>IndexError</code></p>
+    </section>
+
+    <footer class="foot">
+      <span>Ημέρα 02 · Τύποι Δεδομένων &amp; Strings</span>
+      <a href="#stoxoi">Πίσω στην αρχή</a>
+    </footer>
+
+  </div>
+</main>
+
+<script>
+'use strict';
+
+/* ── ασφαλής αποθήκευση: δουλεύει στο GitHub Pages, δεν σκάει πουθενά ── */
+var store = {
+  get: function(k){ try { return window.localStorage.getItem(k); } catch(e){ return null; } },
+  set: function(k,v){ try { window.localStorage.setItem(k,v); } catch(e){} }
+};
+
+/* ══════════════════ ΔΕΔΟΜΕΝΑ QUIZ ══════════════════ */
+var QUIZZES = {
+  q1: { title:'Τύποι δεδομένων', questions:[
+    { p:'Τι τυπώνει το <code>print(type(4.0))</code>;',
+      o:["&lt;class 'int'&gt;","&lt;class 'float'&gt;","&lt;class 'str'&gt;","&lt;class 'bool'&gt;"], a:1,
+      h:'Κοίτα προσεκτικά την τελεία.',
+      e:'Το <code>4.0</code> έχει υποδιαστολή, άρα είναι <code>float</code> — ακόμα κι αν «μοιάζει» ακέραιος.' },
+    { p:'Τι τύπο επιστρέφει <strong>πάντα</strong> η <code>input()</code>;',
+      o:['int, αν πληκτρολογήσεις αριθμό','Εξαρτάται από το τι γράφει ο χρήστης','str, πάντα','float, πάντα'], a:2,
+      h:'Πληκτρολογείς χαρακτήρες στο πληκτρολόγιο, όχι αριθμούς.',
+      e:'Η <code>input()</code> δίνει πάντα <code>str</code>. Γι\' αυτό χρειάζεσαι <code>int()</code> ή <code>float()</code> πριν κάνεις πράξεις.' },
+    { p:'Αν <code>word = "Python"</code>, τι είναι το <code>word[2]</code>;',
+      o:['"P"','"y"','"t"','"h"'], a:2,
+      h:'Μέτρα ξεκινώντας από το μηδέν.',
+      e:'P=0, y=1, <strong>t=2</strong>, h=3, o=4, n=5.' },
+    { p:'<code>age = input("Ηλικία: ")</code> και μετά <code>print(age + 1)</code>. Τι γίνεται;',
+      o:['ValueError','TypeError','IndexError','Δουλεύει κανονικά'], a:1,
+      h:'Τι τύπος είναι το <code>age</code> εκείνη τη στιγμή;',
+      e:'Το <code>age</code> είναι <code>str</code>, και δεν προσθέτεις <code>int</code> σε <code>str</code>. Λύση: <code>int(age) + 1</code>.' }
+  ]},
+  q2: { title:'Πράξεις & μορφοποίηση', questions:[
+    { p:'Τι τυπώνει το <code>print(6 / 3)</code>;', o:['2','2.0','2.00','TypeError'], a:1,
+      h:'Ο τελεστής <code>/</code> έχει έναν κανόνα χωρίς εξαιρέσεις.',
+      e:'Το <code>/</code> δίνει <strong>πάντα</strong> float στην Python 3, ακόμα κι όταν η διαίρεση βγαίνει τέλεια.' },
+    { p:'Τι τυπώνει το <code>print(7 // 2)</code>;', o:['3.5','3','4','1'], a:1,
+      h:'Floor division — κόβει, δεν στρογγυλοποιεί.',
+      e:'Το <code>//</code> πετάει τα δεκαδικά: 7 ÷ 2 = 3.5 → <code>3</code>.' },
+    { p:'Τι τυπώνει το <code>print(2 + 3 * 4)</code>;', o:['20','14','24','9'], a:1,
+      h:'Ίδια σειρά πράξεων με τα μαθηματικά.',
+      e:'Πρώτα ο πολλαπλασιασμός: 3 × 4 = 12, μετά 2 + 12 = <strong>14</strong>.' },
+    { p:'Τι τυπώνει το <code>print(f"{7/2:.1f}")</code>;', o:['3.5','3','4.0','3.50'], a:0,
+      h:'Κάνε πρώτα τη διαίρεση, μετά σκέψου τι σημαίνει το <code>.1f</code>.',
+      e:'7/2 = 3.5, και το <code>:.1f</code> το εμφανίζει με ένα δεκαδικό ψηφίο.' }
+  ]}
+};
+
+/* ══════════════════ RENDER QUIZ ══════════════════ */
+var KEYS = ['Α','Β','Γ','Δ'];
+
+function buildQuiz(host, id){
+  var data = QUIZZES[id];
+  var total = data.questions.length;
+  var answered = 0, right = 0;
+
+  var head = document.createElement('div');
+  head.className = 'quiz__head';
+  head.innerHTML = '<h4>' + data.title + '</h4><span class="quiz__score">— / ' + total + '</span>';
+  host.appendChild(head);
+  var scoreEl = head.querySelector('.quiz__score');
+
+  data.questions.forEach(function(q, qi){
+    var wrap = document.createElement('div');
+    wrap.className = 'q';
+
+    var prompt = document.createElement('p');
+    prompt.className = 'q__p';
+    prompt.innerHTML = '<span class="qn">' + (qi+1) + '.</span>' + q.p;
+    wrap.appendChild(prompt);
+
+    var opts = document.createElement('div');
+    opts.className = 'opts';
+    wrap.appendChild(opts);
+
+    var fb = document.createElement('div');
+    fb.className = 'q__fb';
+
+    var hintBtn = document.createElement('button');
+    hintBtn.type = 'button';
+    hintBtn.className = 'q__hintbtn';
+    hintBtn.textContent = 'Θέλω μια βοήθεια';
+    var hint = document.createElement('p');
+    hint.className = 'q__hint';
+    hint.innerHTML = q.h;
+    hintBtn.addEventListener('click', function(){
+      hint.classList.add('show');
+      hintBtn.style.display = 'none';
+    });
+
+    q.o.forEach(function(text, oi){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.innerHTML = '<span class="opt__k">' + KEYS[oi] + '</span><span class="opt__t">' + text + '</span>';
+      b.addEventListener('click', function(){
+        if (wrap.dataset.done) return;
+        wrap.dataset.done = '1';
+        answered++;
+        var ok = (oi === q.a);
+        if (ok) right++;
+
+        Array.prototype.forEach.call(opts.children, function(el, i){
+          el.disabled = true;
+          if (i === q.a) el.classList.add('is-right');
+          else if (i === oi) el.classList.add('is-wrong');
+        });
+
+        fb.className = 'q__fb show ' + (ok ? 'good' : 'bad');
+        fb.innerHTML = '<b>' + (ok ? 'Σωστά. ' : 'Όχι ακόμα. ') + '</b>' + q.e;
+        hintBtn.style.display = 'none';
+        hint.classList.remove('show');
+        scoreEl.textContent = right + ' / ' + total;
+        if (answered === total) {
+          scoreEl.style.color = (right === total) ? 'var(--pen-green)' : 'var(--ink)';
+        }
+      });
+      opts.appendChild(b);
+    });
+
+    wrap.appendChild(hintBtn);
+    wrap.appendChild(hint);
+    wrap.appendChild(fb);
+    host.appendChild(wrap);
+  });
+}
+
+document.querySelectorAll('[data-quiz]').forEach(function(el){
+  buildQuiz(el, el.dataset.quiz);
+});
+
+/* ══════════════════ ΧΡΩΜΑΤΙΣΜΟΣ ΚΩΔΙΚΑ ══════════════════ */
+var KW = /^(False|None|True|and|as|assert|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield)$/;
+var BI = /^(print|input|int|float|str|bool|type|len|round|range|abs|sum|min|max|list|dict|set|tuple|turtle|forward|left|color|write|goto)$/;
+
+function esc(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlight(src){
+  var re = /(#[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|(\b\d+\.?\d*\b)|([A-Za-z_][A-Za-z0-9_]*)/g;
+  var out = '', last = 0, m;
+  while ((m = re.exec(src)) !== null) {
+    out += esc(src.slice(last, m.index));
+    if (m[1])      out += '<span class="tok-c">' + esc(m[1]) + '</span>';
+    else if (m[2]) out += '<span class="tok-s">' + esc(m[2]) + '</span>';
+    else if (m[3]) out += '<span class="tok-n">' + esc(m[3]) + '</span>';
+    else if (m[4]) {
+      if (KW.test(m[4]))      out += '<span class="tok-k">' + m[4] + '</span>';
+      else if (BI.test(m[4])) out += '<span class="tok-b">' + m[4] + '</span>';
+      else                    out += esc(m[4]);
+    }
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+
+document.querySelectorAll('.codewrap pre code').forEach(function(code){
+  var raw = code.textContent;
+  code.innerHTML = highlight(raw);
+
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'copy';
+  btn.textContent = 'Αντιγραφή';
+  btn.addEventListener('click', function(){
+    var done = function(){
+      btn.textContent = 'Έγινε';
+      btn.classList.add('ok');
+      setTimeout(function(){ btn.textContent = 'Αντιγραφή'; btn.classList.remove('ok'); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(raw).then(done, function(){});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = raw; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(e){}
+      document.body.removeChild(ta);
+    }
+  });
+  code.parentNode.parentNode.appendChild(btn);
+});
+
+/* ══════════════════ CHECKLIST + ΠΡΟΟΔΟΣ ══════════════════ */
+var boxes = document.querySelectorAll('#checklist input[type=checkbox]');
+var progBar = document.getElementById('progBar');
+var progText = document.getElementById('progText');
+
+function paintProgress(){
+  var done = 0;
+  boxes.forEach(function(b){ if (b.checked) done++; });
+  progText.textContent = done + ' / ' + boxes.length;
+  progBar.style.width = (done / boxes.length * 100) + '%';
+}
+
+boxes.forEach(function(b){
+  var key = 'day02.' + b.dataset.ck;
+  if (store.get(key) === '1') b.checked = true;
+  b.addEventListener('change', function(){
+    store.set(key, b.checked ? '1' : '0');
+    paintProgress();
+  });
+});
+paintProgress();
+
+/* ══════════════════ SCROLLSPY ══════════════════ */
+var links = Array.prototype.slice.call(document.querySelectorAll('.day--now li a'));
+var targets = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+
+if ('IntersectionObserver' in window) {
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      var i = targets.indexOf(en.target);
+      if (i < 0) return;
+      links.forEach(function(a){ a.classList.remove('is-active'); });
+      links[i].classList.add('is-active');
+    });
+  }, { rootMargin: '-70px 0px -72% 0px', threshold: 0 });
+  targets.forEach(function(t){ if (t) io.observe(t); });
+}
+
+/* ══════════════════ ΜΕΝΟΥ ΓΙΑ ΚΙΝΗΤΟ ══════════════════ */
+var side = document.getElementById('side');
+var scrim = document.getElementById('scrim');
+var burger = document.getElementById('burger');
+
+function toggleSide(open){
+  side.classList.toggle('open', open);
+  scrim.classList.toggle('show', open);
+  burger.setAttribute('aria-expanded', String(open));
+}
+burger.addEventListener('click', function(){ toggleSide(!side.classList.contains('open')); });
+scrim.addEventListener('click', function(){ toggleSide(false); });
+side.addEventListener('click', function(e){
+  if (e.target.closest('a') && window.innerWidth <= 960) toggleSide(false);
+});
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && side.classList.contains('open')) toggleSide(false);
+});
+
+/* ══════════════════ HERO: ΤΟ ΠΡΟΓΡΑΜΜΑ ΤΡΕΧΕΙ ══════════════════ */
+(function(){
+  var out = document.getElementById('termOut');
+  if (!out) return;
+
+  var script = [
+    { t:'Welcome to the tip calculator!\n', d:22 },
+    { t:'What was the total bill? €', d:22 },
+    { t:'47.50\n', d:70, c:'u' },
+    { t:'What percentage tip would you like to give? 10, 12, or 15? ', d:14 },
+    { t:'12\n', d:90, c:'u' },
+    { t:'How many people to split the bill? ', d:18 },
+    { t:'3\n\n', d:110, c:'u' },
+    { t:'Each person should pay: €17.73\n', d:26, c:'r' }
+  ];
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduce) {
+    out.innerHTML = script.map(function(s){
+      var t = s.t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      return s.c ? '<span class="' + s.c + '">' + t + '</span>' : t;
+    }).join('');
+    return;
+  }
+
+  var si = 0, ci = 0, buf = '';
+  var caret = '<span class="caret"></span>';
+
+  function step(){
+    if (si >= script.length) { out.innerHTML = buf; return; }
+    var seg = script[si];
+    if (ci === 0 && seg.c) buf += '<span class="' + seg.c + '">';
+    var ch = seg.t.charAt(ci);
+    buf += (ch === '<' ? '&lt;' : ch === '&' ? '&amp;' : ch);
+    ci++;
+    if (ci >= seg.t.length) {
+      if (seg.c) buf += '</span>';
+      si++; ci = 0;
+    }
+    out.innerHTML = buf + caret;
+    setTimeout(step, seg.d);
+  }
+  setTimeout(step, 380);
+})();
+</script>
+</body>
+</html>
