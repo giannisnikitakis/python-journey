@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Φύλλο μαθητή · Εβδομάδα 3 — Πού ακριβώς είσαι κάθε στιγμή;</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141e26; --ink-soft:#47555f; --ink-faint:#78868f;
+  --ground:#f0f3f6; --sheet:#ffffff; --rule:#d4dce3; --rule-strong:#b3bfc9;
+  --blue:#17456b; --blue-wash:#e5ecf3;
+  --amber:#a8571f; --amber-wash:#f8efe4;
+  --teal:#0f5d52; --teal-wash:#e7f0ec;
+  --wrong:#9c3535; --wrong-wash:#f7e9e9;
+  --serif:'Alegreya', Georgia, 'Times New Roman', serif;
+  --sans:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --nav-h:60px; --side-w:288px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0; background:var(--ground); color:var(--ink); font-family:var(--serif); font-size:18.5px; line-height:1.68; -webkit-font-smoothing:antialiased}
+
+.nav{position:fixed; inset:0 0 auto 0; height:var(--nav-h); z-index:50; display:flex; align-items:center; gap:16px; padding:0 20px; background:var(--blue); color:#e8eef4; border-bottom:1px solid #0e3252}
+.nav-title{font-family:var(--serif); font-weight:700; font-size:1.06rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.nav-title span{display:block; font-family:var(--sans); font-weight:400; font-size:.7rem; color:#9db9d0; line-height:1.2; margin-top:1px}
+.nav-title a{color:inherit; text-decoration:none}
+.nav-title a:hover{text-decoration:underline; text-underline-offset:3px}
+.burger{display:none; background:none; border:1px solid rgba(255,255,255,.28); color:inherit; border-radius:5px; width:36px; height:34px; cursor:pointer; font-size:1.05rem; line-height:1; flex:0 0 auto}
+.nav-spacer{flex:1}
+.nav-actions{display:flex; gap:8px; font-family:var(--sans); flex:0 0 auto}
+.nav-btn{font-family:var(--sans); font-size:.78rem; font-weight:500; background:transparent; color:#c4d7e6; border:1px solid rgba(255,255,255,.25); border-radius:5px; padding:8px 13px; cursor:pointer; text-decoration:none; display:inline-block}
+.nav-btn:hover{background:rgba(255,255,255,.1); color:#fff}
+.nav-btn.solid{background:#e8eef4; color:var(--blue); border-color:#e8eef4}
+.nav-btn.solid:hover{background:#fff}
+:focus-visible{outline:2.5px solid #f0b27a; outline-offset:2px}
+
+.side{position:fixed; top:var(--nav-h); bottom:0; left:0; width:var(--side-w); z-index:40; overflow-y:auto; background:var(--sheet); border-right:1px solid var(--rule); font-family:var(--sans); padding:20px 0 48px}
+.side h2{font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--ink-faint); margin:22px 20px 8px; padding-top:14px; border-top:1px solid var(--rule)}
+.side h2:first-child{border-top:0; padding-top:0; margin-top:4px}
+.side ol{list-style:none; margin:0; padding:0}
+.side a{display:grid; grid-template-columns:30px 1fr; align-items:baseline; gap:4px; padding:6px 20px 6px 16px; text-decoration:none; color:var(--ink-soft); font-size:.83rem; line-height:1.35; border-left:3px solid transparent}
+.side a:hover{background:var(--blue-wash); color:var(--ink)}
+.side .num{font-variant-numeric:tabular-nums; font-size:.74rem; color:var(--ink-faint)}
+.side a[aria-current="page"]{border-left-color:var(--blue); background:var(--blue-wash); color:var(--blue); font-weight:600}
+.side a[aria-current="page"] .num{color:var(--blue)}
+.side a.pending{color:#9aa6ad}
+.side a.pending .ttl::after{content:''; display:inline-block; width:5px; height:5px; margin-left:7px; border:1px solid #c0cad2; border-radius:50%; vertical-align:.12em}
+.side-note{font-size:.72rem; color:var(--ink-faint); line-height:1.5; margin:20px 20px 0; padding-top:14px; border-top:1px solid var(--rule)}
+
+.wrap{margin-left:var(--side-w); padding-top:var(--nav-h)}
+main{max-width:800px; margin:0 auto; padding:0 32px 120px}
+
+.hero{padding:52px 0 32px; border-bottom:1px solid var(--rule)}
+.kicker{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--blue); margin:0 0 10px}
+.hero h1{font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.8vw,3rem); line-height:1.12; margin:0 0 18px; letter-spacing:-.012em; max-width:15ch}
+.hero-lede{font-size:1.14rem; color:var(--ink-soft); max-width:58ch; margin:0}
+
+figure.boxes{margin:32px 0 0; padding:24px 20px 18px; background:var(--sheet); border:1px solid var(--rule); border-radius:8px}
+figure.boxes svg{display:block; width:100%; height:auto; max-width:500px; margin:0 auto}
+figure.boxes figcaption{font-family:var(--sans); font-size:.8rem; color:var(--ink-soft); margin-top:14px; text-align:center}
+
+section{padding-top:48px}
+h2.sec{font-family:var(--serif); font-weight:700; font-size:1.66rem; line-height:1.2; margin:0 0 6px; letter-spacing:-.008em}
+.sec-sub{font-family:var(--sans); font-size:.8rem; color:var(--ink-faint); margin:0 0 22px}
+h3{font-family:var(--serif); font-weight:700; font-size:1.22rem; margin:30px 0 8px}
+p{margin:0 0 14px; max-width:66ch}
+a.link{color:var(--teal); text-underline-offset:3px}
+a.link:hover{background:var(--teal-wash)}
+ul,ol.body{max-width:64ch; padding-left:22px; margin:0 0 16px}
+li{margin-bottom:7px}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:.86em; background:#eef2f5; padding:1px 5px; border-radius:3px}
+
+.rulebox{border:2px solid var(--blue); border-radius:9px; background:var(--blue-wash); padding:20px 24px; margin:22px 0}
+.rulebox p{margin:0; font-size:1.16rem; font-weight:500; font-style:italic; max-width:none}
+.rulebox .bt{font-family:var(--sans); font-size:.76rem; font-weight:600; font-style:normal; color:var(--blue); margin-bottom:8px; display:block}
+
+.box{border:1px solid var(--rule); border-left-width:4px; border-radius:0 8px 8px 0; background:var(--sheet); padding:16px 20px; margin:20px 0}
+.box p:last-child{margin-bottom:0}
+.box .bt{font-family:var(--sans); font-size:.78rem; font-weight:600; margin:0 0 6px}
+.box.safety{border-left-color:var(--amber); background:var(--amber-wash)}
+.box.safety .bt{color:var(--amber)}
+.box.digital{border-left-color:var(--teal); background:var(--teal-wash)}
+.box.digital .bt{color:var(--teal)}
+
+.sheet{background:var(--sheet); border:1px solid var(--rule); border-radius:9px; padding:20px 22px; margin:20px 0}
+table.obs{width:100%; border-collapse:collapse; font-family:var(--sans); font-size:.82rem}
+table.obs th{background:var(--blue-wash); color:var(--blue); font-weight:600; font-size:.73rem; padding:8px; text-align:right; border:1px solid var(--rule)}
+table.obs td{border:1px solid var(--rule); padding:0}
+table.obs td.n{width:34px; text-align:center; color:var(--ink-faint); font-variant-numeric:tabular-nums; padding:6px 0; background:#fafcfd}
+table.obs input{width:100%; border:0; background:transparent; font-family:var(--sans); font-size:.83rem; color:var(--ink); padding:9px 8px; min-width:0}
+table.obs input:focus{background:#fffbf0; outline:2px solid var(--blue); outline-offset:-2px}
+
+.field{margin:16px 0}
+.field label{display:block; font-family:var(--sans); font-size:.83rem; font-weight:500; margin-bottom:6px}
+.field .hintline{font-family:var(--sans); font-size:.78rem; color:var(--ink-faint); margin:-2px 0 7px}
+textarea, input.line{width:100%; font-family:var(--serif); font-size:1rem; color:var(--ink); background:#fdfefe; border:1px solid var(--rule); border-radius:6px; padding:10px 12px; line-height:1.6}
+textarea{resize:vertical; min-height:84px}
+textarea:focus, input.line:focus{outline:2px solid var(--blue); outline-offset:-1px; background:#fffbf0}
+
+.meas{width:100%; border-collapse:collapse; font-family:var(--sans); font-size:.84rem}
+.meas th{background:var(--blue-wash); color:var(--blue); font-size:.73rem; font-weight:600; padding:8px; text-align:right; border:1px solid var(--rule)}
+.meas td{border:1px solid var(--rule); padding:0}
+.meas td.lbl{padding:8px 10px; text-align:right; background:#fafcfd; color:var(--ink-soft); width:34%}
+.meas input{width:100%; border:0; background:transparent; font-family:var(--sans); font-size:.84rem; padding:9px 10px}
+.meas input:focus{background:#fffbf0; outline:2px solid var(--blue); outline-offset:-2px}
+
+.ask{margin:16px 0; padding:0; list-style:none; max-width:64ch; border-top:1px solid var(--rule)}
+.ask li{margin:0; padding:12px 4px 12px 34px; border-bottom:1px solid var(--rule); position:relative; font-style:italic; font-size:1.03rem; line-height:1.55}
+.ask li::before{content:'?'; position:absolute; left:6px; top:12px; font-family:var(--sans); font-style:normal; font-weight:600; font-size:.86rem; color:var(--blue)}
+
+pre{background:#13202b; color:#dce6ee; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:.82rem; line-height:1.6; padding:16px 18px; border-radius:8px; overflow-x:auto; margin:14px 0}
+pre .c{color:#7d94a6}
+pre .k{color:#8fc4e8}
+pre .s{color:#9ee0b6}
+
+/* Quiz */
+.qcard{background:var(--sheet); border:1px solid var(--rule); border-radius:10px; padding:20px 22px; margin-bottom:14px}
+.qhead{display:flex; gap:12px; align-items:baseline; margin-bottom:14px}
+.qnum{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--blue); flex:0 0 auto; padding-top:2px}
+.qtext{font-size:1.07rem; font-weight:500; margin:0; max-width:none}
+.opts{display:flex; flex-direction:column; gap:8px}
+.opt{display:flex; gap:11px; align-items:flex-start; width:100%; text-align:right; font-family:var(--sans); font-size:.92rem; line-height:1.5; color:var(--ink); background:#fbfdfe; border:1.5px solid var(--rule); border-radius:7px; padding:11px 14px; cursor:pointer; transition:border-color .12s ease, background .12s ease}
+.opt:hover:not([disabled]){border-color:var(--rule-strong); background:#fff}
+.opt .mark{flex:0 0 auto; width:20px; height:20px; border-radius:50%; border:1.5px solid var(--rule-strong); display:flex; align-items:center; justify-content:center; font-size:.8rem; line-height:1; margin-top:1px; font-weight:600; color:transparent}
+.opt[disabled]{cursor:default}
+.opt.correct{border-color:var(--blue); background:var(--blue-wash); color:var(--blue); font-weight:500}
+.opt.correct .mark{border-color:var(--blue); background:var(--blue); color:#fff}
+.opt.incorrect{border-color:var(--wrong); background:var(--wrong-wash); color:var(--wrong)}
+.opt.incorrect .mark{border-color:var(--wrong); background:var(--wrong); color:#fff}
+.opt.dim{opacity:.5}
+.verdict{margin-top:14px; padding-top:13px; border-top:1px solid var(--rule); display:none}
+.verdict.show{display:block}
+.verdict .vt{font-family:var(--sans); font-size:.86rem; font-weight:600; margin:0 0 5px}
+.verdict.ok .vt{color:var(--blue)}
+.verdict.no .vt{color:var(--wrong)}
+.verdict p.why{margin:0; font-size:1rem; color:var(--ink-soft); max-width:60ch}
+.hintbtn{font-family:var(--sans); font-size:.76rem; background:transparent; border:1px solid var(--rule); border-radius:5px; color:var(--ink-faint); padding:5px 10px; cursor:pointer; margin-top:12px}
+.hintbtn:hover{color:var(--blue); border-color:var(--blue)}
+.hinttext{font-family:var(--sans); font-size:.84rem; color:var(--ink-soft); margin:10px 0 0; display:none; font-style:italic}
+.hinttext.show{display:block}
+
+.score{background:var(--sheet); border:2px solid var(--blue); border-radius:10px; padding:22px 24px; margin-top:18px; display:none}
+.score.show{display:block}
+.score h3{margin:0 0 6px; font-size:1.3rem}
+.score p{margin:0; color:var(--ink-soft); max-width:58ch}
+.score .big{font-family:var(--sans); font-size:2.4rem; font-weight:600; color:var(--blue); line-height:1; margin-bottom:10px; font-variant-numeric:tabular-nums}
+
+.toolbar{display:flex; gap:9px; flex-wrap:wrap; margin:18px 0 0}
+.tool{font-family:var(--sans); font-size:.8rem; font-weight:500; background:var(--sheet); color:var(--blue); border:1.5px solid var(--blue); border-radius:6px; padding:8px 15px; cursor:pointer}
+.tool:hover{background:var(--blue); color:#fff}
+.tool.ghost{border-color:var(--rule-strong); color:var(--ink-soft)}
+.tool.ghost:hover{background:var(--ink-soft); color:#fff; border-color:var(--ink-soft)}
+
+.foot{margin-top:60px; padding-top:22px; border-top:1px solid var(--rule); font-family:var(--sans); font-size:.82rem; color:var(--ink-faint); display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
+.foot a{color:var(--blue); text-decoration:none; font-weight:500}
+.foot a:hover{text-decoration:underline}
+.scrim{position:fixed; inset:var(--nav-h) 0 0 0; background:rgba(20,30,38,.42); z-index:35; display:none}
+.scrim.on{display:block}
+
+@media (max-width:1040px){
+  .burger{display:block}
+  .side{transform:translateX(-100%); transition:transform .22s ease; box-shadow:0 0 40px rgba(0,0,0,.14)}
+  .side.open{transform:translateX(0)}
+  .wrap{margin-left:0}
+  main{padding:0 22px 90px}
+  .nav-btn.hideable{display:none}
+}
+@media (max-width:620px){
+  body{font-size:17.5px}
+  .nav{gap:10px; padding:0 12px}
+  .nav-title{font-size:.94rem}
+  .nav-title span{display:none}
+  table.obs{font-size:.76rem}
+  table.obs input{font-size:.77rem; padding:8px 5px}
+  .sheet{padding:14px}
+}
+@media print{
+  .nav,.side,.scrim,.toolbar,.hintbtn{display:none!important}
+  .wrap{margin:0; padding:0}
+  main{max-width:none; padding:0}
+  body{background:#fff; font-size:11pt}
+  section{padding-top:20px}
+  h2.sec{page-break-after:avoid}
+  .sheet,.box,.qcard,figure.boxes,.rulebox,pre{page-break-inside:avoid}
+  textarea,input.line{min-height:62px; background:#fff}
+  .verdict{display:none!important}
+  a.link::after{content:' (' attr(href) ')'; font-size:8pt; color:#555}
+}
+
+/* ── Προσομοίωση: ο άνθρωπος που κινείται ── */
+#simbox canvas{display:block; width:100%; background:#fdfefe; border:1px solid var(--rule); border-radius:6px}
+#simbox .simline{margin-bottom:6px}
+#simbox input[type=range]{width:100%; margin:6px 0 10px; accent-color:var(--blue); cursor:pointer}
+#simbox .simread{display:flex; flex-wrap:wrap; gap:6px 22px; font-family:var(--sans); font-size:.82rem; color:var(--ink-soft); margin:0 0 12px}
+#simbox .simread b{color:var(--blue); font-variant-numeric:tabular-nums; font-weight:600}
+@media print{ #simbox .toolbar{display:none} }
+</style>
+</head>
+<body>
+<header class="nav">
+  <button class="burger" id="burger" aria-label="Άνοιγμα καταλόγου μαθημάτων" aria-expanded="false">☰</button>
+  <h1 class="nav-title"><a href="fysiki.html" title="Όλα τα μαθήματα Φυσικής">Μαθήματα Φυσικής Β΄ Γυμνασίου</a><span>Φύλλο μαθητή</span></h1>
+  <div class="nav-spacer"></div>
+  <div class="nav-actions">
+    <a class="nav-btn hideable" href="fysiki-03.html">Οδηγός καθηγητή</a>
+    <button class="nav-btn solid" id="printBtn">Εκτύπωση</button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<nav class="side" id="side" aria-label="Κατάλογος μαθημάτων">
+  <h2>Κεφάλαιο 1 · Εισαγωγή</h2>
+  <ol>
+    <li><a href="fysiki-01-mathitis.html"><span class="num">01</span><span class="ttl">Τι κάνει ο φυσικός;</span></a></li>
+    <li><a href="fysiki-02-mathitis.html"><span class="num">02</span><span class="ttl">Μεγέθη &amp; μονάδες</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 2 · Κινήσεις</h2>
+  <ol>
+    <li><a href="fysiki-03-mathitis.html" aria-current="page"><span class="num">03</span><span class="ttl">Περιγραφή της κίνησης</span></a></li>
+    <li><a href="fysiki-04-mathitis.html" class="pending"><span class="num">04</span><span class="ttl">Η έννοια της ταχύτητας</span></a></li>
+    <li><a href="fysiki-05-mathitis.html" class="pending"><span class="num">05</span><span class="ttl">Κίνηση με σταθερή ταχύτητα</span></a></li>
+    <li><a href="fysiki-06-mathitis.html" class="pending"><span class="num">06</span><span class="ttl">Μεταβαλλόμενη ταχύτητα</span></a></li>
+    <li><a href="fysiki-07-mathitis.html" class="pending"><span class="num">07</span><span class="ttl">Ελεύθερη πτώση</span></a></li>
+    <li><a href="fysiki-08-mathitis.html" class="pending"><span class="num">08</span><span class="ttl">Ολοκλήρωση: ανάλυση βίντεο</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 3 · Δυνάμεις</h2>
+  <ol>
+    <li><a href="fysiki-09-mathitis.html" class="pending"><span class="num">09</span><span class="ttl">Η έννοια της δύναμης</span></a></li>
+    <li><a href="fysiki-10-mathitis.html" class="pending"><span class="num">10</span><span class="ttl">Βάρος &amp; τριβή</span></a></li>
+    <li><a href="fysiki-11-mathitis.html" class="pending"><span class="num">11</span><span class="ttl">Ελατήρια &amp; νόμος του Χουκ</span></a></li>
+    <li><a href="fysiki-12-mathitis.html" class="pending"><span class="num">12</span><span class="ttl">Σύνθεση &amp; ανάλυση δυνάμεων</span></a></li>
+    <li><a href="fysiki-13-mathitis.html" class="pending"><span class="num">13</span><span class="ttl">Ισορροπία υλικού σημείου</span></a></li>
+    <li><a href="fysiki-14-mathitis.html" class="pending"><span class="num">14</span><span class="ttl">Πρώτος νόμος — αδράνεια</span></a></li>
+    <li><a href="fysiki-15-mathitis.html" class="pending"><span class="num">15</span><span class="ttl">Δεύτερος νόμος — F = m·a</span></a></li>
+    <li><a href="fysiki-16-mathitis.html" class="pending"><span class="num">16</span><span class="ttl">Τρίτος νόμος — αλληλεπίδραση</span></a></li>
+    <li><a href="fysiki-17-mathitis.html" class="pending"><span class="num">17</span><span class="ttl">Βολή, μέρος 1</span></a></li>
+    <li><a href="fysiki-18-mathitis.html" class="pending"><span class="num">18</span><span class="ttl">Βολή, μέρος 2</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 4 · Πίεση</h2>
+  <ol>
+    <li><a href="fysiki-19-mathitis.html" class="pending"><span class="num">19</span><span class="ttl">Πίεση</span></a></li>
+    <li><a href="fysiki-20-mathitis.html" class="pending"><span class="num">20</span><span class="ttl">Υδροστατική πίεση</span></a></li>
+    <li><a href="fysiki-21-mathitis.html" class="pending"><span class="num">21</span><span class="ttl">Ατμοσφαιρική πίεση</span></a></li>
+    <li><a href="fysiki-22-mathitis.html" class="pending"><span class="num">22</span><span class="ttl">Αρχή του Πασκάλ</span></a></li>
+    <li><a href="fysiki-23-mathitis.html" class="pending"><span class="num">23</span><span class="ttl">Άνωση — Αρχή του Αρχιμήδη</span></a></li>
+    <li><a href="fysiki-24-mathitis.html" class="pending"><span class="num">24</span><span class="ttl">Πλεύση &amp; πρόκληση σχεδιασμού</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 5 · Ενέργεια</h2>
+  <ol>
+    <li><a href="fysiki-25-mathitis.html" class="pending"><span class="num">25</span><span class="ttl">Έργο και ενέργεια</span></a></li>
+    <li><a href="fysiki-26-mathitis.html" class="pending"><span class="num">26</span><span class="ttl">Δυναμική &amp; κινητική ενέργεια</span></a></li>
+    <li><a href="fysiki-27-mathitis.html" class="pending"><span class="num">27</span><span class="ttl">Διατήρηση της ενέργειας</span></a></li>
+    <li><a href="fysiki-28-mathitis.html" class="pending"><span class="num">28</span><span class="ttl">Εκκρεμές με αισθητήρες</span></a></li>
+    <li><a href="fysiki-29-mathitis.html" class="pending"><span class="num">29</span><span class="ttl">Βαρύτητα &amp; τροχιές</span></a></li>
+  </ol>
+  <h2>Κλείσιμο</h2>
+  <ol>
+    <li><a href="fysiki-30-mathitis.html" class="pending"><span class="num">30</span><span class="ttl">Έκθεση φακέλου</span></a></li>
+  </ol>
+  <p class="side-note">Ο κύκλος σημαίνει ότι το φύλλο αυτού του μαθήματος δεν έχει γραφτεί ακόμη.</p>
+</nav>
+
+<div class="wrap">
+<main>
+
+  <div class="hero">
+    <p class="kicker">Εβδομάδα 3 · Φύλλο μαθητή</p>
+    <h1>Πού ακριβώς είσαι κάθε στιγμή;</h1>
+    <p class="hero-lede">Κάθεσαι σε μια καρέκλα. Κινείσαι; Η απάντηση είναι «εξαρτάται» — και σήμερα θα μάθεις από τι εξαρτάται, και πώς περιγράφουν οι φυσικοί μια κίνηση χωρίς να χρησιμοποιήσουν ούτε μία φορά τη λέξη «γρήγορα».</p>
+
+    <figure class="boxes">
+      <svg viewBox="0 0 520 150" role="img" aria-label="Δύο διαγράμματα κίνησης: τελείες με ίσα διαστήματα και τελείες με αυξανόμενα διαστήματα">
+        <g id="strobe"></g>
+      </svg>
+      <figcaption>Δύο περίπατοι, μία τελεία κάθε δευτερόλεπτο. Τι διαφέρει;</figcaption>
+    </figure>
+  </div>
+
+  <section id="idea">
+    <h2 class="sec">Πριν αρχίσεις</h2>
+    <p class="sec-sub">Μία ιδέα που αξίζει να κρατήσεις</p>
+    <div class="rulebox">
+      <span class="bt">Η ιδέα</span>
+      <p>Δεν υπάρχει «κινούμαι». Υπάρχει μόνο «κινούμαι <em>σε σχέση με κάτι</em>». Πριν περιγράψεις μια κίνηση, διάλεξε από πού την κοιτάς.</p>
+    </div>
+    <ul class="ask">
+      <li>Κάθεσαι στο λεωφορείο. Το λεωφορείο τρέχει. Κινείσαι σε σχέση με το κάθισμα; Σε σχέση με τον δρόμο; Σε σχέση με τον διπλανό επιβάτη;</li>
+      <li>Αυτή τη στιγμή, ακίνητος στην καρέκλα σου, πόσο γρήγορα κινείσαι σε σχέση με τον Ήλιο;</li>
+    </ul>
+    <div class="sheet">
+      <div class="field" style="margin-top:0; margin-bottom:0">
+        <label for="frame">Γράψε τρία πράγματα σε σχέση με τα οποία είσαι τώρα ακίνητος, και τρία σε σχέση με τα οποία κινείσαι.</label>
+        <textarea id="frame" placeholder="Ακίνητος σε σχέση με: … / Κινούμαι σε σχέση με: …"></textarea>
+      </div>
+    </div>
+    <p>Το «κάτι» από το οποίο κοιτάς λέγεται <strong>σημείο αναφοράς</strong> (reference point). Το ίδιο αυτοκίνητο είναι ακίνητο για τον οδηγό του και τρέχει με 100 km/h για το δέντρο στην άκρη του δρόμου. Και οι δύο έχουν δίκιο.</p>
+  </section>
+
+  <section id="diadromos">
+    <h2 class="sec">Το πείραμα του διαδρόμου</h2>
+    <p class="sec-sub">Φωτογραφίζεις την κίνησή σου, μία «λήψη» κάθε δευτερόλεπτο</p>
+
+    <p>Μια μεζούρα στο πάτωμα, από το 0 μέχρι τα 5 μέτρα. Εσύ περπατάς κατά μήκος της. Ο συνεργάτης σου λέει «τώρα» κάθε ένα δευτερόλεπτο — με μετρονόμο στο κινητό, όχι με το μυαλό. Σε κάθε «τώρα» αφήνεις ένα αυτοκόλλητο χαρτάκι δίπλα στο πόδι σου.</p>
+    <p>Όταν τελειώσεις, το πάτωμα έχει μια σειρά από χαρτάκια. Αυτό λέγεται <strong>διάγραμμα κίνησης</strong> (motion diagram): η κίνησή σου, παγωμένη σε στιγμιότυπα.</p>
+
+    <h3>Περίπατος Α — «ίδιο βήμα, ίδιος ρυθμός»</h3>
+    <div class="sheet">
+      <table class="meas">
+        <thead><tr><th style="width:34%">Χρονική στιγμή t (s)</th><th>Θέση x (m) — από το 0 της μεζούρας</th></tr></thead>
+        <tbody>
+          <tr><td class="lbl">0</td><td><input type="text" aria-label="Α t=0" placeholder="m"></td></tr>
+          <tr><td class="lbl">1</td><td><input type="text" aria-label="Α t=1"></td></tr>
+          <tr><td class="lbl">2</td><td><input type="text" aria-label="Α t=2"></td></tr>
+          <tr><td class="lbl">3</td><td><input type="text" aria-label="Α t=3"></td></tr>
+          <tr><td class="lbl">4</td><td><input type="text" aria-label="Α t=4"></td></tr>
+          <tr><td class="lbl">5</td><td><input type="text" aria-label="Α t=5"></td></tr>
+        </tbody>
+      </table>
+      <div class="field" style="margin-top:16px; margin-bottom:0">
+        <label for="apA">Τα χαρτάκια είναι σε ίσες αποστάσεις μεταξύ τους; Αν όχι, πού πύκνωσαν και γιατί;</label>
+        <textarea id="apA"></textarea>
+      </div>
+    </div>
+
+    <h3>Περίπατος Β — «πήγαινε και γύρνα»</h3>
+    <p>Ξεκίνα από το 1 m. Περπάτα μέχρι το 4 m. Γύρνα πίσω μέχρι το 2 m. Πάντα ένα χαρτάκι το δευτερόλεπτο.</p>
+    <div class="sheet">
+      <table class="meas">
+        <thead><tr><th style="width:34%">t (s)</th><th>x (m)</th></tr></thead>
+        <tbody>
+          <tr><td class="lbl">0</td><td><input type="text" aria-label="Β t=0" placeholder="1"></td></tr>
+          <tr><td class="lbl">1</td><td><input type="text" aria-label="Β t=1"></td></tr>
+          <tr><td class="lbl">2</td><td><input type="text" aria-label="Β t=2"></td></tr>
+          <tr><td class="lbl">3</td><td><input type="text" aria-label="Β t=3"></td></tr>
+          <tr><td class="lbl">4</td><td><input type="text" aria-label="Β t=4"></td></tr>
+          <tr><td class="lbl">5</td><td><input type="text" aria-label="Β t=5"></td></tr>
+          <tr><td class="lbl">6</td><td><input type="text" aria-label="Β t=6"></td></tr>
+        </tbody>
+      </table>
+      <div class="field" style="margin-top:16px"><label for="apostasi">Πόσα μέτρα περπάτησες συνολικά; (το <strong>διάστημα</strong>, distance)</label><input class="line" id="apostasi" type="text" placeholder="… m"></div>
+      <div class="field" style="margin-bottom:0"><label for="metatopisi">Πόσο μακριά είσαι από εκεί που ξεκίνησες, και προς ποια κατεύθυνση; (η <strong>μετατόπιση</strong>, displacement)</label><input class="line" id="metatopisi" type="text" placeholder="… m, προς …"></div>
+    </div>
+
+    <div class="rulebox">
+      <span class="bt">Η διαφορά που μπερδεύει τους πάντες</span>
+      <p>Το <em>διάστημα</em> είναι πόσο δρόμο έκανες. Η <em>μετατόπιση</em> είναι πόσο άλλαξε η θέση σου — από πού ξεκίνησες μέχρι πού κατέληξες, με πρόσημο. Αν γυρίσεις στο σημείο εκκίνησης, το διάστημα είναι μεγάλο και η μετατόπιση μηδέν.</p>
+    </div>
+  </section>
+
+  <section id="lexeis">
+    <h2 class="sec">Οι λέξεις της κίνησης</h2>
+    <p class="sec-sub">Έξι όροι που θα χρησιμοποιείς κάθε εβδομάδα από εδώ και πέρα</p>
+
+    <div class="sheet">
+      <table class="meas">
+        <thead><tr><th style="width:34%">Όρος</th><th>Τι σημαίνει</th><th>Από το πείραμα</th></tr></thead>
+        <tbody>
+          <tr><td class="lbl">Σημείο αναφοράς<br><em>reference point</em></td><td class="lbl">Από πού μετράω</td><td><input type="text" aria-label="σημείο αναφοράς" placeholder="το 0 της μεζούρας"></td></tr>
+          <tr><td class="lbl">Θέση, x<br><em>position</em></td><td class="lbl">Πού είμαι, σε σχέση με το σημείο αναφοράς</td><td><input type="text" aria-label="θέση" placeholder="π.χ. x = 3 m"></td></tr>
+          <tr><td class="lbl">Τροχιά<br><em>trajectory</em></td><td class="lbl">Η γραμμή που «ζωγραφίζει» η κίνηση</td><td><input type="text" aria-label="τροχιά" placeholder="ευθεία; καμπύλη;"></td></tr>
+          <tr><td class="lbl">Χρονική στιγμή, t<br><em>instant</em></td><td class="lbl">Ένα «τώρα» — ένα σημείο στον χρόνο</td><td><input type="text" aria-label="στιγμή" placeholder="t = 2 s"></td></tr>
+          <tr><td class="lbl">Χρονικό διάστημα, Δt<br><em>time interval</em></td><td class="lbl">Πόσος χρόνος πέρασε ανάμεσα σε δύο στιγμές</td><td><input type="text" aria-label="διάστημα χρόνου" placeholder="από t=1 έως t=4: Δt = …"></td></tr>
+          <tr><td class="lbl">Μετατόπιση, Δx<br><em>displacement</em></td><td class="lbl">Πόσο άλλαξε η θέση: τελική – αρχική</td><td><input type="text" aria-label="μετατόπιση" placeholder="Δx = x₂ − x₁ = …"></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <p>Το <strong>Δ</strong> (δέλτα) είναι το ελληνικό γράμμα που οι φυσικοί όλου του κόσμου χρησιμοποιούν για να πουν «αλλαγή». Δx = αλλαγή θέσης. Δt = αλλαγή χρόνου. Θα το βλέπεις παντού, και τώρα ξέρεις ότι είναι απλώς «τελικό μείον αρχικό».</p>
+
+    <div class="box safety">
+      <p class="bt">Το πρόσημο έχει νόημα</p>
+      <p>Μετατόπιση −2 m δεν σημαίνει «λάθος». Σημαίνει «2 μέτρα προς την αρνητική κατεύθυνση» — προς τα πίσω, αν έχεις ορίσει το μπροστά ως θετικό. Η θέση x = −3 m σημαίνει «3 μέτρα από την άλλη πλευρά του σημείου αναφοράς». Το μείον είναι κατεύθυνση, όχι σφάλμα.</p>
+    </div>
+  </section>
+
+  <section id="sim">
+    <h2 class="sec">Ο άνθρωπος που κινείται</h2>
+    <p class="sec-sub">Μια προσομοίωση μέσα στη σελίδα — σέρνε τη θέση και δες τη γραφική να γράφεται</p>
+
+    <div class="box digital">
+      <p class="bt">Πώς δουλεύει</p>
+      <p>Πάτα <em>Καταγραφή</em> και σύρε τον άνθρωπο πάνω στον άξονα. Για δέκα δευτερόλεπτα, η σελίδα σημειώνει πού είναι κάθε στιγμή και ζωγραφίζει το <strong>διάγραμμα θέσης–χρόνου</strong> (x–t). Δίπλα βλέπεις ζωντανά το διάστημα και τη μετατόπιση.</p>
+    </div>
+
+    <div class="sheet" id="simbox">
+      <div class="simline"><canvas id="lineCv" width="700" height="96" aria-label="Άξονας θέσης με τον άνθρωπο"></canvas></div>
+      <input type="range" id="posSlider" min="-10" max="10" step="0.1" value="0" aria-label="Θέση του ανθρώπου σε μέτρα">
+      <div class="simread">
+        <span>t = <b id="rT">0.0</b> s</span>
+        <span>x = <b id="rX">0.0</b> m</span>
+        <span>διάστημα = <b id="rD">0.0</b> m</span>
+        <span>μετατόπιση Δx = <b id="rDx">0.0</b> m</span>
+      </div>
+      <canvas id="graphCv" width="700" height="240" aria-label="Διάγραμμα θέσης-χρόνου"></canvas>
+      <div class="toolbar" style="margin-top:12px">
+        <button class="tool" id="simStart">Καταγραφή</button>
+        <button class="tool ghost" id="simClear">Καθαρισμός</button>
+      </div>
+    </div>
+
+    <h3>Τρεις αποστολές στην προσομοίωση</h3>
+    <div class="sheet">
+      <div class="field" style="margin-top:0"><label for="s1">Κάνε τη γραφική μια <strong>οριζόντια</strong> γραμμή. Τι έκανες με τον άνθρωπο;</label><input class="line" id="s1" type="text"></div>
+      <div class="field"><label for="s2">Κάνε τη γραφική μια <strong>ίσια γραμμή που ανεβαίνει</strong>. Τι σημαίνει αυτό για την κίνηση; Πώς μοιάζει με τον Περίπατο Α;</label><textarea id="s2"></textarea></div>
+      <div class="field" style="margin-bottom:0"><label for="s3">Κάνε τη μετατόπιση Δx να είναι <strong>μηδέν</strong> ενώ το διάστημα είναι μεγάλο. Πώς μοιάζει η γραφική;</label><textarea id="s3"></textarea></div>
+    </div>
+
+    <div class="box digital">
+      <p class="bt">Το πρωτότυπο, αν θέλεις</p>
+      <p>Η ιδέα προέρχεται από το PhET <a class="link" href="https://phet.colorado.edu/el/simulations/moving-man">The Moving Man</a> — παλιότερη προσομοίωση που τρέχει με έναν ειδικό μεταφραστή Java και μπορεί να αργεί να ανοίξει. Αν φορτώσει, έχει και το διάγραμμα ταχύτητας, που θα το χρειαστούμε την επόμενη εβδομάδα. Εναλλακτικά, το <a class="link" href="https://ophysics.com/k1.html">oPhysics — Position &amp; Velocity Graphs</a>.</p>
+    </div>
+  </section>
+
+  <section id="kodikas">
+    <h2 class="sec">Ο κώδικας: διάγραμμα κίνησης από τον υπολογιστή</h2>
+    <p class="sec-sub">Το ίδιο πείραμα, χωρίς χαρτάκια</p>
+
+    <p>Την Εβδομάδα 1 έγραψες ένα σώμα που κινείται. Σήμερα του ζητάς να αφήνει «χαρτάκι» — μια τελεία — σε τακτά διαστήματα. Στο <a class="link" href="https://www.glowscript.org">glowscript.org</a>:</p>
+
+<pre><span class="c"># Διάγραμμα κίνησης — Εβδομάδα 3</span>
+Web VPython 3.2
+
+soma = sphere(pos=vector(-5,0,0), radius=0.25, color=color.orange,
+              make_trail=True, trail_type=<span class="s">"points"</span>, interval=50)
+
+v  = vector(1.5,0,0)
+dt = 0.01
+t  = 0
+
+<span class="k">while</span> t &lt; 6:
+    rate(100)
+    soma.pos = soma.pos + v*dt
+    t = t + dt
+</pre>
+
+    <p>Το <code>make_trail=True</code> με <code>trail_type="points"</code> αφήνει μια τελεία κάθε 50 βήματα — δηλαδή κάθε μισό δευτερόλεπτο. Είναι ο συνεργάτης σου που λέει «τώρα», μόνο που δεν κάνει ποτέ λάθος στον ρυθμό.</p>
+
+    <div class="sheet">
+      <div class="field" style="margin-top:0"><label for="c1">Πριν το τρέξεις: πώς θα είναι τοποθετημένες οι τελείες — σε ίσες αποστάσεις ή όχι; Γιατί;</label><input class="line" id="c1" type="text"></div>
+      <div class="field"><label for="c2">Άλλαξε το <code>v</code> σε <code>vector(-1.5,0,0)</code>. Τι άλλαξε; Τι σημαίνει το μείον;</label><input class="line" id="c2" type="text"></div>
+      <div class="field" style="margin-bottom:0"><label for="c3">Πρόκληση: κάνε το σώμα να πάει δεξιά για 3 δευτερόλεπτα και μετά αριστερά για 3. Χρειάζεσαι ένα <code>if t &gt; 3:</code> μέσα στον βρόχο. Γράψε εδώ τι έβαλες μέσα στο if.</label><textarea id="c3"></textarea></div>
+    </div>
+
+    <div class="box digital">
+      <p class="bt">Going further — η γραφική από τον κώδικα</p>
+      <p>Πρόσθεσε πάνω από τον βρόχο <code>g = gcurve(color=color.blue)</code> και μέσα στον βρόχο <code>g.plot(t, soma.pos.x)</code>. Το GlowScript θα ανοίξει από μόνο του ένα διάγραμμα x–t δίπλα στο 3D. Σύγκρινέ το με αυτό που ζωγράφισε η προσομοίωση της σελίδας.</p>
+    </div>
+  </section>
+
+  <section id="kouiz">
+    <h2 class="sec">Έλεγξε τον εαυτό σου</h2>
+    <p class="sec-sub">Πέντε ερωτήσεις. Κάνε κλικ σε μια απάντηση και θα δεις αμέσως αν είναι σωστή. Δεν μπαίνει βαθμός πουθενά.</p>
+    <div id="quiz"></div>
+    <div class="score" id="score" role="status" aria-live="polite">
+      <div class="big" id="scoreBig">0 / 5</div>
+      <h3 id="scoreTitle"></h3>
+      <p id="scoreText"></p>
+    </div>
+    <div class="toolbar"><button class="tool ghost" id="quizReset">Ξαναπροσπάθησε</button></div>
+  </section>
+
+  <section id="apostoli">
+    <h2 class="sec">Η αποστολή σου</h2>
+    <p class="sec-sub">Για το σπίτι, αν σου αρέσει</p>
+    <p>Βιντεοσκόπησε με το κινητό κάτι που κινείται σε ευθεία για 5 δευτερόλεπτα — ένα ποδήλατο, έναν σκύλο που τρέχει, εσένα να περπατάς. Κράτα το κινητό <strong>ακίνητο</strong>. Μετά, παύση κάθε ένα δευτερόλεπτο και σημείωσε πού βρίσκεται. Ζωγράφισε το διάγραμμα κίνησης στο τετράδιο.</p>
+    <p>Φύλαξε το βίντεο. Την Εβδομάδα 5 θα το ανοίξεις σε ένα πρόγραμμα που θα σου βγάλει τη θέση κάθε καρέ μόνο του, και θα δεις πόσο κοντά έπεσες με το χέρι.</p>
+
+    <div class="box">
+      <p class="bt" style="color:var(--blue)">Στο τετράδιο</p>
+      <p>Ένα μικρό κόμικ δύο καρέ: το ίδιο αυτοκίνητο, από τη ματιά του οδηγού και από τη ματιά κάποιου στο πεζοδρόμιο. Στο πρώτο καρέ το αυτοκίνητο είναι ακίνητο. Στο δεύτερο τρέχει. Και τα δύο είναι σωστά — αυτό είναι το σημείο αναφοράς, ζωγραφισμένο.</p>
+    </div>
+
+    <div class="toolbar">
+      <button class="tool" id="printBtn2">Εκτύπωση φύλλου</button>
+      <button class="tool ghost" id="clearAll">Καθάρισε τι έγραψα</button>
+    </div>
+
+    <div class="foot">
+      <span>Εβδομάδα 3 από 30</span>
+      <a href="fysiki-04-mathitis.html">Επόμενο: Η έννοια της ταχύτητας</a>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+
+  /* Hero: δύο διαγράμματα κίνησης */
+  var g=document.getElementById('strobe');
+  if(g){
+    function mk(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);g.appendChild(e);return e;}
+    function row(y,xs,label){
+      mk('line',{x1:40,y1:y,x2:480,y2:y,stroke:'#c0cad2','stroke-width':1});
+      for(var m=0;m<=5;m++){var x=60+m*84;mk('line',{x1:x,y1:y-5,x2:x,y2:y+5,stroke:'#b3bfc9','stroke-width':1});
+        var tt=mk('text',{x:x,y:y+20,'text-anchor':'middle','font-family':"'IBM Plex Sans',sans-serif",'font-size':9,fill:'#78868f'});tt.textContent=m+' m';}
+      xs.forEach(function(px,i){
+        mk('circle',{cx:60+px*84,cy:y,r:6,fill:i===0?'#a8571f':'#17456b'});
+        var t=mk('text',{x:60+px*84,y:y-13,'text-anchor':'middle','font-family':"'IBM Plex Sans',sans-serif",'font-size':9,fill:'#47555f'});t.textContent=i+' s';
+      });
+      var l=mk('text',{x:40,y:y-30,'font-family':"'IBM Plex Sans',sans-serif",'font-size':11,fill:'#17456b','font-weight':600});l.textContent=label;
+    }
+    row(52,[0,0.8,1.6,2.4,3.2,4.0],'Περίπατος 1');
+    row(122,[0,0.3,0.8,1.6,2.7,4.2],'Περίπατος 2');
+  }
+
+  /* Drawer */
+  var side=document.getElementById('side'),burger=document.getElementById('burger'),scrim=document.getElementById('scrim');
+  function setDrawer(o){side.classList.toggle('open',o);scrim.classList.toggle('on',o);burger.setAttribute('aria-expanded',o?'true':'false');}
+  burger.addEventListener('click',function(){setDrawer(!side.classList.contains('open'));});
+  scrim.addEventListener('click',function(){setDrawer(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setDrawer(false);});
+
+  /* ── Ο άνθρωπος που κινείται ─────────────────────────────── */
+  var lineCv=document.getElementById('lineCv'), graphCv=document.getElementById('graphCv');
+  var slider=document.getElementById('posSlider');
+  var rT=document.getElementById('rT'), rX=document.getElementById('rX'), rD=document.getElementById('rD'), rDx=document.getElementById('rDx');
+  var startBtn=document.getElementById('simStart'), clearBtn=document.getElementById('simClear');
+  var DUR=10, samples=[], running=false, t0=null, raf=null, dist=0, lastX=null, x0=0;
+  var blue=getComputedStyle(document.documentElement).getPropertyValue('--blue').trim()||'#17456b';
+
+  function fit(cv){
+    var dpr=window.devicePixelRatio||1, w=cv.clientWidth||cv.width, hgt=parseInt(cv.getAttribute('height'),10);
+    cv.width=Math.round(w*dpr); cv.height=Math.round(hgt*dpr); cv.style.height=hgt+'px';
+    var c=cv.getContext('2d'); c.setTransform(dpr,0,0,dpr,0,0); return {c:c,w:w,h:hgt};
+  }
+  function drawLine(){
+    var o=fit(lineCv), c=o.c, w=o.w, h=o.h, pad=28, y=62;
+    c.clearRect(0,0,w,h);
+    c.strokeStyle='#b3bfc9'; c.lineWidth=1.2; c.beginPath(); c.moveTo(pad,y); c.lineTo(w-pad,y); c.stroke();
+    c.font='10px "IBM Plex Sans",sans-serif'; c.fillStyle='#78868f'; c.textAlign='center';
+    for(var m=-10;m<=10;m+=2){var px=pad+(m+10)/20*(w-2*pad);
+      c.beginPath(); c.moveTo(px,y-5); c.lineTo(px,y+5); c.stroke(); c.fillText(m+' m',px,y+20);}
+    var x=parseFloat(slider.value), px=pad+(x+10)/20*(w-2*pad);
+    /* ο άνθρωπος */
+    c.strokeStyle=blue; c.fillStyle=blue; c.lineWidth=2.2; c.lineCap='round';
+    c.beginPath(); c.arc(px,y-38,6,0,Math.PI*2); c.fill();
+    c.beginPath(); c.moveTo(px,y-31); c.lineTo(px,y-14); c.moveTo(px-9,y-26); c.lineTo(px+9,y-26);
+    c.moveTo(px,y-14); c.lineTo(px-7,y-2); c.moveTo(px,y-14); c.lineTo(px+7,y-2); c.stroke();
+    c.fillStyle='#a8571f'; c.beginPath(); c.arc(px,y,3.5,0,Math.PI*2); c.fill();
+  }
+  function drawGraph(){
+    var o=fit(graphCv), c=o.c, w=o.w, h=o.h, L=44, R=14, T=14, B=30;
+    c.clearRect(0,0,w,h);
+    var gx=function(t){return L+t/DUR*(w-L-R);}, gy=function(x){return T+(10-x)/20*(h-T-B);};
+    c.strokeStyle='#e3e9ee'; c.lineWidth=1;
+    for(var t=0;t<=DUR;t+=1){c.beginPath(); c.moveTo(gx(t),T); c.lineTo(gx(t),h-B); c.stroke();}
+    for(var x=-10;x<=10;x+=5){c.beginPath(); c.moveTo(L,gy(x)); c.lineTo(w-R,gy(x)); c.stroke();}
+    c.strokeStyle='#8fa2b3'; c.lineWidth=1.2;
+    c.beginPath(); c.moveTo(L,gy(0)); c.lineTo(w-R,gy(0)); c.stroke();
+    c.beginPath(); c.moveTo(L,T); c.lineTo(L,h-B); c.stroke();
+    c.font='10px "IBM Plex Sans",sans-serif'; c.fillStyle='#78868f';
+    c.textAlign='center'; for(var t2=0;t2<=DUR;t2+=2){c.fillText(t2+' s',gx(t2),h-B+16);}
+    c.textAlign='right'; for(var x2=-10;x2<=10;x2+=5){c.fillText(x2+' m',L-6,gy(x2)+3);}
+    c.textAlign='left'; c.fillStyle='#47555f'; c.font='600 10px "IBM Plex Sans",sans-serif';
+    c.fillText('θέση x',L+4,T+10); c.textAlign='right'; c.fillText('χρόνος t',w-R,h-B+28);
+    if(samples.length>1){
+      c.strokeStyle=blue; c.lineWidth=2.4; c.lineJoin='round'; c.beginPath();
+      samples.forEach(function(s,i){var X=gx(s[0]),Y=gy(s[1]); if(i===0)c.moveTo(X,Y); else c.lineTo(X,Y);});
+      c.stroke();
+    }
+    if(samples.length){
+      var s=samples[samples.length-1]; c.fillStyle='#a8571f'; c.beginPath(); c.arc(gx(s[0]),gy(s[1]),4,0,Math.PI*2); c.fill();
+    }
+  }
+  function readout(t){
+    var x=parseFloat(slider.value);
+    rT.textContent=t.toFixed(1); rX.textContent=x.toFixed(1);
+    rD.textContent=dist.toFixed(1); rDx.textContent=(x-x0).toFixed(1);
+  }
+  function tick(){
+    var t=(performance.now()-t0)/1000;
+    var x=parseFloat(slider.value);
+    if(lastX!==null) dist+=Math.abs(x-lastX);
+    lastX=x;
+    samples.push([Math.min(t,DUR),x]);
+    readout(Math.min(t,DUR)); drawGraph();
+    if(t>=DUR){ stop(); return; }
+    raf=requestAnimationFrame(tick);
+  }
+  function stop(){ running=false; cancelAnimationFrame(raf); startBtn.textContent='Καταγραφή'; }
+  startBtn.addEventListener('click',function(){
+    if(running){ stop(); return; }
+    samples=[]; dist=0; lastX=null; x0=parseFloat(slider.value); t0=performance.now(); running=true;
+    startBtn.textContent='Σταμάτα'; raf=requestAnimationFrame(tick);
+  });
+  clearBtn.addEventListener('click',function(){ stop(); samples=[]; dist=0; lastX=null; x0=parseFloat(slider.value); readout(0); drawGraph(); });
+  slider.addEventListener('input',function(){ drawLine(); if(!running){ readout(0); } });
+  window.addEventListener('resize',function(){ drawLine(); drawGraph(); });
+  drawLine(); drawGraph(); readout(0);
+
+  /* Quiz */
+  var QS=[
+    {q:'Κάθεσαι σε λεωφορείο που τρέχει σταθερά. Σε σχέση με <strong>ποιο</strong> από τα παρακάτω <em>δεν</em> κινείσαι;',
+     hint:'Τι μένει στην ίδια απόσταση από εσένα όλη την ώρα;',
+     opts:['Τον δρόμο','Τα δέντρα έξω','Το κάθισμά σου','Έναν πεζό στη στάση'],
+     a:2, ok:'Σωστά.', no:'Όχι ακόμα.',
+     why:'Η απόστασή σου από το κάθισμα δεν αλλάζει, άρα ως προς αυτό είσαι ακίνητος. Ως προς τον δρόμο, τα δέντρα και τον πεζό, κινείσαι. Όλα σωστά — αλλάζει μόνο το σημείο αναφοράς.'},
+
+    {q:'Περπατάς από το x = 1 m στο x = 5 m και γυρίζεις στο x = 3 m. Ποιο είναι το <strong>διάστημα</strong> και ποια η <strong>μετατόπιση</strong>;',
+     hint:'Το ένα μετράει δρόμο, το άλλο μετράει αλλαγή θέσης.',
+     opts:['Διάστημα 6 m, μετατόπιση +2 m','Διάστημα 2 m, μετατόπιση 6 m','Και τα δύο 6 m','Διάστημα 4 m, μετατόπιση −2 m'],
+     a:0, ok:'Ακριβώς.', no:'Ξαναδές τι μετράει το καθένα.',
+     why:'Δρόμος: 4 m προς τα εμπρός + 2 m πίσω = 6 m. Αλλαγή θέσης: από το 1 στο 3, δηλαδή +2 m.'},
+
+    {q:'Σε ένα διάγραμμα κίνησης (μία τελεία το δευτερόλεπτο) οι τελείες είναι όλες σε <strong>ίσες</strong> αποστάσεις. Τι λέει αυτό;',
+     hint:'Ίδιος χρόνος ανάμεσα στις τελείες — και ίδιο διάστημα.',
+     opts:['Το σώμα είναι ακίνητο','Το σώμα διανύει ίσα διαστήματα σε ίσους χρόνους','Το σώμα επιταχύνει','Δεν λέει τίποτα'],
+     a:1, ok:'Ναι.', no:'Κοίτα τι σημαίνει ίση απόσταση σε ίσο χρόνο.',
+     why:'Ίσα διαστήματα σε ίσους χρόνους: ο ρυθμός της κίνησης δεν αλλάζει. Την επόμενη εβδομάδα αυτό θα πάρει όνομα.'},
+
+    {q:'Η μετατόπιση ενός σώματος είναι Δx = −4 m. Τι σημαίνει το μείον;',
+     hint:'Το μείον δεν είναι λάθος.',
+     opts:['Έγινε λάθος στη μέτρηση','Το σώμα κινήθηκε 4 m προς την αρνητική κατεύθυνση','Το σώμα δεν κινήθηκε','Το σώμα κινήθηκε 4 m προς τα πάνω'],
+     a:1, ok:'Σωστά.', no:'Το πρόσημο είναι πληροφορία.',
+     why:'Το πρόσημο της μετατόπισης δηλώνει κατεύθυνση σε σχέση με τον άξονα που όρισες. −4 m σημαίνει «4 μέτρα προς τα εκεί που ονόμασες αρνητικά».'},
+
+    {q:'Στην προσομοίωση, μια <strong>οριζόντια</strong> γραμμή στο διάγραμμα x–t σημαίνει ότι…',
+     hint:'Τι έκανες για να την πετύχεις;',
+     opts:['Ο άνθρωπος κινείται με σταθερό ρυθμό','Ο άνθρωπος είναι ακίνητος','Ο άνθρωπος βρίσκεται στο x = 0','Ο χρόνος σταμάτησε'],
+     a:1, ok:'Ναι.', no:'Σκέψου τι δείχνει ο κατακόρυφος άξονας.',
+     why:'Ο κατακόρυφος άξονας είναι η θέση. Αν η γραμμή δεν ανεβαίνει ούτε κατεβαίνει, η θέση δεν αλλάζει — ακινησία, όπου κι αν βρίσκεται ο άνθρωπος. Το «θετική θέση = κίνηση» είναι ένα από τα πιο συχνά μπερδέματα.'}
+  ];
+
+  var answered=0,right=0;
+  var quiz=document.getElementById('quiz');
+  var scoreEl=document.getElementById('score'),scoreBig=document.getElementById('scoreBig'),
+      scoreTitle=document.getElementById('scoreTitle'),scoreText=document.getElementById('scoreText');
+
+  function build(){
+    quiz.innerHTML=''; answered=0; right=0; scoreEl.classList.remove('show');
+    QS.forEach(function(item,qi){
+      var card=document.createElement('div'); card.className='qcard';
+      var head='<div class="qhead"><span class="qnum">'+(qi+1)+'</span><p class="qtext">'+item.q+'</p></div>';
+      var opts='<div class="opts" role="group" aria-label="Επιλογές ερώτησης '+(qi+1)+'">';
+      item.opts.forEach(function(o,oi){
+        opts+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'"><span class="mark" aria-hidden="true"></span><span>'+o+'</span></button>';
+      });
+      opts+='</div>';
+      var extra='<button class="hintbtn" data-hint="'+qi+'">Δώσε μου μια βοήθεια</button>'+
+                '<p class="hinttext" id="hint'+qi+'">'+item.hint+'</p>'+
+                '<div class="verdict" id="v'+qi+'"><p class="vt"></p><p class="why">'+item.why+'</p></div>';
+      card.innerHTML=head+opts+extra;
+      quiz.appendChild(card);
+    });
+  }
+  quiz.addEventListener('click',function(e){
+    var hb=e.target.closest('.hintbtn');
+    if(hb){document.getElementById('hint'+hb.dataset.hint).classList.add('show'); hb.remove(); return;}
+    var btn=e.target.closest('.opt');
+    if(!btn||btn.disabled) return;
+    var qi=+btn.dataset.q, oi=+btn.dataset.o, item=QS[qi], card=btn.closest('.qcard');
+    card.querySelectorAll('.opt').forEach(function(b){b.disabled=true;b.classList.add('dim');});
+    var ok=card.querySelector('.opt[data-o="'+item.a+'"]');
+    ok.classList.remove('dim'); ok.classList.add('correct'); ok.querySelector('.mark').textContent='✓';
+    var v=document.getElementById('v'+qi);
+    if(oi===item.a){right++; v.classList.add('ok'); v.querySelector('.vt').textContent=item.ok;}
+    else{btn.classList.remove('dim'); btn.classList.add('incorrect'); btn.querySelector('.mark').textContent='✕';
+         v.classList.add('no'); v.querySelector('.vt').textContent=item.no;}
+    v.classList.add('show');
+    answered++; if(answered===QS.length) finish();
+  });
+  function finish(){
+    scoreBig.textContent=right+' / '+QS.length;
+    var t,x;
+    if(right===5){t='Πλήρες.';x='Σημείο αναφοράς, θέση, μετατόπιση, διάστημα — και ξέρεις να διαβάζεις ένα x–t. Την επόμενη εβδομάδα η κλίση αυτής της γραμμής παίρνει όνομα.';}
+    else if(right===4){t='Πολύ καλά.';x='Ένα σου ξέφυγε. Διάβασε την εξήγησή του και θα κάτσει αμέσως.';}
+    else if(right===3){t='Καλή αρχή.';x='Οι μισές ιδέες είναι εκεί. Ξαναδές τις εξηγήσεις των υπολοίπων και ρώτα ό,τι δεν βγάζει νόημα.';}
+    else{t='Αξίζει μια δεύτερη ματιά.';x='Δεν πειράζει — διάστημα και μετατόπιση μπερδεύονται μέχρι και σε πανεπιστήμιο. Ξαναπαίξε με την προσομοίωση και ξαναπροσπάθησε.';}
+    scoreTitle.textContent=t; scoreText.textContent=x;
+    scoreEl.classList.add('show'); scoreEl.scrollIntoView({block:'nearest'});
+  }
+  document.getElementById('quizReset').addEventListener('click',function(){build();document.getElementById('kouiz').scrollIntoView();});
+
+  function doPrint(){window.print();}
+  document.getElementById('printBtn').addEventListener('click',doPrint);
+  document.getElementById('printBtn2').addEventListener('click',doPrint);
+  document.getElementById('clearAll').addEventListener('click',function(){
+    if(!confirm('Να σβηστούν όλα όσα έγραψες σε αυτό το φύλλο;')) return;
+    document.querySelectorAll('main input[type="text"], main textarea').forEach(function(f){f.value='';});
+  });
+  build();
+})();
+</script>
+</body>
+</html>

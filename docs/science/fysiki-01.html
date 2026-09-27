@@ -1,0 +1,640 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Εβδομάδα 1 · Πώς ξέρουμε ότι κάτι είναι αλήθεια; — Μαθήματα Φυσικής Β΄ Γυμνασίου</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141e26; --ink-soft:#47555f; --ink-faint:#78868f;
+  --ground:#f0f3f6; --sheet:#ffffff; --rule:#d4dce3; --rule-strong:#b3bfc9;
+
+  /* Φυσική: μπλε = δομή · κεχριμπάρι = ασφάλεια · πράσινο = ψηφιακά */
+  --blue:#17456b; --blue-wash:#e5ecf3;
+  --amber:#a8571f; --amber-wash:#f8efe4;
+  --teal:#0f5d52; --teal-wash:#e7f0ec;
+
+  --serif:'Alegreya', Georgia, 'Times New Roman', serif;
+  --sans:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --nav-h:60px; --side-w:288px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0; background:var(--ground); color:var(--ink); font-family:var(--serif); font-size:18px; line-height:1.68; -webkit-font-smoothing:antialiased}
+
+.nav{position:fixed; inset:0 0 auto 0; height:var(--nav-h); z-index:50; display:flex; align-items:center; gap:16px; padding:0 20px; background:var(--blue); color:#e8eef4; border-bottom:1px solid #0e3252}
+.nav-title{font-family:var(--serif); font-weight:700; font-size:1.06rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.nav-title span{display:block; font-family:var(--sans); font-weight:400; font-size:.7rem; color:#9db9d0; line-height:1.2; margin-top:1px}
+.nav-title a{color:inherit; text-decoration:none}
+.nav-title a:hover{text-decoration:underline; text-underline-offset:3px}
+.burger{display:none; background:none; border:1px solid rgba(255,255,255,.28); color:inherit; border-radius:5px; width:36px; height:34px; cursor:pointer; font-size:1.05rem; line-height:1; flex:0 0 auto}
+.nav-spacer{flex:1}
+.timer{display:flex; align-items:center; gap:10px; font-family:var(--sans); flex:0 0 auto}
+.timer-read{min-width:132px; text-align:right; line-height:1.15}
+.timer-clock{font-size:1.02rem; font-weight:600; font-variant-numeric:tabular-nums; display:block}
+.timer-seg{font-size:.68rem; color:#9db9d0; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:210px}
+.timer-btn{font-family:var(--sans); font-size:.78rem; font-weight:500; background:#e8eef4; color:var(--blue); border:0; border-radius:5px; padding:8px 13px; cursor:pointer; text-decoration:none; display:inline-block}
+.timer-btn:hover{background:#fff}
+.timer-btn.reset{background:transparent; color:#9db9d0; border:1px solid rgba(255,255,255,.25)}
+.timer-btn.reset:hover{color:#e8eef4}
+:focus-visible{outline:2.5px solid #f0b27a; outline-offset:2px}
+
+.side{position:fixed; top:var(--nav-h); bottom:0; left:0; width:var(--side-w); z-index:40; overflow-y:auto; background:var(--sheet); border-right:1px solid var(--rule); font-family:var(--sans); padding:20px 0 48px}
+.side h2{font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--ink-faint); margin:22px 20px 8px; padding-top:14px; border-top:1px solid var(--rule)}
+.side h2:first-child{border-top:0; padding-top:0; margin-top:4px}
+.side ol{list-style:none; margin:0; padding:0}
+.side a{display:grid; grid-template-columns:30px 1fr; align-items:baseline; gap:4px; padding:6px 20px 6px 16px; text-decoration:none; color:var(--ink-soft); font-size:.83rem; line-height:1.35; border-left:3px solid transparent}
+.side a:hover{background:var(--blue-wash); color:var(--ink)}
+.side .num{font-variant-numeric:tabular-nums; font-size:.74rem; color:var(--ink-faint)}
+.side a[aria-current="page"]{border-left-color:var(--blue); background:var(--blue-wash); color:var(--blue); font-weight:600}
+.side a[aria-current="page"] .num{color:var(--blue)}
+.side a.pending{color:#9aa6ad}
+.side a.pending .ttl::after{content:''; display:inline-block; width:5px; height:5px; margin-left:7px; border:1px solid #c0cad2; border-radius:50%; vertical-align:.12em}
+.side-note{font-size:.72rem; color:var(--ink-faint); line-height:1.5; margin:20px 20px 0; padding-top:14px; border-top:1px solid var(--rule)}
+
+.wrap{margin-left:var(--side-w); padding-top:var(--nav-h)}
+main{max-width:830px; margin:0 auto; padding:0 32px 120px}
+
+.hero{padding:52px 0 34px; border-bottom:1px solid var(--rule)}
+.hero-week{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--blue); margin:0 0 10px}
+.hero h1{font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.6vw,2.9rem); line-height:1.14; margin:0 0 18px; letter-spacing:-.012em; max-width:16ch}
+.hero-lede{font-size:1.12rem; color:var(--ink-soft); max-width:60ch; margin:0 0 26px}
+.hero-lede em{color:var(--ink); font-style:italic}
+.facts{display:flex; flex-wrap:wrap; gap:0; font-family:var(--sans); font-size:.79rem; border:1px solid var(--rule); border-radius:7px; overflow:hidden; background:var(--sheet)}
+.fact{padding:11px 16px; border-right:1px solid var(--rule); flex:1 1 auto}
+.fact:last-child{border-right:0}
+.fact dt{color:var(--ink-faint); font-size:.71rem; margin-bottom:2px}
+.fact dd{margin:0; font-weight:500; color:var(--ink)}
+
+figure.boxes{margin:34px 0 0; padding:26px 22px 20px; background:var(--sheet); border:1px solid var(--rule); border-radius:8px}
+figure.boxes svg{display:block; width:100%; height:auto; max-width:520px; margin:0 auto}
+figure.boxes figcaption{font-family:var(--sans); font-size:.79rem; color:var(--ink-soft); margin-top:16px; text-align:center; line-height:1.55; max-width:56ch; margin-left:auto; margin-right:auto}
+figure.boxes figcaption b{color:var(--amber); font-weight:600}
+
+section{padding-top:46px}
+h2.sec{font-family:var(--serif); font-weight:700; font-size:1.62rem; line-height:1.2; margin:0 0 6px; letter-spacing:-.008em}
+.sec-sub{font-family:var(--sans); font-size:.79rem; color:var(--ink-faint); margin:0 0 22px}
+h3{font-family:var(--serif); font-weight:700; font-size:1.2rem; margin:30px 0 8px}
+h4{font-family:var(--sans); font-weight:600; font-size:.92rem; margin:22px 0 6px}
+p{margin:0 0 14px; max-width:68ch}
+a.link{color:var(--teal); text-underline-offset:3px; text-decoration-thickness:1px}
+a.link:hover{background:var(--teal-wash)}
+ul,ol.body{max-width:66ch; padding-left:22px; margin:0 0 16px}
+li{margin-bottom:7px}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:.86em; background:#eef2f5; padding:1px 5px; border-radius:3px}
+
+table{width:100%; border-collapse:collapse; font-family:var(--sans); font-size:.83rem; background:var(--sheet); border:1px solid var(--rule); border-radius:8px; overflow:hidden; margin:16px 0 22px}
+th,td{padding:9px 13px; text-align:right; border-bottom:1px solid var(--rule); vertical-align:top}
+th{background:var(--blue-wash); color:var(--blue); font-weight:600; font-size:.76rem}
+tbody tr:last-child td{border-bottom:0}
+td.n{width:38px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+
+.rail{margin:22px 0 8px; border-left:2px solid var(--rule-strong)}
+.tick{position:relative; display:grid; grid-template-columns:74px 1fr; gap:16px; padding:13px 14px 13px 18px; border-radius:0 7px 7px 0}
+.tick::before{content:''; position:absolute; left:-2px; top:0; bottom:0; width:2px; background:transparent}
+.tick[data-active="true"]{background:var(--blue-wash)}
+.tick[data-active="true"]::before{background:var(--blue)}
+.tick .t{font-family:var(--sans); font-size:.78rem; font-weight:600; font-variant-numeric:tabular-nums; color:var(--ink-faint); padding-top:2px}
+.tick[data-active="true"] .t{color:var(--blue)}
+.tick .lab{font-family:var(--sans); font-size:.9rem; font-weight:500}
+.tick .lab small{display:block; font-weight:400; font-size:.79rem; color:var(--ink-soft); margin-top:2px; line-height:1.45}
+
+.box{border:1px solid var(--rule); border-left-width:4px; border-radius:0 8px 8px 0; background:var(--sheet); padding:16px 20px; margin:20px 0}
+.box p:last-child{margin-bottom:0}
+.box .bt{font-family:var(--sans); font-size:.78rem; font-weight:600; margin:0 0 6px}
+.box.safety{border-left-color:var(--amber); background:var(--amber-wash)}
+.box.safety .bt{color:var(--amber)}
+.box.digital{border-left-color:var(--teal); background:var(--teal-wash)}
+.box.digital .bt{color:var(--teal)}
+.box.key{border-left-color:var(--blue); background:var(--blue-wash)}
+.box.key .bt{color:var(--blue)}
+
+.ask{margin:16px 0; padding:0; list-style:none; max-width:66ch; border-top:1px solid var(--rule)}
+.ask li{margin:0; padding:12px 4px 12px 34px; border-bottom:1px solid var(--rule); position:relative; font-style:italic; font-size:1.02rem; line-height:1.55}
+.ask li::before{content:'?'; position:absolute; left:6px; top:12px; font-family:var(--sans); font-style:normal; font-weight:600; font-size:.86rem; color:var(--blue)}
+
+.dialogue{margin:18px 0; max-width:60ch}
+.dialogue p{margin:0 0 4px; padding-left:18px; border-left:2px solid var(--rule)}
+.dialogue p.you{font-weight:500}
+.dialogue p.him{color:var(--ink-soft); font-style:italic}
+
+pre{background:#13202b; color:#dce6ee; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:.82rem; line-height:1.6; padding:16px 18px; border-radius:8px; overflow-x:auto; margin:14px 0}
+pre .c{color:#7d94a6}
+pre .k{color:#8fc4e8}
+
+.quiz{margin:18px 0}
+details.q{background:var(--sheet); border:1px solid var(--rule); border-radius:8px; margin-bottom:9px; overflow:hidden}
+details.q[open]{border-color:var(--rule-strong)}
+details.q summary{cursor:pointer; padding:14px 18px; font-size:1rem; font-weight:500; list-style:none; display:flex; gap:12px; align-items:baseline}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary::after{content:'+'; margin-left:auto; font-family:var(--sans); color:var(--ink-faint); font-size:1.05rem; line-height:1}
+details.q[open] summary::after{content:'–'}
+details.q summary .qn{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--blue); flex:0 0 auto; padding-top:3px}
+.q-body{padding:14px 18px 16px 48px; border-top:1px solid var(--rule)}
+.q-body .opt{font-family:var(--sans); font-size:.85rem; color:var(--ink-soft); margin:0 0 4px}
+.q-body .opt.right{color:var(--blue); font-weight:600}
+.q-body .why{font-size:.97rem; color:var(--ink-soft); margin:12px 0 0; max-width:62ch}
+
+.foot{margin-top:64px; padding-top:22px; border-top:1px solid var(--rule); font-family:var(--sans); font-size:.82rem; color:var(--ink-faint); display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
+.foot a{color:var(--blue); text-decoration:none; font-weight:500}
+.foot a:hover{text-decoration:underline}
+.scrim{position:fixed; inset:var(--nav-h) 0 0 0; background:rgba(20,30,38,.42); z-index:35; display:none}
+.scrim.on{display:block}
+
+@media (max-width:1040px){
+  .burger{display:block}
+  .side{transform:translateX(-100%); transition:transform .22s ease; box-shadow:0 0 40px rgba(0,0,0,.14)}
+  .side.open{transform:translateX(0)}
+  .wrap{margin-left:0}
+  main{padding:0 22px 90px}
+  .timer-read{min-width:auto}
+  .timer-seg{display:none}
+  #studentLink{display:none}
+}
+@media (max-width:620px){
+  body{font-size:17px}
+  .nav{gap:10px; padding:0 12px}
+  .nav-title{font-size:.94rem}
+  .nav-title span{display:none}
+  .timer-btn{padding:7px 10px; font-size:.74rem}
+  .tick{grid-template-columns:56px 1fr; gap:10px; padding-left:12px}
+  table{font-size:.78rem}
+  th,td{padding:7px 9px}
+}
+@media print{
+  .nav,.side,.scrim,.timer{display:none!important}
+  .wrap{margin:0; padding:0}
+  main{max-width:none; padding:0}
+  body{background:#fff; font-size:11pt}
+  section{padding-top:22px}
+  h2.sec{page-break-after:avoid}
+  .box,figure.boxes,table,.tick,pre{page-break-inside:avoid}
+  details.q{page-break-inside:avoid}
+  details.q .q-body{display:block!important}
+  a.link::after{content:' (' attr(href) ')'; font-size:8pt; color:#555; word-break:break-all}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <button class="burger" id="burger" aria-label="Άνοιγμα καταλόγου μαθημάτων" aria-expanded="false">☰</button>
+  <h1 class="nav-title"><a href="fysiki.html" title="Όλα τα μαθήματα Φυσικής">Μαθήματα Φυσικής Β΄ Γυμνασίου</a><span>Εμπλουτισμένο πρόγραμμα 30 εβδομάδων</span></h1>
+  <div class="nav-spacer"></div>
+  <a class="timer-btn reset" id="studentLink" href="fysiki-01-mathitis.html">Φύλλο μαθητή</a>
+  <div class="timer">
+    <div class="timer-read">
+      <span class="timer-clock" id="clock">00:00</span>
+      <span class="timer-seg" id="segname">Το μάθημα δεν έχει ξεκινήσει</span>
+    </div>
+    <button class="timer-btn" id="toggle">Έναρξη</button>
+    <button class="timer-btn reset" id="reset">Μηδενισμός</button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<nav class="side" id="side" aria-label="Κατάλογος μαθημάτων">
+  <h2>Κεφάλαιο 1 · Εισαγωγή</h2>
+  <ol>
+    <li><a href="fysiki-01.html" aria-current="page"><span class="num">01</span><span class="ttl">Τι κάνει ο φυσικός;</span></a></li>
+    <li><a href="fysiki-02.html"><span class="num">02</span><span class="ttl">Μεγέθη &amp; μονάδες</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 2 · Κινήσεις</h2>
+  <ol>
+    <li><a href="fysiki-03.html"><span class="num">03</span><span class="ttl">Περιγραφή της κίνησης</span></a></li>
+    <li><a href="fysiki-04.html" class="pending"><span class="num">04</span><span class="ttl">Η έννοια της ταχύτητας</span></a></li>
+    <li><a href="fysiki-05.html" class="pending"><span class="num">05</span><span class="ttl">Κίνηση με σταθερή ταχύτητα</span></a></li>
+    <li><a href="fysiki-06.html" class="pending"><span class="num">06</span><span class="ttl">Μεταβαλλόμενη ταχύτητα</span></a></li>
+    <li><a href="fysiki-07.html" class="pending"><span class="num">07</span><span class="ttl">Ελεύθερη πτώση</span></a></li>
+    <li><a href="fysiki-08.html" class="pending"><span class="num">08</span><span class="ttl">Ολοκλήρωση: ανάλυση βίντεο</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 3 · Δυνάμεις</h2>
+  <ol>
+    <li><a href="fysiki-09.html" class="pending"><span class="num">09</span><span class="ttl">Η έννοια της δύναμης</span></a></li>
+    <li><a href="fysiki-10.html" class="pending"><span class="num">10</span><span class="ttl">Βάρος &amp; τριβή</span></a></li>
+    <li><a href="fysiki-11.html" class="pending"><span class="num">11</span><span class="ttl">Ελατήρια &amp; νόμος του Χουκ</span></a></li>
+    <li><a href="fysiki-12.html" class="pending"><span class="num">12</span><span class="ttl">Σύνθεση &amp; ανάλυση δυνάμεων</span></a></li>
+    <li><a href="fysiki-13.html" class="pending"><span class="num">13</span><span class="ttl">Ισορροπία υλικού σημείου</span></a></li>
+    <li><a href="fysiki-14.html" class="pending"><span class="num">14</span><span class="ttl">Πρώτος νόμος — αδράνεια</span></a></li>
+    <li><a href="fysiki-15.html" class="pending"><span class="num">15</span><span class="ttl">Δεύτερος νόμος — F = m·a</span></a></li>
+    <li><a href="fysiki-16.html" class="pending"><span class="num">16</span><span class="ttl">Τρίτος νόμος — αλληλεπίδραση</span></a></li>
+    <li><a href="fysiki-17.html" class="pending"><span class="num">17</span><span class="ttl">Βολή, μέρος 1</span></a></li>
+    <li><a href="fysiki-18.html" class="pending"><span class="num">18</span><span class="ttl">Βολή, μέρος 2</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 4 · Πίεση</h2>
+  <ol>
+    <li><a href="fysiki-19.html" class="pending"><span class="num">19</span><span class="ttl">Πίεση</span></a></li>
+    <li><a href="fysiki-20.html" class="pending"><span class="num">20</span><span class="ttl">Υδροστατική πίεση</span></a></li>
+    <li><a href="fysiki-21.html" class="pending"><span class="num">21</span><span class="ttl">Ατμοσφαιρική πίεση</span></a></li>
+    <li><a href="fysiki-22.html" class="pending"><span class="num">22</span><span class="ttl">Αρχή του Πασκάλ</span></a></li>
+    <li><a href="fysiki-23.html" class="pending"><span class="num">23</span><span class="ttl">Άνωση — Αρχή του Αρχιμήδη</span></a></li>
+    <li><a href="fysiki-24.html" class="pending"><span class="num">24</span><span class="ttl">Πλεύση &amp; πρόκληση σχεδιασμού</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 5 · Ενέργεια</h2>
+  <ol>
+    <li><a href="fysiki-25.html" class="pending"><span class="num">25</span><span class="ttl">Έργο και ενέργεια</span></a></li>
+    <li><a href="fysiki-26.html" class="pending"><span class="num">26</span><span class="ttl">Δυναμική &amp; κινητική ενέργεια</span></a></li>
+    <li><a href="fysiki-27.html" class="pending"><span class="num">27</span><span class="ttl">Διατήρηση της ενέργειας</span></a></li>
+    <li><a href="fysiki-28.html" class="pending"><span class="num">28</span><span class="ttl">Εκκρεμές με αισθητήρες</span></a></li>
+    <li><a href="fysiki-29.html" class="pending"><span class="num">29</span><span class="ttl">Βαρύτητα &amp; τροχιές</span></a></li>
+  </ol>
+  <h2>Κλείσιμο</h2>
+  <ol>
+    <li><a href="fysiki-30.html" class="pending"><span class="num">30</span><span class="ttl">Έκθεση φακέλου</span></a></li>
+  </ol>
+  <p class="side-note">Ο κύκλος δίπλα σε ένα μάθημα σημαίνει ότι η σελίδα του δεν έχει γραφτεί ακόμη.</p>
+</nav>
+
+<div class="wrap">
+<main>
+
+  <div class="hero">
+    <p class="hero-week">Εβδομάδα 1 · Κεφάλαιο 1.1–1.2 · 60 λεπτά</p>
+    <h1>Πώς ξέρουμε ότι κάτι είναι αλήθεια;</h1>
+    <p class="hero-lede">Η φυσική δεν είναι κατάλογος νόμων προς απομνημόνευση. Είναι <em>η τέχνη του να ξέρεις κάτι που δεν μπορείς να δεις</em> — και να ξέρεις πόσο σίγουρος είσαι.</p>
+
+    <dl class="facts">
+      <div class="fact"><dt>Ερώτημα-οδηγός</dt><dd>Τι υπάρχει μέσα σε κάτι που δεν ανοίγει;</dd></div>
+      <div class="fact"><dt>Παρανόηση-στόχος</dt><dd>Η επιστήμη είναι συλλογή γεγονότων</dd></div>
+      <div class="fact"><dt>Ψηφιακά</dt><dd>phyphox · PhET · Algodoo · GlowScript</dd></div>
+    </dl>
+
+    <figure class="boxes">
+      <svg viewBox="0 0 520 190" role="img" aria-label="Δύο πανομοιότυπα σφραγισμένα κουτιά με ερωτηματικά">
+        <g id="bx"></g>
+      </svg>
+      <figcaption>Δύο σφραγισμένα κουτιά, ίδια απ’ έξω και με <b>ακριβώς την ίδια μάζα</b>. Μέσα τους υπάρχουν διαφορετικά πράγματα. Η ζυγαριά δεν θα τον βοηθήσει — θα χρειαστεί καλύτερα τεκμήρια.</figcaption>
+    </figure>
+  </div>
+
+  <!-- PREP -->
+  <section id="prep">
+    <h2 class="sec">Πριν το μάθημα</h2>
+    <p class="sec-sub">Προετοιμασία περίπου 30 λεπτών, κυρίως εγκαταστάσεις</p>
+
+    <h3>Τα δύο κουτιά</h3>
+    <p>Δύο ίδια κουτιά (παπουτσιών ή χάρτινα ταχυδρομείου), σφραγισμένα με ταινία ώστε να μην ανοίγονται. Μέσα βάζεις πράγματα με <strong>διαφορετική συμπεριφορά αλλά ίδια συνολική μάζα</strong> — ζύγισέ τα και ισοστάθμισέ τα με νομίσματα ή χαρτί μέχρι να δείχνουν το ίδιο.</p>
+    <table>
+      <thead><tr><th>Κουτί</th><th>Περιεχόμενο</th><th>Τι το προδίδει</th></tr></thead>
+      <tbody>
+        <tr><td><strong>Α</strong></td><td>Μία βαριά μπίλια ή μπάλα του γκολφ, ελεύθερη</td><td>Κυλάει, επιταχύνει όταν γέρνεις το κουτί, χτυπάει μία φορά δυνατά</td></tr>
+        <tr><td><strong>Β</strong></td><td>Ένα ορθογώνιο βαρίδι ή μπαταρία, ελεύθερο</td><td>Ολισθαίνει, «κολλάει» και ξεκολλάει απότομα, σταματά γρήγορα</td></tr>
+      </tbody>
+    </table>
+    <div class="box key">
+      <p class="bt">Γιατί ίδια μάζα</p>
+      <p>Είναι το ίδιο παιδαγωγικό κόλπο με τα τέσσερα ταυτόσημα λευκά της Χημείας. Η πρώτη του κίνηση θα είναι να τα ζυγίσει. Όταν δει ότι η ζυγαριά δίνει το ίδιο νούμερο, αναγκάζεται να σκεφτεί τι <em>άλλο</em> μετριέται — και εκεί αρχίζει η φυσική.</p>
+    </div>
+
+    <h3>Οι εγκαταστάσεις</h3>
+    <table>
+      <thead><tr><th>Εργαλείο</th><th>Πού</th><th>Τι χρειάζεται</th></tr></thead>
+      <tbody>
+        <tr><td><strong>phyphox</strong></td><td><a class="link" href="https://phyphox.org">phyphox.org</a></td><td>Δωρεάν εφαρμογή, Android &amp; iOS. Μετατρέπει το κινητό σε εργαστήριο αισθητήρων.</td></tr>
+        <tr><td><strong>Algodoo</strong></td><td><a class="link" href="http://www.algodoo.com">algodoo.com</a></td><td>Δωρεάν για Windows &amp; Mac. Ζωγραφίζεις μηχανές και υπακούν στη φυσική.</td></tr>
+        <tr><td><strong>PhET</strong></td><td><a class="link" href="https://phet.colorado.edu/el/simulations/filter?subjects=physics">phet.colorado.edu/el</a></td><td>Τίποτα — τρέχει στον browser. Πολλές προσομοιώσεις στα ελληνικά.</td></tr>
+        <tr><td><strong>GlowScript</strong></td><td><a class="link" href="https://www.glowscript.org">glowscript.org</a></td><td>Λογαριασμός Google. Python στον browser με 3D γραφικά.</td></tr>
+      </tbody>
+    </table>
+
+    <h3>Το σχολικό βιβλίο</h3>
+    <p>Το <a class="link" href="http://ebooks.edu.gr/ebooks/v/html/8547/2204/Fysiki_B-Gymnasiou_html-empl/">εμπλουτισμένο διαδραστικό βιβλίο Φυσικής Β΄ Γυμνασίου</a> στο ebooks.edu.gr έχει ενσωματωμένα βίντεο και προσομοιώσεις μέσα στο κείμενο. Κράτησέ το ανοιχτό σε μια καρτέλα όλη τη χρονιά.</p>
+
+    <h4>Επίσης</h4>
+    <p>Ζυγαριά κουζίνας ή ακριβείας, χάρακας ή μεζούρα, χρονόμετρο, το κινητό, και το τετράδιο.</p>
+  </section>
+
+  <!-- TIMELINE -->
+  <section id="roi">
+    <h2 class="sec">Η ροή των 60 λεπτών</h2>
+    <p class="sec-sub">Πάτα «Έναρξη» πάνω δεξιά και το τρέχον τμήμα θα φωτίζεται μόνο του</p>
+    <div class="rail" id="rail">
+      <div class="tick" data-from="0" data-to="5"><span class="t">0΄ – 5΄</span><span class="lab">Η πρόκληση<small>Δύο κουτιά, καμία άδεια να τα ανοίξει</small></span></div>
+      <div class="tick" data-from="5" data-to="22"><span class="t">5΄ – 22΄</span><span class="lab">Η έρευνα<small>Παρατήρηση, υποθέσεις, και το πείραμα που τις ξεχωρίζει</small></span></div>
+      <div class="tick" data-from="22" data-to="32"><span class="t">22΄ – 32΄</span><span class="lab">Μέτρηση και αβεβαιότητα<small>Γιατί ένας αριθμός μόνος του δεν είναι μέτρηση</small></span></div>
+      <div class="tick" data-from="32" data-to="44"><span class="t">32΄ – 44΄</span><span class="lab">Τα εργαλεία της χρονιάς<small>phyphox ζωντανά, PhET, Algodoo</small></span></div>
+      <div class="tick" data-from="44" data-to="56"><span class="t">44΄ – 56΄</span><span class="lab">Ο πρώτος κώδικας<small>GlowScript: ένα σώμα που κινείται</small></span></div>
+      <div class="tick" data-from="56" data-to="60"><span class="t">56΄ – 60΄</span><span class="lab">Exit ticket<small>Πέντε ερωτήσεις</small></span></div>
+    </div>
+  </section>
+
+  <!-- 0-5 -->
+  <section id="s1">
+    <h2 class="sec">Η πρόκληση</h2>
+    <p class="sec-sub">0΄ – 5΄</p>
+    <p>Βάλε τα δύο κουτιά στο τραπέζι χωρίς εξηγήσεις και πες μόνο αυτό:</p>
+    <ul class="ask"><li>Μέσα σε αυτά τα δύο κουτιά υπάρχουν διαφορετικά πράγματα. Δεν επιτρέπεται να τα ανοίξεις. Πες μου τι είναι.</li></ul>
+    <p>Θα διαμαρτυρηθεί ότι είναι αδύνατο. Είναι η σωστή αντίδραση, και η απάντησή σου είναι η θέση όλης της χρονιάς:</p>
+    <div class="box key">
+      <p class="bt">Πες το ακριβώς έτσι</p>
+      <p>«Κανένας φυσικός δεν έχει δει ποτέ άτομο με τα μάτια του. Κανείς δεν έχει πάει στο κέντρο της Γης. Κανείς δεν έχει αγγίξει μαύρη τρύπα. Κι όμως ξέρουμε πράγματα γι’ αυτά — και ξέρουμε και πόσο σίγουροι είμαστε. Αυτό ακριβώς θα κάνεις τώρα, σε μικρογραφία.»</p>
+    </div>
+  </section>
+
+  <!-- 5-22 -->
+  <section id="s2">
+    <h2 class="sec">Η έρευνα</h2>
+    <p class="sec-sub">5΄ – 22΄ · η καρδιά του μαθήματος</p>
+
+    <p>Άσ’ τον ελεύθερο με τα κουτιά και μη δώσεις ιδέες. Θα τα κουνήσει, θα τα γείρει, θα τα ζυγίσει. Η μόνη σου παρέμβαση είναι ο πίνακας με τις δύο στήλες:</p>
+
+    <table>
+      <thead><tr><th style="width:50%">Τι έκανα και τι παρατήρησα</th><th>Τι συμπεραίνω</th></tr></thead>
+      <tbody><tr><td style="height:36px"></td><td></td></tr><tr><td style="height:36px"></td><td></td></tr></tbody>
+    </table>
+
+    <p>Αυτή η διάκριση — <strong>παρατήρηση</strong> από <strong>συμπέρασμα</strong> — είναι ακριβώς η ίδια που δουλεύετε στη Χημεία. Είναι σκόπιμο: τα δύο μαθήματα χτίζουν την ίδια δεξιότητα από δύο μεριές.</p>
+
+    <h3>Η στιγμή της ζυγαριάς</h3>
+    <p>Κάποια στιγμή θα τα ζυγίσει και θα δει το ίδιο νούμερο. Άσ’ τον να μπερδευτεί.</p>
+    <div class="dialogue">
+      <p class="him">— Ζυγίζουν το ίδιο. Άρα έχουν το ίδιο πράγμα μέσα;</p>
+      <p class="you">Ζυγίζουν το ίδιο. Αυτό είναι όλο που σου λέει η ζυγαριά.</p>
+      <p class="him">— Μα τότε πώς…</p>
+      <p class="you">Τι <em>άλλο</em> μπορείς να μετρήσεις;</p>
+    </div>
+    <p>Οι απαντήσεις που ψάχνεις: πόσο γρήγορα μετακινείται το περιεχόμενο όταν γέρνει το κουτί· πόσες φορές χτυπάει· αν κυλάει ομαλά ή γλιστράει απότομα· αν συνεχίζει να κινείται αφού σταματήσεις εσύ.</p>
+
+    <h3>Οι ερωτήσεις που κάνουν τη δουλειά</h3>
+    <ul class="ask">
+      <li>Ποια από αυτά που μου είπες τα <em>είδες</em>, και ποια τα <em>σκέφτηκες</em>;</li>
+      <li>Πόσες διαφορετικές εξηγήσεις ταιριάζουν με ό,τι παρατήρησες μέχρι τώρα;</li>
+      <li>Τι πείραμα θα ξεχώριζε τη μία εξήγηση από την άλλη;</li>
+      <li>Αν κάνεις αυτό το πείραμα και βγει το αντίθετο από ό,τι περιμένεις, τι θα σήμαινε;</li>
+    </ul>
+    <p>Η τρίτη ερώτηση είναι η σημαντικότερη ολόκληρου του μαθήματος. Μια υπόθεση που δεν μπορεί να ελεγχθεί με κανένα πείραμα δεν είναι επιστημονική υπόθεση — είναι γνώμη.</p>
+
+    <h3>Το κλείσιμο της έρευνας</h3>
+    <p>Δεν ανοίγετε τα κουτιά σήμερα. Ούτε στο τέλος του μαθήματος.</p>
+    <div class="box key">
+      <p class="bt">Κρατήστε τα κλειστά</p>
+      <p>Γράψτε και οι δύο την τελική σας πρόβλεψη σε ένα χαρτί, διπλώστε το και κολλήστε το πάνω στο κουτί. Θα τα ανοίξετε στην <strong>Εβδομάδα 8</strong>, όταν θα έχει μάθει να αναλύει κίνηση από βίντεο και θα μπορεί να επιστρέψει με πραγματικά εργαλεία. Η αναμονή είναι μέρος του μαθήματος: στην πραγματική επιστήμη η επιβεβαίωση αργεί χρόνια.</p>
+    </div>
+    <p>Αν επιμείνει πολύ να τα ανοίξει, αυτή η ίδια η ανυπομονησία αξίζει να ονομαστεί: είναι το αίσθημα που κρατάει τους ερευνητές στη δουλειά τους.</p>
+  </section>
+
+  <!-- 22-32 -->
+  <section id="s3">
+    <h2 class="sec">Μέτρηση και αβεβαιότητα</h2>
+    <p class="sec-sub">22΄ – 32΄</p>
+
+    <p>Τώρα περνάτε στο 1.3, αλλά μέσα από τα κουτιά, όχι από το βιβλίο. Ζήτα του να μετρήσει τη μάζα ενός κουτιού <strong>πέντε φορές</strong>, βγάζοντάς το και ξαναβάζοντάς το στη ζυγαριά κάθε φορά.</p>
+    <ul class="ask">
+      <li>Βγήκε ακριβώς το ίδιο νούμερο και τις πέντε φορές;</li>
+      <li>Αν όχι, ποιο είναι το «σωστό»;</li>
+      <li>Πόσο μακριά από τον μέσο όρο έπεσε η χειρότερη μέτρηση;</li>
+    </ul>
+    <div class="box key">
+      <p class="bt">Η πρόταση που θέλεις να κρατήσει</p>
+      <p>Ένας αριθμός χωρίς εκτίμηση του σφάλματός του δεν είναι μέτρηση. Το «482 g» δεν λέει τίποτα. Το «482 ± 2 g» είναι μέτρηση.</p>
+    </div>
+    <p>Κάντε το ίδιο με το μήκος του κουτιού και με τον χρόνο που κάνει το περιεχόμενο να φτάσει από τη μια άκρη στην άλλη όταν γέρνετε. Ο χρόνος θα έχει τη μεγαλύτερη διασπορά — καλή αφορμή για το ερώτημα «ποιος αντιδρά πιο αργά, εσύ ή το χρονόμετρο;».</p>
+    <p>Κλείστε με τις μονάδες SI: μέτρο, χιλιόγραμμο, δευτερόλεπτο. Και με το επιχείρημα γιατί υπάρχουν — το <a class="link" href="https://www.nasa.gov/">Mars Climate Orbiter</a> χάθηκε το 1999 επειδή μια ομάδα δούλευε σε αγγλοσαξονικές μονάδες και η άλλη σε μετρικές. Είναι η ιστορία που κάνει τις μονάδες να μοιάζουν σοβαρές αντί για γραφειοκρατία.</p>
+  </section>
+
+  <!-- 32-44 -->
+  <section id="s4">
+    <h2 class="sec">Τα εργαλεία της χρονιάς</h2>
+    <p class="sec-sub">32΄ – 44΄</p>
+    <p>Δώδεκα λεπτά, τρία εργαλεία, καμία διάλεξη. Στόχος είναι να τα δει να δουλεύουν, όχι να τα μάθει.</p>
+
+    <div class="box digital">
+      <p class="bt">phyphox · 5 λεπτά — ξεκίνα από εδώ</p>
+      <p>Άνοιξε το <em>Acceleration (without g)</em> και δώσ’ του το κινητό στο χέρι. Να το κουνήσει, να το αφήσει ακίνητο, να το ανεβοκατεβάσει. Βλέπει τη γραφική παράσταση να απαντά στην κίνηση του χεριού του σε πραγματικό χρόνο.</p>
+      <p>Μετά το πραγματικό κόλπο: βάλτε το κινητό μέσα σε μια τσάντα, κουνήστε τη, και δείξε του ότι <strong>μπορείς να καταλάβεις τι έγινε μέσα στην τσάντα χωρίς να την ανοίξεις</strong>. Είναι το ίδιο πρόβλημα με τα κουτιά — και τώρα έχει όργανο.</p>
+    </div>
+
+    <div class="box digital">
+      <p class="bt">PhET · 4 λεπτά</p>
+      <p>Άνοιξε το <a class="link" href="https://phet.colorado.edu/el/simulations/filter?subjects=physics">phet.colorado.edu/el</a> και άφησέ τον να διαλέξει μία προσομοίωση να παίξει. Ό,τι κι αν διαλέξει είναι σωστό. Η μόνη ερώτηση που κάνεις μετά:</p>
+      <ul class="ask" style="border-top-color:rgba(15,93,82,.2); margin-bottom:0">
+        <li>Αυτό που μόλις είδες είναι η πραγματικότητα ή ένα μοντέλο της; Τι νομίζεις ότι άφησε απ’ έξω;</li>
+      </ul>
+    </div>
+
+    <div class="box digital">
+      <p class="bt">Algodoo · 3 λεπτά</p>
+      <p>Ζωγράφισε μπροστά του ένα κουτί και μια ράμπα, πάτα play, και άφησέ το να κυλήσει. Μετά δώσ’ του το ποντίκι. Δεν χρειάζεται καμία οδηγία — είναι σχεδιασμένο γι’ αυτό. Για ένα παιδί που ζωγραφίζει, το Algodoo είναι το εργαλείο που θα αγαπήσει πιο γρήγορα απ’ όλα.</p>
+    </div>
+  </section>
+
+  <!-- 44-56 -->
+  <section id="s5">
+    <h2 class="sec">Ο πρώτος κώδικας</h2>
+    <p class="sec-sub">44΄ – 56΄</p>
+
+    <p>Επειδή έχει ήδη βάσεις Python, παρακάμπτουμε τα οπτικά περιβάλλοντα και πάμε κατευθείαν σε <strong>GlowScript</strong>: σύνταξη Python, τρέχει στον browser, και δίνει τρισδιάστατα αντικείμενα από την πρώτη γραμμή. Μπες στο <a class="link" href="https://www.glowscript.org">glowscript.org</a>, κάνε <em>Sign in</em> με Google και μετά <em>Create New Program</em>.</p>
+
+    <p>Γράψτε το μαζί — στο πληκτρολόγιο είναι <em>αυτός</em>, εσύ κάνεις ερωτήσεις:</p>
+
+<pre><span class="c"># Ένα σώμα που κινείται με σταθερή ταχύτητα</span>
+Web VPython 3.2
+
+<span class="c"># το αντικείμενο</span>
+soma = box(pos=vector(-5,0,0), size=vector(1,1,1), color=color.orange)
+
+<span class="c"># η ταχύτητά του και το βήμα του χρόνου</span>
+v  = vector(2,0,0)
+dt = 0.01
+t  = 0
+
+<span class="k">while</span> t &lt; 5:
+    rate(100)
+    soma.pos = soma.pos + v*dt
+    t = t + dt
+</pre>
+
+    <p>Δώδεκα γραμμές, και μέσα τους κρύβεται ολόκληρη η κινηματική της χρονιάς.</p>
+
+    <h3>Οι ερωτήσεις πάνω στον κώδικα</h3>
+    <ul class="ask">
+      <li>Ποια γραμμή είναι η φυσική και ποιες είναι απλώς σκηνικό;</li>
+      <li>Τι θα γίνει αν κάνω το <code>v</code> διπλάσιο; Πρόβλεψέ το πριν το τρέξεις.</li>
+      <li>Τι θα γίνει αν κάνω το <code>dt</code> δέκα φορές μεγαλύτερο; Και γιατί;</li>
+      <li>Πώς θα έκανες το σώμα να πηγαίνει προς τα πάνω αντί για δεξιά;</li>
+    </ul>
+
+    <div class="box key">
+      <p class="bt">Γιατί αυτό αξίζει τα 12 λεπτά</p>
+      <p>Η γραμμή <code>soma.pos = soma.pos + v*dt</code> είναι ο ορισμός της ταχύτητας γραμμένος με τρόπο που δεν σηκώνει καμία ασάφεια. Στην Εβδομάδα 6 θα προσθέσετε από πάνω της τη γραμμή <code>v = v + a*dt</code> και θα έχετε φτιάξει ολοκληρωτή Euler — χωρίς να χρειαστεί να ονομαστεί έτσι.</p>
+    </div>
+    <p>Αν προλάβετε, βάλ’ τον να αλλάξει χρώμα και σχήμα. Η ιδιοκτησία πάνω στον κώδικα μετράει περισσότερο από τη φυσική αυτή τη στιγμή.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz">
+    <h2 class="sec">Exit ticket</h2>
+    <p class="sec-sub">56΄ – 60΄ · πέντε ερωτήσεις, χωρίς βαθμό</p>
+
+    <div class="quiz">
+      <details class="q">
+        <summary><span class="qn">1</span><span>Ποια από τις παρακάτω είναι παρατήρηση και όχι συμπέρασμα;</span></summary>
+        <div class="q-body">
+          <p class="opt">Μέσα στο κουτί Α υπάρχει κάτι μεταλλικό</p>
+          <p class="opt right">Όταν γέρνω το κουτί Α, ακούγεται ένας μόνο ήχος μετά από περίπου ένα δευτερόλεπτο</p>
+          <p class="opt">Το κουτί Α είναι πιο ενδιαφέρον από το Β</p>
+          <p class="opt">Τα δύο κουτιά έχουν το ίδιο πράγμα μέσα</p>
+          <p class="why">Παρατήρηση είναι μόνο ό,τι κατέγραψαν οι αισθήσεις σου, με όσο μεγαλύτερη ακρίβεια γίνεται. Όλα τα υπόλοιπα είναι ερμηνείες — μπορεί σωστές, αλλά δεν τις είδες.</p>
+        </div>
+      </details>
+
+      <details class="q">
+        <summary><span class="qn">2</span><span>Τα δύο κουτιά ζυγίζουν ακριβώς το ίδιο. Τι αποδεικνύει αυτό;</span></summary>
+        <div class="q-body">
+          <p class="opt">Ότι έχουν το ίδιο περιεχόμενο</p>
+          <p class="opt">Ότι έχουν τον ίδιο όγκο υλικού μέσα</p>
+          <p class="opt right">Μόνο ότι η συνολική τους μάζα είναι ίδια, τίποτε άλλο</p>
+          <p class="opt">Ότι δεν μπορούμε να μάθουμε τίποτα γι’ αυτά</p>
+          <p class="why">Κάθε όργανο απαντά σε μία και μόνο ερώτηση. Η ζυγαριά απαντά «πόση μάζα». Δεν απαντά «τι σχήμα», «πόσα κομμάτια» ή «πώς κινείται μέσα». Το να ξέρεις τι <em>δεν</em> σου λέει ένα όργανο είναι εξίσου σημαντικό με το να ξέρεις τι σου λέει.</p>
+        </div>
+      </details>
+
+      <details class="q">
+        <summary><span class="qn">3</span><span>Ζυγίζεις το ίδιο κουτί πέντε φορές και παίρνεις 481, 483, 482, 484, 482 g. Ποια είναι η σωστή απάντηση;</span></summary>
+        <div class="q-body">
+          <p class="opt">Το 481, γιατί ήταν η πρώτη μέτρηση</p>
+          <p class="opt">Το 484, γιατί ήταν η μεγαλύτερη</p>
+          <p class="opt right">Περίπου 482 g, με αβεβαιότητα γύρω στα ±2 g</p>
+          <p class="opt">Καμία — η ζυγαριά είναι χαλασμένη</p>
+          <p class="why">Η διασπορά δεν σημαίνει αποτυχία, σημαίνει ότι μετράς σωστά. Κάθε πραγματική μέτρηση έχει σκέδαση· η δουλειά σου είναι να την εκτιμήσεις και να την αναφέρεις, όχι να την κρύψεις.</p>
+        </div>
+      </details>
+
+      <details class="q">
+        <summary><span class="qn">4</span><span>Ποια υπόθεση <strong>δεν</strong> είναι επιστημονική;</span></summary>
+        <div class="q-body">
+          <p class="opt">Μέσα στο κουτί υπάρχει κάτι μεταλλικό</p>
+          <p class="opt">Μέσα στο κουτί υπάρχουν δύο κομμάτια αντί για ένα</p>
+          <p class="opt right">Μέσα στο κουτί υπάρχει κάτι που εξαφανίζεται κάθε φορά που κοιτάζουμε</p>
+          <p class="opt">Το περιεχόμενο είναι βαρύ αλλά μικρό</p>
+          <p class="why">Οι άλλες τρεις μπορούν να ελεγχθούν: υπάρχει πείραμα που θα τις διέψευδε. Αυτή είναι φτιαγμένη έτσι ώστε να μην μπορεί ποτέ να ελεγχθεί — και μια υπόθεση που τίποτα δεν μπορεί να τη διαψεύσει δεν λέει τίποτα για τον κόσμο.</p>
+        </div>
+      </details>
+
+      <details class="q">
+        <summary><span class="qn">5</span><span>Στον κώδικα, τι κάνει η γραμμή <code>soma.pos = soma.pos + v*dt</code>;</span></summary>
+        <div class="q-body">
+          <p class="opt">Ζωγραφίζει το σώμα στην οθόνη</p>
+          <p class="opt">Ορίζει πόσο γρήγορα τρέχει το πρόγραμμα</p>
+          <p class="opt right">Μετακινεί το σώμα κατά όσο προλαβαίνει να διανύσει σε χρόνο dt</p>
+          <p class="opt">Σταματάει τον βρόχο όταν τελειώσει ο χρόνος</p>
+          <p class="why">Είναι ο ορισμός της ταχύτητας γραμμένος σε κώδικα: νέα θέση = παλιά θέση + ταχύτητα επί χρόνο. Ο υπολογιστής δεν δέχεται ασάφεια, γι’ αυτό το να γράψεις έναν νόμο σε κώδικα είναι το αυστηρότερο τεστ του αν τον έχεις καταλάβει.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- AFTER -->
+  <section id="meta">
+    <h2 class="sec">Μετά το μάθημα</h2>
+    <p class="sec-sub">Εργασία, επεκτάσεις, και τι να προσέξεις</p>
+
+    <h3>Εργασία για το σπίτι — προαιρετική</h3>
+    <p>Να φτιάξει <strong>δικό του μυστήριο κουτί</strong> και να σου το δώσει την επόμενη εβδομάδα. Θα ανακαλύψει ότι το να σχεδιάσεις ένα καλό αίνιγμα απαιτεί να σκεφτείς σαν αυτόν που θα το λύσει — που είναι ακριβώς η δεξιότητα του πειραματικού σχεδιασμού.</p>
+    <p>Και η πρώτη σελίδα του τετραδίου: εξώφυλλο δικό του, και σχέδια των δύο κουτιών με τις υποθέσεις του σημειωμένες γύρω τους, σαν σελίδα από σημειωματάριο ερευνητή.</p>
+
+    <h3>Going further</h3>
+    <p>Αν θέλει κι άλλο κώδικα, βάλ’ τον να κάνει το σώμα να αναπηδά στα τοιχώματα — χρειάζεται ένα <code>if</code> και μια αλλαγή προσήμου. Είναι το πρώτο του «φυσικό» <code>if</code>.</p>
+
+    <h3>Τι να προσέξεις</h3>
+    <ul>
+      <li><strong>Αν εκνευριστεί που δεν ανοίγουν τα κουτιά:</strong> μη λυγίσεις, αλλά ονόμασε το συναίσθημα. «Αυτό που νιώθεις τώρα είναι ό,τι νιώθει κάθε ερευνητής. Είναι ο λόγος που συνεχίζουν.»</li>
+      <li><strong>Αν λύσει τα κουτιά πολύ γρήγορα:</strong> ζήτα του να σου πει <em>πόσο σίγουρος</em> είναι σε κλίμακα 1 έως 10, και ποια παρατήρηση θα κατέβαζε αυτόν τον αριθμό. Η βαθμονόμηση της βεβαιότητας είναι πιο δύσκολη από την ίδια την εικασία.</li>
+      <li><strong>Αν τα δώδεκα λεπτά του κώδικα πάνε στραβά</strong> (λογαριασμός, σύνδεση, τυπογραφικά): μην το παλέψεις. Κλείσ’ το, μετάφερέ το στην Εβδομάδα 2 και δώσε τον χρόνο στο phyphox. Η πρώτη εβδομάδα δεν πρέπει να τελειώσει με απογοήτευση από στημένο υπολογιστή.</li>
+    </ul>
+
+    <div class="box key">
+      <p class="bt">Το σημάδι ότι πέτυχε</p>
+      <p>Αν μέσα στην εβδομάδα τον πιάσεις να κουνάει ξανά τα κουτιά μόνος του.</p>
+    </div>
+
+    <div class="foot">
+      <span>Εβδομάδα 1 από 30 · Κεφάλαιο 1.1–1.2</span>
+      <a href="fysiki-02.html">Επόμενο: Μεγέθη &amp; μονάδες</a>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+
+  /* Δύο πανομοιότυπα κουτιά σε ισομετρική προβολή */
+  var g=document.getElementById('bx');
+  if(g){
+    function mk(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);g.appendChild(e);return e;}
+    [[70,'Α'],[290,'Β']].forEach(function(pair){
+      var x=pair[0], y=52, w=140, h=78, d=30;
+      /* πάνω όψη */
+      mk('path',{d:'M'+x+' '+y+' l'+d+' -'+d+' h'+w+' l-'+d+' '+d+' z', fill:'#dbe3ea', stroke:'#8fa2b3','stroke-width':1.3,'stroke-linejoin':'round'});
+      /* δεξιά όψη */
+      mk('path',{d:'M'+(x+w)+' '+y+' l'+d+' -'+d+' v'+h+' l-'+d+' '+d+' z', fill:'#c3d0da', stroke:'#8fa2b3','stroke-width':1.3,'stroke-linejoin':'round'});
+      /* μπροστινή όψη */
+      mk('rect',{x:x, y:y, width:w, height:h, fill:'#eef2f6', stroke:'#8fa2b3','stroke-width':1.3});
+      /* ταινία σφράγισης */
+      mk('rect',{x:x+w/2-11, y:y-d, width:22, height:h+d, fill:'#a8571f', opacity:.28});
+      /* ερωτηματικό */
+      var q=mk('text',{x:x+w/2, y:y+h/2+13,'text-anchor':'middle','font-family':"'Alegreya',serif",'font-size':38, fill:'#17456b','font-weight':700});
+      q.textContent='?';
+      /* ετικέτα */
+      var t=mk('text',{x:x+w/2, y:y+h+26,'text-anchor':'middle','font-family':"'IBM Plex Sans',sans-serif",'font-size':12, fill:'#47555f','font-weight':600});
+      t.textContent='Κουτί '+pair[1];
+    });
+    /* ένδειξη ίσης μάζας */
+    var eq=document.createElementNS(NS,'text');
+    eq.setAttribute('x','260'); eq.setAttribute('y','98'); eq.setAttribute('text-anchor','middle');
+    eq.setAttribute('font-family',"'IBM Plex Sans',sans-serif"); eq.setAttribute('font-size','15');
+    eq.setAttribute('fill','#a8571f'); eq.setAttribute('font-weight','600');
+    eq.textContent='=';
+    g.appendChild(eq);
+    var em=document.createElementNS(NS,'text');
+    em.setAttribute('x','260'); em.setAttribute('y','118'); em.setAttribute('text-anchor','middle');
+    em.setAttribute('font-family',"'IBM Plex Sans',sans-serif"); em.setAttribute('font-size','10');
+    em.setAttribute('fill','#a8571f');
+    em.textContent='ίδια μάζα';
+    g.appendChild(em);
+  }
+
+  /* Drawer */
+  var side=document.getElementById('side'),burger=document.getElementById('burger'),scrim=document.getElementById('scrim');
+  function setDrawer(o){side.classList.toggle('open',o);scrim.classList.toggle('on',o);burger.setAttribute('aria-expanded',o?'true':'false');}
+  burger.addEventListener('click',function(){setDrawer(!side.classList.contains('open'));});
+  scrim.addEventListener('click',function(){setDrawer(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setDrawer(false);});
+
+  /* Χρονόμετρο μαθήματος */
+  var ticks=[].slice.call(document.querySelectorAll('.tick'));
+  var clock=document.getElementById('clock'),segname=document.getElementById('segname');
+  var toggle=document.getElementById('toggle'),reset=document.getElementById('reset');
+  var started=null, elapsed=0, id=null;
+  function fmt(s){var m=Math.floor(s/60),r=Math.floor(s%60);return (m<10?'0':'')+m+':'+(r<10?'0':'')+r;}
+  function paint(){
+    var secs=elapsed+(started?(Date.now()-started)/1000:0), mins=secs/60;
+    clock.textContent=fmt(secs);
+    var found=null;
+    ticks.forEach(function(t){
+      var a=+t.dataset.from,b=+t.dataset.to,on=mins>=a&&mins<b;
+      t.setAttribute('data-active',on?'true':'false'); if(on)found=t;
+    });
+    if(!started&&elapsed===0) segname.textContent='Το μάθημα δεν έχει ξεκινήσει';
+    else if(found) segname.textContent=found.querySelector('.lab').firstChild.textContent.trim();
+    else segname.textContent='Το μάθημα ολοκληρώθηκε';
+  }
+  toggle.addEventListener('click',function(){
+    if(started){elapsed+=(Date.now()-started)/1000;started=null;clearInterval(id);id=null;toggle.textContent='Συνέχεια';}
+    else{started=Date.now();toggle.textContent='Παύση';id=setInterval(paint,1000);}
+    paint();
+  });
+  reset.addEventListener('click',function(){clearInterval(id);id=null;started=null;elapsed=0;toggle.textContent='Έναρξη';paint();});
+  paint();
+})();
+</script>
+</body>
+</html>

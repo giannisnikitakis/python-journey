@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Εβδομάδα 1 · Πώς σκέφτεται ένας χημικός; — Μαθήματα Χημείας Β΄ Γυμνασίου</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16211f;
+  --ink-soft:#4a5a56;
+  --ink-faint:#7c8d88;
+  --ground:#f1f4f0;
+  --sheet:#ffffff;
+  --rule:#d5ded7;
+  --rule-strong:#b6c3ba;
+
+  /* Semantic colour: each has one job */
+  --green:#0f5d52;        /* structure, teaching, the course itself */
+  --green-wash:#e7f0ec;
+  --amber:#a8571f;        /* safety only */
+  --amber-wash:#f8efe4;
+  --indigo:#31456b;       /* digital tools only */
+  --indigo-wash:#e8ecf4;
+
+  --serif:'Alegreya', Georgia, 'Times New Roman', serif;
+  --sans:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --nav-h:60px;
+  --side-w:288px;
+}
+
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){
+  html{scroll-behavior:auto}
+  *{animation:none!important; transition:none!important}
+}
+body{
+  margin:0;
+  background:var(--ground);
+  color:var(--ink);
+  font-family:var(--serif);
+  font-size:18px;
+  line-height:1.68;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ─────────────── Navbar ─────────────── */
+.nav{
+  position:fixed; inset:0 0 auto 0; height:var(--nav-h); z-index:50;
+  display:flex; align-items:center; gap:16px;
+  padding:0 20px;
+  background:var(--green);
+  color:#eaf2ef;
+  border-bottom:1px solid #0a463e;
+}
+.nav-title{
+  font-family:var(--serif); font-weight:700; font-size:1.06rem;
+  letter-spacing:.005em; margin:0; white-space:nowrap;
+  overflow:hidden; text-overflow:ellipsis;
+}
+.nav-title span{display:block; font-family:var(--sans); font-weight:400; font-size:.7rem; color:#9dc4b9; line-height:1.2; margin-top:1px}
+.nav-title a{color:inherit; text-decoration:none}
+.nav-title a:hover{text-decoration:underline; text-underline-offset:3px}
+.burger{
+  display:none; background:none; border:1px solid rgba(255,255,255,.28);
+  color:inherit; border-radius:5px; width:36px; height:34px; cursor:pointer;
+  font-size:1.05rem; line-height:1; flex:0 0 auto;
+}
+.nav-spacer{flex:1}
+
+/* Lesson timer — the one interactive moment */
+.timer{
+  display:flex; align-items:center; gap:10px;
+  font-family:var(--sans); flex:0 0 auto;
+}
+.timer-read{
+  min-width:132px; text-align:right; line-height:1.15;
+}
+.timer-clock{font-size:1.02rem; font-weight:600; font-variant-numeric:tabular-nums; display:block}
+.timer-seg{font-size:.68rem; color:#9dc4b9; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:210px}
+.timer-btn{
+  font-family:var(--sans); font-size:.78rem; font-weight:500;
+  background:#eaf2ef; color:var(--green); border:0; border-radius:5px;
+  padding:8px 13px; cursor:pointer; text-decoration:none; display:inline-block;
+}
+.timer-btn:hover{background:#fff}
+.timer-btn.reset{background:transparent; color:#9dc4b9; border:1px solid rgba(255,255,255,.25)}
+.timer-btn.reset:hover{color:#eaf2ef}
+:focus-visible{outline:2.5px solid #f0b27a; outline-offset:2px}
+
+/* ─────────────── Sidebar ─────────────── */
+.side{
+  position:fixed; top:var(--nav-h); bottom:0; left:0; width:var(--side-w); z-index:40;
+  overflow-y:auto; background:var(--sheet); border-right:1px solid var(--rule);
+  font-family:var(--sans); padding:20px 0 48px;
+}
+.side h2{
+  font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--ink-faint);
+  margin:22px 20px 8px; padding-top:14px; border-top:1px solid var(--rule);
+  letter-spacing:.02em;
+}
+.side h2:first-child{border-top:0; padding-top:0; margin-top:4px}
+.side ol{list-style:none; margin:0; padding:0}
+.side a{
+  display:grid; grid-template-columns:30px 1fr; align-items:baseline; gap:4px;
+  padding:6px 20px 6px 16px; text-decoration:none;
+  color:var(--ink-soft); font-size:.83rem; line-height:1.35;
+  border-left:3px solid transparent;
+}
+.side a:hover{background:var(--green-wash); color:var(--ink)}
+.side .num{font-variant-numeric:tabular-nums; font-size:.74rem; color:var(--ink-faint)}
+.side a[aria-current="page"]{
+  border-left-color:var(--green); background:var(--green-wash);
+  color:var(--green); font-weight:600;
+}
+.side a[aria-current="page"] .num{color:var(--green)}
+.side a.pending{color:#9aa8a3}
+.side a.pending .ttl::after{
+  content:''; display:inline-block; width:5px; height:5px; margin-left:7px;
+  border:1px solid #c2cec8; border-radius:50%; vertical-align:.12em;
+}
+.side-note{
+  font-size:.72rem; color:var(--ink-faint); line-height:1.5;
+  margin:20px 20px 0; padding-top:14px; border-top:1px solid var(--rule);
+}
+
+/* ─────────────── Main ─────────────── */
+.wrap{margin-left:var(--side-w); padding-top:var(--nav-h)}
+main{
+  max-width:830px; margin:0 auto; padding:0 32px 120px;
+}
+
+/* Hero */
+.hero{padding:52px 0 34px; border-bottom:1px solid var(--rule)}
+.hero-week{
+  font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--green);
+  margin:0 0 10px;
+}
+.hero h1{
+  font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.6vw,2.9rem);
+  line-height:1.14; margin:0 0 18px; letter-spacing:-.012em; max-width:16ch;
+}
+.hero-lede{
+  font-size:1.12rem; color:var(--ink-soft); max-width:60ch; margin:0 0 26px;
+}
+.hero-lede em{color:var(--ink); font-style:italic}
+.facts{
+  display:flex; flex-wrap:wrap; gap:0; font-family:var(--sans); font-size:.79rem;
+  border:1px solid var(--rule); border-radius:7px; overflow:hidden; background:var(--sheet);
+}
+.fact{padding:11px 16px; border-right:1px solid var(--rule); flex:1 1 auto}
+.fact:last-child{border-right:0}
+.fact dt{color:var(--ink-faint); font-size:.71rem; margin-bottom:2px}
+.fact dd{margin:0; font-weight:500; color:var(--ink)}
+
+/* Vial figure */
+figure.vials{
+  margin:34px 0 0; padding:26px 22px 20px; background:var(--sheet);
+  border:1px solid var(--rule); border-radius:8px;
+}
+figure.vials svg{display:block; width:100%; height:auto; max-width:640px; margin:0 auto}
+figure.vials figcaption{
+  font-family:var(--sans); font-size:.79rem; color:var(--ink-soft);
+  margin-top:16px; text-align:center; line-height:1.55; max-width:56ch;
+  margin-left:auto; margin-right:auto;
+}
+figure.vials figcaption b{color:var(--amber); font-weight:600}
+
+/* Sections */
+section{padding-top:46px}
+h2.sec{
+  font-family:var(--serif); font-weight:700; font-size:1.62rem; line-height:1.2;
+  margin:0 0 6px; letter-spacing:-.008em;
+}
+.sec-sub{font-family:var(--sans); font-size:.79rem; color:var(--ink-faint); margin:0 0 22px}
+h3{font-family:var(--serif); font-weight:700; font-size:1.2rem; margin:30px 0 8px}
+h4{font-family:var(--sans); font-weight:600; font-size:.92rem; margin:22px 0 6px; color:var(--ink)}
+p{margin:0 0 14px; max-width:68ch}
+a.link{color:var(--indigo); text-underline-offset:3px; text-decoration-thickness:1px}
+a.link:hover{background:var(--indigo-wash)}
+ul,ol.body{max-width:66ch; padding-left:22px; margin:0 0 16px}
+li{margin-bottom:7px}
+
+/* Tables */
+table{
+  width:100%; border-collapse:collapse; font-family:var(--sans); font-size:.83rem;
+  background:var(--sheet); border:1px solid var(--rule); border-radius:8px;
+  overflow:hidden; margin:16px 0 22px;
+}
+th,td{padding:9px 13px; text-align:right; border-bottom:1px solid var(--rule); vertical-align:top}
+th{background:var(--green-wash); color:var(--green); font-weight:600; font-size:.76rem}
+tbody tr:last-child td{border-bottom:0}
+td.n{width:38px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+tr.white-set td{background:#fbfbf7}
+tr.white-set td.n{color:var(--amber); font-weight:600}
+
+/* The 60-minute rail */
+.rail{margin:22px 0 8px; border-left:2px solid var(--rule-strong); padding-left:0}
+.tick{
+  position:relative; display:grid; grid-template-columns:74px 1fr; gap:16px;
+  padding:13px 14px 13px 18px; border-radius:0 7px 7px 0;
+}
+.tick::before{
+  content:''; position:absolute; left:-2px; top:0; bottom:0; width:2px; background:transparent;
+}
+.tick[data-active="true"]{background:var(--green-wash)}
+.tick[data-active="true"]::before{background:var(--green)}
+.tick .t{
+  font-family:var(--sans); font-size:.78rem; font-weight:600; font-variant-numeric:tabular-nums;
+  color:var(--ink-faint); padding-top:2px;
+}
+.tick[data-active="true"] .t{color:var(--green)}
+.tick .lab{font-family:var(--sans); font-size:.9rem; font-weight:500}
+.tick .lab small{display:block; font-weight:400; font-size:.79rem; color:var(--ink-soft); margin-top:2px; line-height:1.45}
+
+/* Callouts */
+.box{
+  border:1px solid var(--rule); border-left-width:4px; border-radius:0 8px 8px 0;
+  background:var(--sheet); padding:16px 20px; margin:20px 0;
+}
+.box p:last-child{margin-bottom:0}
+.box .bt{font-family:var(--sans); font-size:.78rem; font-weight:600; margin:0 0 6px}
+.box.safety{border-left-color:var(--amber); background:var(--amber-wash)}
+.box.safety .bt{color:var(--amber)}
+.box.digital{border-left-color:var(--indigo); background:var(--indigo-wash)}
+.box.digital .bt{color:var(--indigo)}
+.box.key{border-left-color:var(--green); background:var(--green-wash)}
+.box.key .bt{color:var(--green)}
+
+/* Spoken questions */
+.ask{
+  margin:16px 0; padding:0; list-style:none; max-width:66ch;
+  border-top:1px solid var(--rule);
+}
+.ask li{
+  margin:0; padding:12px 4px 12px 34px; border-bottom:1px solid var(--rule);
+  position:relative; font-style:italic; font-size:1.02rem; line-height:1.55;
+}
+.ask li::before{
+  content:'?'; position:absolute; left:6px; top:12px;
+  font-family:var(--sans); font-style:normal; font-weight:600; font-size:.86rem;
+  color:var(--green);
+}
+
+/* Dialogue */
+.dialogue{margin:18px 0; max-width:60ch}
+.dialogue p{margin:0 0 4px; padding-left:18px; border-left:2px solid var(--rule)}
+.dialogue p.you{font-weight:500}
+.dialogue p.him{color:var(--ink-soft); font-style:italic}
+
+/* Quiz */
+.quiz{margin:18px 0}
+details.q{
+  background:var(--sheet); border:1px solid var(--rule); border-radius:8px;
+  margin-bottom:9px; overflow:hidden;
+}
+details.q[open]{border-color:var(--rule-strong)}
+details.q summary{
+  cursor:pointer; padding:14px 18px; font-size:1rem; font-weight:500;
+  list-style:none; display:flex; gap:12px; align-items:baseline;
+}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary::after{
+  content:'+'; margin-left:auto; font-family:var(--sans); color:var(--ink-faint);
+  font-size:1.05rem; line-height:1;
+}
+details.q[open] summary::after{content:'–'}
+details.q summary .qn{
+  font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--green);
+  flex:0 0 auto; padding-top:3px;
+}
+.q-body{padding:0 18px 16px 48px; border-top:1px solid var(--rule); padding-top:14px}
+.q-body .opt{font-family:var(--sans); font-size:.85rem; color:var(--ink-soft); margin:0 0 4px}
+.q-body .opt.right{color:var(--green); font-weight:600}
+.q-body .why{font-size:.97rem; color:var(--ink-soft); margin:12px 0 0; max-width:62ch}
+
+/* Footer nav */
+.foot{
+  margin-top:64px; padding-top:22px; border-top:1px solid var(--rule);
+  font-family:var(--sans); font-size:.82rem; color:var(--ink-faint);
+  display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap;
+}
+.foot a{color:var(--green); text-decoration:none; font-weight:500}
+.foot a:hover{text-decoration:underline}
+
+/* Scrim for mobile drawer */
+.scrim{
+  position:fixed; inset:var(--nav-h) 0 0 0; background:rgba(22,33,31,.42);
+  z-index:35; display:none;
+}
+.scrim.on{display:block}
+
+@media (max-width:1040px){
+  .burger{display:block}
+  .side{transform:translateX(-100%); transition:transform .22s ease; box-shadow:0 0 40px rgba(0,0,0,.14)}
+  .side.open{transform:translateX(0)}
+  .wrap{margin-left:0}
+  main{padding:0 22px 90px}
+  .timer-read{min-width:auto}
+  .timer-seg{display:none}
+}
+@media (max-width:620px){
+  body{font-size:17px}
+  .nav{gap:10px; padding:0 12px}
+  .nav-title{font-size:.94rem}
+  .nav-title span{display:none}
+  .timer-btn{padding:7px 10px; font-size:.74rem}
+  .tick{grid-template-columns:56px 1fr; gap:10px; padding-left:12px}
+  table{font-size:.78rem}
+  th,td{padding:7px 9px}
+}
+
+@media print{
+  .nav,.side,.scrim,.timer{display:none!important}
+  .wrap{margin:0; padding:0}
+  main{max-width:none; padding:0}
+  body{background:#fff; font-size:11pt}
+  section{page-break-inside:auto; padding-top:22px}
+  h2.sec{page-break-after:avoid}
+  .box,figure.vials,table,.tick{page-break-inside:avoid}
+  details.q{page-break-inside:avoid}
+  details.q .q-body{display:block!important}
+  a.link::after{content:' (' attr(href) ')'; font-size:8pt; color:#555; word-break:break-all}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <button class="burger" id="burger" aria-label="Άνοιγμα καταλόγου μαθημάτων" aria-expanded="false">☰</button>
+  <h1 class="nav-title"><a href="ximeia.html" title="Όλα τα μαθήματα">Μαθήματα Χημείας Β΄ Γυμνασίου</a><span>Εμπλουτισμένο πρόγραμμα 30 εβδομάδων</span></h1>
+  <div class="nav-spacer"></div>
+  <a class="timer-btn reset" id="studentLink" href="mathima-01-mathitis.html">Φύλλο μαθητή</a>
+  <div class="timer">
+    <div class="timer-read">
+      <span class="timer-clock" id="clock">00:00</span>
+      <span class="timer-seg" id="segname">Το μάθημα δεν έχει ξεκινήσει</span>
+    </div>
+    <button class="timer-btn" id="toggle">Έναρξη</button>
+    <button class="timer-btn reset" id="reset">Μηδενισμός</button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<nav class="side" id="side" aria-label="Κατάλογος μαθημάτων">
+  <h2>Ενότητα 1 · Εισαγωγή στη Χημεία</h2>
+  <ol>
+    <li><a href="mathima-01.html" aria-current="page"><span class="num">01</span><span class="ttl">Τι είναι η Χημεία &amp; το εργαστήριο</span></a></li>
+    <li><a href="mathima-02.html" class="pending"><span class="num">02</span><span class="ttl">Καταστάσεις των υλικών</span></a></li>
+    <li><a href="mathima-03.html" class="pending"><span class="num">03</span><span class="ttl">Φυσικές ιδιότητες — πυκνότητα</span></a></li>
+  </ol>
+
+  <h2>Ενότητα 2 · Από το νερό στο άτομο</h2>
+  <ol>
+    <li><a href="mathima-04.html" class="pending"><span class="num">04</span><span class="ttl">Το νερό στη ζωή μας</span></a></li>
+    <li><a href="mathima-05.html" class="pending"><span class="num">05</span><span class="ttl">Το νερό ως διαλύτης — Μείγματα</span></a></li>
+    <li><a href="mathima-06.html" class="pending"><span class="num">06</span><span class="ttl">Διαλύματα — η διάλυση</span></a></li>
+    <li><a href="mathima-07.html" class="pending"><span class="num">07</span><span class="ttl">Περιεκτικότητα % w/w</span></a></li>
+    <li><a href="mathima-08.html" class="pending"><span class="num">08</span><span class="ttl">Περιεκτικότητα % w/v</span></a></li>
+    <li><a href="mathima-09.html" class="pending"><span class="num">09</span><span class="ttl">% v/v και αραίωση</span></a></li>
+    <li><a href="mathima-10.html" class="pending"><span class="num">10</span><span class="ttl">Ρύπανση του νερού</span></a></li>
+    <li><a href="mathima-11.html" class="pending"><span class="num">11</span><span class="ttl">Διαχωρισμός μειγμάτων Ι</span></a></li>
+    <li><a href="mathima-12.html" class="pending"><span class="num">12</span><span class="ttl">Διαχωρισμός μειγμάτων ΙΙ</span></a></li>
+    <li><a href="mathima-13.html" class="pending"><span class="num">13</span><span class="ttl">Εμπέδωση &amp; έρευνα νερού</span></a></li>
+    <li><a href="mathima-14.html" class="pending"><span class="num">14</span><span class="ttl">Ηλεκτρόλυση του νερού</span></a></li>
+    <li><a href="mathima-15.html" class="pending"><span class="num">15</span><span class="ttl">Φυσικές σταθερές των ουσιών</span></a></li>
+    <li><a href="mathima-16.html" class="pending"><span class="num">16</span><span class="ttl">Χημική αντίδραση</span></a></li>
+    <li><a href="mathima-17.html" class="pending"><span class="num">17</span><span class="ttl">Άτομα &amp; μόρια</span></a></li>
+    <li><a href="mathima-18.html" class="pending"><span class="num">18</span><span class="ttl">Υποατομικά σωματίδια — ιόντα</span></a></li>
+    <li><a href="mathima-19.html" class="pending"><span class="num">19</span><span class="ttl">Σύμβολα &amp; Περιοδικός Πίνακας</span></a></li>
+    <li><a href="mathima-20.html" class="pending"><span class="num">20</span><span class="ttl">Χημική εξίσωση — διατήρηση μάζας</span></a></li>
+    <li><a href="mathima-21.html" class="pending"><span class="num">21</span><span class="ttl">Εμπέδωση &amp; project ατόμου</span></a></li>
+  </ol>
+
+  <h2>Ενότητα 3 · Ατμοσφαιρικός αέρας</h2>
+  <ol>
+    <li><a href="mathima-22.html" class="pending"><span class="num">22</span><span class="ttl">Σύσταση του ατμοσφαιρικού αέρα</span></a></li>
+    <li><a href="mathima-23.html" class="pending"><span class="num">23</span><span class="ttl">Οξυγόνο</span></a></li>
+    <li><a href="mathima-24.html" class="pending"><span class="num">24</span><span class="ttl">Διοξείδιο του άνθρακα</span></a></li>
+    <li><a href="mathima-25.html" class="pending"><span class="num">25</span><span class="ttl">Ρύπανση του αέρα — αιθαλομίχλη</span></a></li>
+    <li><a href="mathima-26.html" class="pending"><span class="num">26</span><span class="ttl">Project ποιότητας αέρα</span></a></li>
+  </ol>
+
+  <h2>Ενότητα 4 · Έδαφος</h2>
+  <ol>
+    <li><a href="mathima-27.html" class="pending"><span class="num">27</span><span class="ttl">Έδαφος &amp; υπέδαφος</span></a></li>
+    <li><a href="mathima-28.html" class="pending"><span class="num">28</span><span class="ttl">Ρύπανση του εδάφους</span></a></li>
+    <li><a href="mathima-29.html" class="pending"><span class="num">29</span><span class="ttl">Project εδάφους &amp; ολοκλήρωση</span></a></li>
+  </ol>
+
+  <h2>Κλείσιμο</h2>
+  <ol>
+    <li><a href="mathima-30.html" class="pending"><span class="num">30</span><span class="ttl">Τελική σύνθεση &amp; portfolio</span></a></li>
+  </ol>
+
+  <p class="side-note">Ο κύκλος δίπλα σε ένα μάθημα σημαίνει ότι η σελίδα του δεν έχει γραφτεί ακόμη.</p>
+</nav>
+
+<div class="wrap">
+<main>
+
+  <div class="hero">
+    <p class="hero-week">Εβδομάδα 1 · Γενική Ενότητα 1.1 · 60 λεπτά</p>
+    <h1>Πώς σκέφτεται ένας χημικός;</h1>
+    <p class="hero-lede">Η χημεία δεν ξεκινά από τους τύπους. Ξεκινά από την <em>παρατήρηση χωρίς συμπέρασμα</em> — και αυτό είναι δεξιότητα που ο περισσότερος κόσμος δεν έχει.</p>
+
+    <dl class="facts">
+      <div class="fact"><dt>Ερώτημα-οδηγός</dt><dd>Τι ξέρει να κάνει ένας χημικός που δεν ξέρουν οι άλλοι;</dd></div>
+      <div class="fact"><dt>Παρανόηση-στόχος</dt><dd>«Χημικό» σημαίνει τοξικό ή τεχνητό</dd></div>
+      <div class="fact"><dt>Ψηφιακό</dt><dd>Ptable · Φωτόδεντρο</dd></div>
+    </dl>
+
+    <figure class="vials">
+      <svg viewBox="0 0 640 152" role="img" aria-labelledby="vt vd">
+        <title id="vt">Δέκα αριθμημένα φιαλίδια, τέσσερα από τα οποία περιέχουν πανομοιότυπη λευκή σκόνη</title>
+        <desc id="vd">Σειρά δέκα φιαλιδίων με διαφορετικά περιεχόμενα· τα φιαλίδια 2 έως 5 φαίνονται εντελώς ίδια.</desc>
+        <g id="row"></g>
+      </svg>
+      <figcaption>Τα δέκα άγνωστα, όπως θα τα δει. Τα φιαλίδια <b>2, 3, 4 και 5</b> είναι σόδα, ζάχαρη, αλάτι και θειικό μαγνήσιο — και με το μάτι δεν ξεχωρίζουν καθόλου. Αυτή η αμηχανία είναι το αγκίστρι όλης της χρονιάς.</figcaption>
+    </figure>
+  </div>
+
+  <!-- ── Preparation ── -->
+  <section id="prep">
+    <h2 class="sec">Πριν το μάθημα</h2>
+    <p class="sec-sub">Προετοιμασία περίπου 30 λεπτών</p>
+
+    <h3>Δύο PDF που θα χρησιμοποιείς όλη τη χρονιά</h3>
+    <ul>
+      <li><a class="link" href="http://ebooks.edu.gr/ebooks/d/8547/824/21-0107_Chimeia_B-Gymnasiou_Ergastiriakos-Odigos.pdf">Εργαστηριακός Οδηγός Χημείας Β΄ Γυμνασίου</a> — η Ενότητα 3 έχει τους κανόνες ασφαλείας και τα σύμβολα επικινδυνότητας, η Ενότητα 6 τις εικόνες όλων των οργάνων.</li>
+      <li><a class="link" href="http://ebooks.edu.gr/ebooks/d/8547/826/21-0212-01_Chimeia_B-Gymnasiou_Vivlio-Mathiti.pdf">Βιβλίο Μαθητή Χημείας Β΄ Γυμνασίου</a> — το κείμενο αναφοράς.</li>
+    </ul>
+    <p>Το ΙΕΠ προτείνει ακριβώς αυτό για την ενότητα 1.1: γνωριμία με το εργαστήριο, τα όργανα και τους κανόνες ασφαλείας, με συζήτηση για τα σύμβολα επικινδυνότητας και προτεινόμενη δραστηριότητα την κατασκευή αφίσας. Την κρατάμε ως εργασία για το σπίτι.</p>
+
+    <h3>Τα δέκα φιαλίδια</h3>
+    <p>Αριθμημένα 1–10, χωρίς καμία ετικέτα.</p>
+    <table>
+      <thead><tr><th class="n">#</th><th>Ουσία</th><th>Γιατί μπαίνει</th></tr></thead>
+      <tbody>
+        <tr><td class="n">1</td><td>Γλυκερίνη</td><td>παχύρρευστο διαφανές υγρό</td></tr>
+        <tr class="white-set"><td class="n">2</td><td>Νατρίου διττανθρακικό</td><td>λευκή σκόνη</td></tr>
+        <tr class="white-set"><td class="n">3</td><td>Ζάχαρη</td><td>λευκοί κρύσταλλοι</td></tr>
+        <tr class="white-set"><td class="n">4</td><td>Μαγειρικό αλάτι</td><td>λευκοί κρύσταλλοι</td></tr>
+        <tr class="white-set"><td class="n">5</td><td>Θειικό μαγνήσιο</td><td>λευκοί κρύσταλλοι</td></tr>
+        <tr><td class="n">6</td><td>Βάμμα ιωδίου</td><td>σκούρο καφέ υγρό</td></tr>
+        <tr><td class="n">7</td><td>Αιθανόλη 70%</td><td>άχρωμο, πτητικό</td></tr>
+        <tr><td class="n">8</td><td>Απεσταγμένο νερό</td><td>άχρωμο, «τίποτα»</td></tr>
+        <tr><td class="n">9</td><td>Ενεργός άνθρακας</td><td>μαύρη σκόνη</td></tr>
+        <tr><td class="n">10</td><td>Βαζελίνη</td><td>ημιστερεό</td></tr>
+      </tbody>
+    </table>
+
+    <div class="box key">
+      <p class="bt">Η παγίδα είναι σκόπιμη</p>
+      <p>Τέσσερα λευκά στερεά που δεν ξεχωρίζουν με το μάτι. Εκεί στηρίζεται όλη η χρονιά — και ειδικά η Εβδομάδα 15, όπου θα μάθει να τα ταυτοποιεί με μετρήσιμες σταθερές.</p>
+    </div>
+
+    <h4>Επίσης στο τραπέζι</h4>
+    <p>Ζυγαριά ακριβείας, ποτήρια ζέσεως, σύριγγες, ογκομετρικός κύλινδρος, σταγονόμετρο, γυαλιά, γάντια — και δύο ή τρία πραγματικά προϊόντα με εικονογράμματα CLP στην ετικέτα: χλωρίνη, οινόπνευμα, καθαριστικό φούρνου.</p>
+  </section>
+
+  <!-- ── Timeline ── -->
+  <section id="roi">
+    <h2 class="sec">Η ροή των 60 λεπτών</h2>
+    <p class="sec-sub">Πάτα «Έναρξη» πάνω δεξιά και το τρέχον τμήμα θα φωτίζεται μόνο του</p>
+
+    <div class="rail" id="rail">
+      <div class="tick" data-from="0" data-to="5"><span class="t">0΄ – 5΄</span><span class="lab">Το τελετουργικό και το ερώτημα<small>Πόσο ζυγίζει η υπογραφή σου;</small></span></div>
+      <div class="tick" data-from="5" data-to="15"><span class="t">5΄ – 15΄</span><span class="lab">Ξενάγηση στα όργανα<small>Γιατί το καθένα έχει αυτό το σχήμα</small></span></div>
+      <div class="tick" data-from="15" data-to="35"><span class="t">15΄ – 35΄</span><span class="lab">Τα δέκα άγνωστα<small>Η κεντρική δραστηριότητα</small></span></div>
+      <div class="tick" data-from="35" data-to="48"><span class="t">35΄ – 48΄</span><span class="lab">Ασφάλεια και εικονογράμματα CLP<small>Από τις πραγματικές ετικέτες, όχι από λίστα</small></span></div>
+      <div class="tick" data-from="48" data-to="57"><span class="t">48΄ – 57΄</span><span class="lab">Το τετράδιο και ο Περιοδικός Πίνακας<small>Πρώτη σελίδα, κυνήγι θησαυρού στο Ptable</small></span></div>
+      <div class="tick" data-from="57" data-to="60"><span class="t">57΄ – 60΄</span><span class="lab">Exit ticket<small>Πέντε ερωτήσεις, χωρίς βαθμό</small></span></div>
+    </div>
+  </section>
+
+  <!-- ── 0–5 ── -->
+  <section id="s1">
+    <h2 class="sec">Το τελετουργικό και το ερώτημα</h2>
+    <p class="sec-sub">0΄ – 5΄</p>
+    <p>Μην πεις «σήμερα θα κάνουμε χημεία». Πες: <em>«Θέλω να δεις κάτι.»</em></p>
+    <p>Άνοιξε τη ζυγαριά ακριβείας, ζύγισε ένα φύλλο χαρτιού μπροστά του, και ρώτα:</p>
+    <ul class="ask"><li>Πόσο ζυγίζει η υπογραφή σου;</li></ul>
+    <p>Ζυγίστε το χαρτί, υπόγραψε, ζυγίστε ξανά. Η διαφορά είναι το μελάνι. Είναι μικρή, μετρήσιμη, και δείχνει σε ενενήντα δευτερόλεπτα τι κάνει η χημεία: μετράει πράγματα που ο κόσμος θεωρεί ότι δεν μετριούνται.</p>
+    <p>Μετά γράψτε στο τετράδιο το ερώτημα της χρονιάς: <em>Πώς σκέφτεται ένας χημικός;</em></p>
+  </section>
+
+  <!-- ── 5–15 ── -->
+  <section id="s2">
+    <h2 class="sec">Ξενάγηση στα όργανα</h2>
+    <p class="sec-sub">5΄ – 15΄</p>
+    <p>Δεν κάνεις διάλεξη. Βάζεις τα όργανα στο τραπέζι και ρωτάς γιατί το καθένα έχει αυτό το σχήμα.</p>
+    <ul class="ask">
+      <li>Γιατί το ποτήρι ζέσεως έχει χείλος; Τι θα γινόταν χωρίς;</li>
+      <li>Ο ογκομετρικός κύλινδρος είναι ψηλός και στενός, το ποτήρι ζέσεως κοντό και φαρδύ. Με ποιο θα μετρούσες πιο σωστά 25 mL, και γιατί;</li>
+      <li>Γιατί μια σύριγγα μετράει καλύτερα από ένα κουτάλι;</li>
+      <li>Ποιο από αυτά δεν είναι όργανο μέτρησης, μόνο δοχείο;</li>
+    </ul>
+    <h4>Το πείραμα των εξήντα δευτερολέπτων</h4>
+    <p>Βάλε τον να μετρήσει 25 mL νερό σε ποτήρι ζέσεως, να τα χύσει στον ογκομετρικό κύλινδρο και να δει πόσα ήταν πραγματικά. Δείξε του τον μηνίσκο και το «διαβάζουμε στο ύψος των ματιών». Πρώτο μάθημα ακρίβειας, χωρίς μια λέξη θεωρίας.</p>
+  </section>
+
+  <!-- ── 15–35 ── -->
+  <section id="s3">
+    <h2 class="sec">Τα δέκα άγνωστα</h2>
+    <p class="sec-sub">15΄ – 35΄ · η καρδιά του μαθήματος</p>
+
+    <div class="box key">
+      <p class="bt">Ο μοναδικός κανόνας της δραστηριότητας</p>
+      <p>«Θα γράψεις μόνο ό,τι βλέπεις. Απαγορεύεται να γράψεις τι νομίζεις ότι είναι.»</p>
+    </div>
+
+    <p>Φτιάξτε μαζί αυτόν τον πίνακα στο τετράδιο. Θα τον χρησιμοποιείτε τριάντα εβδομάδες.</p>
+    <table>
+      <thead><tr><th class="n">#</th><th>Κατάσταση</th><th>Χρώμα</th><th>Διαφάνεια</th><th>Κόκκος / υφή</th><th>Άλλο</th></tr></thead>
+      <tbody><tr><td class="n">1</td><td></td><td></td><td></td><td></td><td></td></tr>
+      <tr><td class="n">2</td><td></td><td></td><td></td><td></td><td></td></tr></tbody>
+    </table>
+
+    <div class="box safety">
+      <p class="bt">Ο κανόνας του wafting</p>
+      <p>Μόνο εσύ αποφασίζεις ποια φιαλίδια ανοίγουν. Δίδαξε τη σωστή τεχνική οσμής — φιαλίδιο σε απόσταση, χέρι που «σπρώχνει» τους ατμούς προς τη μύτη, ποτέ απευθείας εισπνοή. Είναι μία από τις πέντε δεξιότητες που θα κρατήσει για πάντα.</p>
+    </div>
+
+    <h3>Η στιγμή που κλειδώνει τη χρονιά</h3>
+    <p>Όταν φτάσει στα φιαλίδια 2, 3, 4, 5, θα κολλήσει. Άσ’ τον να κολλήσει. Μη βοηθήσεις.</p>
+    <div class="dialogue">
+      <p class="you">Ποια είναι η διαφορά τους;</p>
+      <p class="him">— Καμία. Είναι όλα λευκά.</p>
+      <p class="you">Άρα είναι η ίδια ουσία;</p>
+      <p class="him">— Όχι… μάλλον όχι.</p>
+      <p class="you">Πώς το ξέρεις;</p>
+    </div>
+    <p>Ένα από αυτά είναι ζάχαρη και τρώγεται, ένα είναι αλάτι, ένα σόδα, ένα καθαρτικό. Ίδια όψη, εντελώς διαφορετική ταυτότητα. Πες του καθαρά: «Στην Εβδομάδα 15 θα μάθεις να τα ξεχωρίζεις με απόδειξη. Μέχρι τότε, κράτα ότι το μάτι δεν αρκεί.»</p>
+
+    <h3>Η ταξινόμηση</h3>
+    <p>Τώρα ζήτα του να τα χωρίσει σε ομάδες με δικό του κριτήριο — δεν του δίνεις εσύ το κριτήριο. Ό,τι κι αν διαλέξει είναι σωστό, αρκεί να το δικαιολογήσει.</p>
+    <ul class="ask"><li>Ποια από τις ιδιότητες που έγραψες μπορεί να μετρηθεί με αριθμό, και ποια είναι απλώς η γνώμη σου;</li></ul>
+    <p>Εκεί μπαίνει η διάκριση ποιοτικής και ποσοτικής παρατήρησης, και προετοιμάζεται η Εβδομάδα 3.</p>
+
+    <h3>Η παρανόηση που πρέπει να χτυπηθεί σήμερα</h3>
+    <ul class="ask"><li>Ποια από αυτά τα δέκα είναι χημικές ουσίες;</li></ul>
+    <p>Οι περισσότεροι δεκατριάχρονοι απαντούν «το ιώδιο, το οινόπνευμα, ο άνθρακας» — δηλαδή αυτά που φαίνονται επικίνδυνα. Η απάντηση είναι και τα δέκα, μαζί με το νερό και τη ζάχαρη.</p>
+    <div class="box key">
+      <p class="bt">Πες το ακριβώς έτσι</p>
+      <p>«Χημικό δεν σημαίνει τοξικό ή τεχνητό. Το νερό είναι χημική ουσία. Εσύ είσαι φτιαγμένος από χημικές ουσίες. Η λέξη περιγράφει τι είναι κάτι, όχι πόσο επικίνδυνο είναι.»</p>
+    </div>
+  </section>
+
+  <!-- ── 35–48 ── -->
+  <section id="s4">
+    <h2 class="sec">Ασφάλεια και εικονογράμματα CLP</h2>
+    <p class="sec-sub">35΄ – 48΄</p>
+    <p>Μην απαγγείλεις κανόνες. Ξεκίνα από τις πραγματικές ετικέτες. Δώσ’ του τη χλωρίνη και το καθαριστικό φούρνου και ζήτα του να βρει μόνος του τα εικονογράμματα και να μαντέψει τι σημαίνουν πριν του πεις.</p>
+    <p>Τα εικονογράμματα CLP είναι κόκκινος ρόμβος με μαύρο σύμβολο σε λευκό φόντο, και σκοπός τους είναι να ενημερώνουν για τη βλάβη που μπορεί να προκαλέσει μια ουσία στην υγεία ή στο περιβάλλον. Ο κανονισμός τέθηκε σε ισχύ στην ΕΕ στις 20 Ιανουαρίου 2009 και βασίζεται στο παγκόσμια εναρμονισμένο σύστημα του ΟΗΕ.</p>
+    <div class="box safety">
+      <p class="bt">Μια λεπτομέρεια που αξίζει να του πεις</p>
+      <p>Η νομοθεσία απαγορεύει στις ετικέτες φράσεις όπως «Μη τοξικό», «Ακίνδυνο» ή «Οικολογικό». Καλή αφορμή για τη συζήτηση: γιατί κανένας σοβαρός επιστήμονας δεν λέει «απολύτως ασφαλές».</p>
+    </div>
+
+    <div class="box digital">
+      <p class="bt">Ψηφιακή δραστηριότητα · υπάρχει έτοιμο ελληνικό κουίζ</p>
+      <p><a class="link" href="https://photodentro.edu.gr/lor/r/8521/3533">Φωτόδεντρο — Σύμβολα επικινδυνότητας προϊόντων</a>. Πληροφοριακό υλικό και κουίζ επτά ερωτήσεων πολλαπλής επιλογής. Στα ελληνικά, δωρεάν, πέντε λεπτά.</p>
+      <p>Συμπληρωματικά: το φυλλάδιο της ΕΕ <a class="link" href="https://eur-lex.europa.eu/resource.html?uri=cellar:27a196a9-9dce-47ba-8756-6137b15c18ff.0011.01/DOC_1&amp;format=PDF">«Γνωρίζετε τι σημαίνουν αυτά τα εικονογράμματα;»</a> και ο <a class="link" href="https://ec.europa.eu/taxation_customs/dds2/SAMANCTA/EL/Safety/SymbolsOfHazard_EL.htm">πίνακας συμβόλων κινδύνου της Ευρωπαϊκής Επιτροπής</a>.</p>
+    </div>
+
+    <h3>Οι πέντε κανόνες, γραμμένοι από αυτόν</h3>
+    <p>Αντί να του δώσεις λίστα, ρώτα: «Με βάση όσα είδαμε σήμερα, ποιους πέντε κανόνες θα έβαζες;» Καθοδήγησέ τον ώστε να καταλήξει σε κάτι σαν αυτό.</p>
+    <ol class="body">
+      <li>Γυαλιά και γάντια πριν ανοίξει οτιδήποτε.</li>
+      <li>Ποτέ δεν μυρίζουμε απευθείας — μόνο με wafting.</li>
+      <li>Τίποτα δεν μπαίνει στο στόμα, ποτέ, ούτε αστεία.</li>
+      <li>Ανοιχτό παράθυρο ή απορροφητήρας σε κάθε πείραμα.</li>
+      <li>Ξέρω πού είναι η βρύση και ο πυροσβεστήρας πριν ξεκινήσω.</li>
+    </ol>
+    <p>Υπογράψτε τους και οι δύο. Το ΕΚΦΕ Χανίων το ονομάζει ακριβώς έτσι, «συμβόλαιο». Κολλήστε το στην πρώτη σελίδα του τετραδίου.</p>
+  </section>
+
+  <!-- ── 48–57 ── -->
+  <section id="s5">
+    <h2 class="sec">Το τετράδιο και ο Περιοδικός Πίνακας</h2>
+    <p class="sec-sub">48΄ – 57΄</p>
+
+    <h3>Το εικονογραφημένο τετράδιο</h3>
+    <p>Είναι το κεντρικό τεχνούργημα της χρονιάς και το σημείο όπου το ταλέντο του γίνεται εργαλείο μάθησης, όχι διακόσμηση.</p>
+    <ul>
+      <li>Εικονογραφημένο εξώφυλλο που φτιάχνει όπως θέλει. Ο τίτλος να είναι δικός του, όχι «Χημεία Β΄ Γυμνασίου».</li>
+      <li>Το συμβόλαιο ασφαλείας με τις δύο υπογραφές.</li>
+      <li>Σχέδια των οργάνων με λεζάντες — από το πραγματικό αντικείμενο μπροστά του, όχι από φωτογραφία, με ονομασίες στα ελληνικά και στα αγγλικά: ποτήρι ζέσεως / <em>beaker</em>, ογκομετρικός κύλινδρος / <em>graduated cylinder</em>, σταγονόμετρο / <em>dropper</em>.</li>
+    </ul>
+    <p>Πες του ρητά ότι μπαίνει σε μια παράδοση. Ο Ramón y Cajal κέρδισε Νόμπελ ζωγραφίζοντας ό,τι έβλεπε στο μικροσκόπιο· ο Δαρβίνος σχεδίαζε τα πουλιά του. Το σχέδιο στην επιστήμη δεν είναι στολίδι, είναι ο τρόπος που κοιτάς προσεκτικά.</p>
+
+    <div class="box key">
+      <p class="bt">Ο σταθερός κανόνας κάθε σελίδας, όλη τη χρονιά</p>
+      <p>Δύο στήλες: «Τι είδα» και «Τι σκέφτομαι». Ποτέ ανακατεμένα.</p>
+    </div>
+
+    <div class="box digital">
+      <p class="bt">Ptable · τέσσερα λεπτά</p>
+      <p><a class="link" href="https://ptable.com">ptable.com</a> — δωρεάν, στον browser, χωρίς λογαριασμό. Μην κάνεις μάθημα περιοδικού πίνακα· κάνε κυνήγι θησαυρού.</p>
+      <ul class="ask" style="border-top-color:rgba(49,69,107,.25)">
+        <li>Ένα από τα φιαλίδια ήταν ενεργός άνθρακας. Βρες τον άνθρακα. Τι σύμβολο έχει; Τι σημαίνει το 6 από πάνω;</li>
+        <li>Τώρα βρες το ιώδιο. Το νάτριο. Το μαγνήσιο. Το οξυγόνο.</li>
+        <li>Πόσα στοιχεία υπάρχουν συνολικά, και πόσα από αυτά νομίζεις ότι υπάρχουν στο σώμα σου;</li>
+      </ul>
+      <p>Πάτα <em>Properties → State</em> και δείξε του πώς αλλάζει ο πίνακας με τη θερμοκρασία. Είναι εντυπωσιακό και δεν χρειάζεται καμία εξήγηση. Εναλλακτικά, ο <a class="link" href="https://www.rsc.org/periodic-table">περιοδικός πίνακας της Royal Society of Chemistry</a> έχει πιο πλούσιο οπτικό υλικό ανά στοιχείο.</p>
+    </div>
+  </section>
+
+  <!-- ── Quiz ── -->
+  <section id="quiz">
+    <h2 class="sec">Exit ticket</h2>
+    <p class="sec-sub">57΄ – 60΄ · πέντε ερωτήσεις, χωρίς βαθμό — μόνο για να δεις τι κάθισε</p>
+
+    <div class="quiz">
+      <details class="q">
+        <summary><span class="qn">1</span><span>Ποια από τις παρακάτω είναι παρατήρηση και όχι συμπέρασμα;</span></summary>
+        <div class="q-body">
+          <p class="opt">Το φιαλίδιο 3 περιέχει ζάχαρη</p>
+          <p class="opt">Το φιαλίδιο 3 είναι ακίνδυνο</p>
+          <p class="opt right">Το φιαλίδιο 3 έχει λευκούς κρυστάλλους που γυαλίζουν</p>
+          <p class="opt">Το φιαλίδιο 3 μοιάζει με αυτό που βάζουμε στον καφέ</p>
+          <p class="why">Παρατήρηση είναι μόνο ό,τι καταγράφουν οι αισθήσεις. «Είναι ζάχαρη» και «είναι ακίνδυνο» είναι συμπεράσματα — μπορεί να είναι σωστά, αλλά δεν είναι αυτό που είδε.</p>
+        </div>
+      </details>
+
+      <details class="q">
+        <summary><span class="qn">2</span><span>Από τα δέκα φιαλίδια, ποια είναι χημικές ουσίες;</span></summary>
+        <div class="q-body">
+          <p class="opt">Μόνο το βάμμα ιωδίου και η αιθανόλη</p>
+          <p class="opt">Όλα εκτός από το νερό</p>
+          <p class="opt">Μόνο όσα έχουν σύμβολο κινδύνου στην ετικέτα</p>
+          <p class="opt right">Και τα δέκα, μαζί με το νερό και τη ζάχαρη</p>
+          <p class="why">Κάθε υλικό είναι φτιαγμένο από χημικές ουσίες. Η λέξη περιγράφει τι είναι κάτι, όχι πόσο επικίνδυνο είναι.</p>
+        </div>
+      </details>
+
+      <details class="q">
+        <summary><span class="qn">3</span><span>Θέλεις να μετρήσεις ακριβώς 25 mL. Πού θα το κάνεις;</span></summary>
+        <div class="q-body">
+          <p class="opt">Στο ποτήρι ζέσεως, γιατί χωράει περισσότερο</p>
+          <p class="opt right">Στον ογκομετρικό κύλινδρο, γιατί είναι στενός</p>
+          <p class="opt">Είναι το ίδιο και στα δύο</p>
+          <p class="opt">Στο ποτήρι ζέσεως, γιατί έχει χείλος</p>
+          <p class="why">Στο στενό δοχείο μια μικρή διαφορά όγκου δίνει μεγάλη διαφορά ύψους, άρα διαβάζεται με μεγαλύτερη ακρίβεια. Το ποτήρι ζέσεως είναι κυρίως δοχείο, όχι όργανο μέτρησης.</p>
+        </div>
+      </details>
+
+      <details class="q">
+        <summary><span class="qn">4</span><span>Ο σωστός τρόπος να ελέγξεις την οσμή μιας ουσίας είναι:</span></summary>
+        <div class="q-body">
+          <p class="opt right">Κρατάς το φιαλίδιο μακριά και «σπρώχνεις» τους ατμούς με το χέρι προς τη μύτη</p>
+          <p class="opt">Το φέρνεις κοντά στη μύτη και εισπνέεις σιγά</p>
+          <p class="opt">Εισπνέεις δυνατά μία φορά για να τελειώνεις</p>
+          <p class="opt">Το μυρίζεις μόνο αφού βάλεις γάντια</p>
+          <p class="why">Το wafting κατευθύνει ελάχιστη ποσότητα ατμών προς τη μύτη. Η απευθείας εισπνοή δίνει μεγάλη δόση από κάτι ερεθιστικό πριν προλάβεις να αντιδράσεις.</p>
+        </div>
+      </details>
+
+      <details class="q">
+        <summary><span class="qn">5</span><span>Τέσσερα φιαλίδια είχαν λευκή σκόνη. Ποιος είναι ο επιστημονικός τρόπος να τα ξεχωρίσεις;</span></summary>
+        <div class="q-body">
+          <p class="opt">Να τα κοιτάξω πιο προσεκτικά στο φως</p>
+          <p class="opt">Να δοκιμάσω λίγο από το καθένα</p>
+          <p class="opt right">Να μετρήσω ιδιότητες που δίνουν αριθμούς, όπως σε τι θερμοκρασία λιώνουν</p>
+          <p class="opt">Να ρωτήσω κάποιον που ξέρει</p>
+          <p class="why">Η όψη δεν αρκεί για ταυτοποίηση. Χρειάζονται μετρήσιμες ιδιότητες: σημείο τήξης, διαλυτότητα, πυκνότητα, αντίδραση με άλλες ουσίες. Αυτό ακριβώς έρχεται στην Εβδομάδα 15.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- ── After ── -->
+  <section id="meta">
+    <h2 class="sec">Μετά το μάθημα</h2>
+    <p class="sec-sub">Εργασία, επεκτάσεις, και τι να προσέξεις</p>
+
+    <h3>Εργασία για το σπίτι — προαιρετική, περίπου 40΄</h3>
+    <p>Η αφίσα ασφαλείας: ένα Α3 με τους πέντε κανόνες και τα εννέα εικονογράμματα CLP, σχεδιασμένα από το χέρι του. Κρεμιέται στον χώρο των πειραμάτων και μένει εκεί όλη τη χρονιά.</p>
+
+    <h3>Going further</h3>
+    <p>Ξεκινήστε το δίγλωσσο γλωσσάρι στις τελευταίες σελίδες του τετραδίου, δύο στήλες ελληνικά και αγγλικά. Σήμερα μπαίνουν δέκα λέξεις. Στο τέλος της χρονιάς θα είναι διακόσιες, και θα μπορεί να διαβάζει διεθνείς πηγές.</p>
+
+    <h3>Τι να προσέξεις</h3>
+    <ul>
+      <li><strong>Αν βαρεθεί στα όργανα:</strong> κόψε την ξενάγηση στα έξι λεπτά και δώσε τον χρόνο στα δέκα άγνωστα. Η δραστηριότητα κρατάει μόνη της.</li>
+      <li><strong>Αν λύσει την ταξινόμηση πολύ γρήγορα:</strong> πρόσθεσε τη δύσκολη ερώτηση — «χωρίς να τα ανοίξεις, ποιο θα διαλυόταν στο νερό και ποιο όχι; Πώς θα το αποδείκνυες;» Προετοιμάζει την Εβδομάδα 5.</li>
+      <li><strong>Ο μεγαλύτερος κίνδυνος</strong> είναι να γίνει διάλεξη ασφαλείας. Δεν είναι. Είναι πρόσκληση σε έναν τρόπο να κοιτάς τα πράγματα.</li>
+    </ul>
+
+    <div class="box key">
+      <p class="bt">Το σημάδι ότι πέτυχε</p>
+      <p>Αν το βράδυ ή την επόμενη μέρα σε ρωτήσει τι ήταν το φιαλίδιο 5.</p>
+    </div>
+
+    <div class="foot">
+      <span>Εβδομάδα 1 από 30 · Γενική Ενότητα 1.1</span>
+      <a href="mathima-02.html">Επόμενο: Καταστάσεις των υλικών</a>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  /* ── Vial row ─────────────────────────────────────── */
+  var subs = [
+    {fill:'#e9ece7', label:'1'},   /* γλυκερίνη */
+    {fill:'#fdfdfb', label:'2', white:true},
+    {fill:'#fdfdfb', label:'3', white:true},
+    {fill:'#fdfdfb', label:'4', white:true},
+    {fill:'#fdfdfb', label:'5', white:true},
+    {fill:'#7a4114', label:'6'},   /* ιώδιο */
+    {fill:'#eef1ee', label:'7'},   /* αιθανόλη */
+    {fill:'#e6efef', label:'8'},   /* νερό */
+    {fill:'#26302e', label:'9'},   /* άνθρακας */
+    {fill:'#f4efe2', label:'10'}   /* βαζελίνη */
+  ];
+  var g = document.getElementById('row');
+  if(g){
+    var NS='http://www.w3.org/2000/svg', step=62, x0=18;
+    subs.forEach(function(s,i){
+      var x = x0 + i*step;
+      function mk(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);g.appendChild(e);return e;}
+      /* cap */
+      mk('rect',{x:x+11,y:14,width:16,height:11,rx:2,fill:'#b6c3ba'});
+      /* neck */
+      mk('rect',{x:x+13,y:24,width:12,height:12,fill:'#f6f8f5',stroke:'#c6d0c8','stroke-width':1});
+      /* body */
+      mk('rect',{x:x+2,y:34,width:34,height:74,rx:5,fill:'#f8faf7',stroke:'#c6d0c8','stroke-width':1.2});
+      /* contents */
+      mk('rect',{x:x+5,y:60,width:28,height:45,rx:3,fill:s.fill,stroke:s.white?'#dde3da':'none','stroke-width':s.white?1:0});
+      /* graduation ticks */
+      [72,84,96].forEach(function(y){
+        mk('line',{x1:x+2,y1:y,x2:x+9,y2:y,stroke:'#c6d0c8','stroke-width':1});
+      });
+      /* number */
+      var t = mk('text',{x:x+19,y:130,'text-anchor':'middle','font-family':"'IBM Plex Sans',sans-serif",'font-size':11,fill:s.white?'#a8571f':'#7c8d88','font-weight':s.white?600:400});
+      t.textContent = s.label;
+    });
+    /* bracket under the four identical whites */
+    var bx1 = x0 + 1*step, bx2 = x0 + 4*step + 38;
+    var p = document.createElementNS(NS,'path');
+    p.setAttribute('d','M'+bx1+' 138 v6 H'+bx2+' v-6');
+    p.setAttribute('fill','none'); p.setAttribute('stroke','#a8571f'); p.setAttribute('stroke-width','1.2');
+    g.appendChild(p);
+    var lt = document.createElementNS(NS,'text');
+    lt.setAttribute('x',(bx1+bx2)/2); lt.setAttribute('y',152);
+    lt.setAttribute('text-anchor','middle');
+    lt.setAttribute('font-family',"'IBM Plex Sans',sans-serif");
+    lt.setAttribute('font-size','10.5'); lt.setAttribute('fill','#a8571f');
+    lt.textContent = 'τέσσερα ταυτόσημα λευκά';
+    g.appendChild(lt);
+  }
+
+  /* ── Sidebar drawer ───────────────────────────────── */
+  var side=document.getElementById('side'), burger=document.getElementById('burger'), scrim=document.getElementById('scrim');
+  function setDrawer(open){
+    side.classList.toggle('open',open);
+    scrim.classList.toggle('on',open);
+    burger.setAttribute('aria-expanded',open?'true':'false');
+  }
+  burger.addEventListener('click',function(){setDrawer(!side.classList.contains('open'));});
+  scrim.addEventListener('click',function(){setDrawer(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setDrawer(false);});
+
+  /* ── Lesson timer ─────────────────────────────────── */
+  var ticks=[].slice.call(document.querySelectorAll('.tick'));
+  var clock=document.getElementById('clock'), segname=document.getElementById('segname');
+  var toggle=document.getElementById('toggle'), reset=document.getElementById('reset');
+  var started=null, elapsed=0, id=null;
+
+  function fmt(s){
+    var m=Math.floor(s/60), r=Math.floor(s%60);
+    return (m<10?'0':'')+m+':'+(r<10?'0':'')+r;
+  }
+  function paint(){
+    var secs = elapsed + (started ? (Date.now()-started)/1000 : 0);
+    var mins = secs/60;
+    clock.textContent = fmt(secs);
+    var found=null;
+    ticks.forEach(function(t){
+      var a=+t.dataset.from, b=+t.dataset.to;
+      var on = mins>=a && mins<b;
+      t.setAttribute('data-active', on?'true':'false');
+      if(on) found=t;
+    });
+    if(!started && elapsed===0) segname.textContent='Το μάθημα δεν έχει ξεκινήσει';
+    else if(found) segname.textContent=found.querySelector('.lab').firstChild.textContent.trim();
+    else segname.textContent='Το μάθημα ολοκληρώθηκε';
+  }
+  toggle.addEventListener('click',function(){
+    if(started){
+      elapsed += (Date.now()-started)/1000; started=null;
+      clearInterval(id); id=null; toggle.textContent='Συνέχεια';
+    }else{
+      started=Date.now(); toggle.textContent='Παύση';
+      id=setInterval(paint,1000);
+    }
+    paint();
+  });
+  reset.addEventListener('click',function(){
+    clearInterval(id); id=null; started=null; elapsed=0;
+    toggle.textContent='Έναρξη'; paint();
+  });
+  paint();
+})();
+</script>
+</body>
+</html>

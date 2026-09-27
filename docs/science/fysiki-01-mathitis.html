@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Φύλλο μαθητή · Εβδομάδα 1 — Πώς ξέρουμε ότι κάτι είναι αλήθεια;</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141e26; --ink-soft:#47555f; --ink-faint:#78868f;
+  --ground:#f0f3f6; --sheet:#ffffff; --rule:#d4dce3; --rule-strong:#b3bfc9;
+  --blue:#17456b; --blue-wash:#e5ecf3;
+  --amber:#a8571f; --amber-wash:#f8efe4;
+  --teal:#0f5d52; --teal-wash:#e7f0ec;
+  --wrong:#9c3535; --wrong-wash:#f7e9e9;
+  --serif:'Alegreya', Georgia, 'Times New Roman', serif;
+  --sans:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --nav-h:60px; --side-w:288px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0; background:var(--ground); color:var(--ink); font-family:var(--serif); font-size:18.5px; line-height:1.68; -webkit-font-smoothing:antialiased}
+
+.nav{position:fixed; inset:0 0 auto 0; height:var(--nav-h); z-index:50; display:flex; align-items:center; gap:16px; padding:0 20px; background:var(--blue); color:#e8eef4; border-bottom:1px solid #0e3252}
+.nav-title{font-family:var(--serif); font-weight:700; font-size:1.06rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.nav-title span{display:block; font-family:var(--sans); font-weight:400; font-size:.7rem; color:#9db9d0; line-height:1.2; margin-top:1px}
+.nav-title a{color:inherit; text-decoration:none}
+.nav-title a:hover{text-decoration:underline; text-underline-offset:3px}
+.burger{display:none; background:none; border:1px solid rgba(255,255,255,.28); color:inherit; border-radius:5px; width:36px; height:34px; cursor:pointer; font-size:1.05rem; line-height:1; flex:0 0 auto}
+.nav-spacer{flex:1}
+.nav-actions{display:flex; gap:8px; font-family:var(--sans); flex:0 0 auto}
+.nav-btn{font-family:var(--sans); font-size:.78rem; font-weight:500; background:transparent; color:#c4d7e6; border:1px solid rgba(255,255,255,.25); border-radius:5px; padding:8px 13px; cursor:pointer; text-decoration:none; display:inline-block}
+.nav-btn:hover{background:rgba(255,255,255,.1); color:#fff}
+.nav-btn.solid{background:#e8eef4; color:var(--blue); border-color:#e8eef4}
+.nav-btn.solid:hover{background:#fff}
+:focus-visible{outline:2.5px solid #f0b27a; outline-offset:2px}
+
+.side{position:fixed; top:var(--nav-h); bottom:0; left:0; width:var(--side-w); z-index:40; overflow-y:auto; background:var(--sheet); border-right:1px solid var(--rule); font-family:var(--sans); padding:20px 0 48px}
+.side h2{font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--ink-faint); margin:22px 20px 8px; padding-top:14px; border-top:1px solid var(--rule)}
+.side h2:first-child{border-top:0; padding-top:0; margin-top:4px}
+.side ol{list-style:none; margin:0; padding:0}
+.side a{display:grid; grid-template-columns:30px 1fr; align-items:baseline; gap:4px; padding:6px 20px 6px 16px; text-decoration:none; color:var(--ink-soft); font-size:.83rem; line-height:1.35; border-left:3px solid transparent}
+.side a:hover{background:var(--blue-wash); color:var(--ink)}
+.side .num{font-variant-numeric:tabular-nums; font-size:.74rem; color:var(--ink-faint)}
+.side a[aria-current="page"]{border-left-color:var(--blue); background:var(--blue-wash); color:var(--blue); font-weight:600}
+.side a[aria-current="page"] .num{color:var(--blue)}
+.side a.pending{color:#9aa6ad}
+.side a.pending .ttl::after{content:''; display:inline-block; width:5px; height:5px; margin-left:7px; border:1px solid #c0cad2; border-radius:50%; vertical-align:.12em}
+.side-note{font-size:.72rem; color:var(--ink-faint); line-height:1.5; margin:20px 20px 0; padding-top:14px; border-top:1px solid var(--rule)}
+
+.wrap{margin-left:var(--side-w); padding-top:var(--nav-h)}
+main{max-width:800px; margin:0 auto; padding:0 32px 120px}
+
+.hero{padding:52px 0 32px; border-bottom:1px solid var(--rule)}
+.kicker{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--blue); margin:0 0 10px}
+.hero h1{font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.8vw,3rem); line-height:1.12; margin:0 0 18px; letter-spacing:-.012em; max-width:15ch}
+.hero-lede{font-size:1.14rem; color:var(--ink-soft); max-width:58ch; margin:0}
+
+figure.boxes{margin:32px 0 0; padding:24px 20px 18px; background:var(--sheet); border:1px solid var(--rule); border-radius:8px}
+figure.boxes svg{display:block; width:100%; height:auto; max-width:500px; margin:0 auto}
+figure.boxes figcaption{font-family:var(--sans); font-size:.8rem; color:var(--ink-soft); margin-top:14px; text-align:center}
+
+section{padding-top:48px}
+h2.sec{font-family:var(--serif); font-weight:700; font-size:1.66rem; line-height:1.2; margin:0 0 6px; letter-spacing:-.008em}
+.sec-sub{font-family:var(--sans); font-size:.8rem; color:var(--ink-faint); margin:0 0 22px}
+h3{font-family:var(--serif); font-weight:700; font-size:1.22rem; margin:30px 0 8px}
+p{margin:0 0 14px; max-width:66ch}
+a.link{color:var(--teal); text-underline-offset:3px}
+a.link:hover{background:var(--teal-wash)}
+ul,ol.body{max-width:64ch; padding-left:22px; margin:0 0 16px}
+li{margin-bottom:7px}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:.86em; background:#eef2f5; padding:1px 5px; border-radius:3px}
+
+.rulebox{border:2px solid var(--blue); border-radius:9px; background:var(--blue-wash); padding:20px 24px; margin:22px 0}
+.rulebox p{margin:0; font-size:1.16rem; font-weight:500; font-style:italic; max-width:none}
+.rulebox .bt{font-family:var(--sans); font-size:.76rem; font-weight:600; font-style:normal; color:var(--blue); margin-bottom:8px; display:block}
+
+.box{border:1px solid var(--rule); border-left-width:4px; border-radius:0 8px 8px 0; background:var(--sheet); padding:16px 20px; margin:20px 0}
+.box p:last-child{margin-bottom:0}
+.box .bt{font-family:var(--sans); font-size:.78rem; font-weight:600; margin:0 0 6px}
+.box.safety{border-left-color:var(--amber); background:var(--amber-wash)}
+.box.safety .bt{color:var(--amber)}
+.box.digital{border-left-color:var(--teal); background:var(--teal-wash)}
+.box.digital .bt{color:var(--teal)}
+
+.sheet{background:var(--sheet); border:1px solid var(--rule); border-radius:9px; padding:20px 22px; margin:20px 0}
+table.obs{width:100%; border-collapse:collapse; font-family:var(--sans); font-size:.82rem}
+table.obs th{background:var(--blue-wash); color:var(--blue); font-weight:600; font-size:.73rem; padding:8px; text-align:right; border:1px solid var(--rule)}
+table.obs td{border:1px solid var(--rule); padding:0}
+table.obs td.n{width:34px; text-align:center; color:var(--ink-faint); font-variant-numeric:tabular-nums; padding:6px 0; background:#fafcfd}
+table.obs input{width:100%; border:0; background:transparent; font-family:var(--sans); font-size:.83rem; color:var(--ink); padding:9px 8px; min-width:0}
+table.obs input:focus{background:#fffbf0; outline:2px solid var(--blue); outline-offset:-2px}
+
+.field{margin:16px 0}
+.field label{display:block; font-family:var(--sans); font-size:.83rem; font-weight:500; margin-bottom:6px}
+.field .hintline{font-family:var(--sans); font-size:.78rem; color:var(--ink-faint); margin:-2px 0 7px}
+textarea, input.line{width:100%; font-family:var(--serif); font-size:1rem; color:var(--ink); background:#fdfefe; border:1px solid var(--rule); border-radius:6px; padding:10px 12px; line-height:1.6}
+textarea{resize:vertical; min-height:84px}
+textarea:focus, input.line:focus{outline:2px solid var(--blue); outline-offset:-1px; background:#fffbf0}
+
+.meas{width:100%; border-collapse:collapse; font-family:var(--sans); font-size:.84rem}
+.meas th{background:var(--blue-wash); color:var(--blue); font-size:.73rem; font-weight:600; padding:8px; text-align:right; border:1px solid var(--rule)}
+.meas td{border:1px solid var(--rule); padding:0}
+.meas td.lbl{padding:8px 10px; text-align:right; background:#fafcfd; color:var(--ink-soft); width:34%}
+.meas input{width:100%; border:0; background:transparent; font-family:var(--sans); font-size:.84rem; padding:9px 10px}
+.meas input:focus{background:#fffbf0; outline:2px solid var(--blue); outline-offset:-2px}
+
+.ask{margin:16px 0; padding:0; list-style:none; max-width:64ch; border-top:1px solid var(--rule)}
+.ask li{margin:0; padding:12px 4px 12px 34px; border-bottom:1px solid var(--rule); position:relative; font-style:italic; font-size:1.03rem; line-height:1.55}
+.ask li::before{content:'?'; position:absolute; left:6px; top:12px; font-family:var(--sans); font-style:normal; font-weight:600; font-size:.86rem; color:var(--blue)}
+
+pre{background:#13202b; color:#dce6ee; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:.82rem; line-height:1.6; padding:16px 18px; border-radius:8px; overflow-x:auto; margin:14px 0}
+pre .c{color:#7d94a6}
+pre .k{color:#8fc4e8}
+
+/* Quiz */
+.qcard{background:var(--sheet); border:1px solid var(--rule); border-radius:10px; padding:20px 22px; margin-bottom:14px}
+.qhead{display:flex; gap:12px; align-items:baseline; margin-bottom:14px}
+.qnum{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--blue); flex:0 0 auto; padding-top:2px}
+.qtext{font-size:1.07rem; font-weight:500; margin:0; max-width:none}
+.opts{display:flex; flex-direction:column; gap:8px}
+.opt{display:flex; gap:11px; align-items:flex-start; width:100%; text-align:right; font-family:var(--sans); font-size:.92rem; line-height:1.5; color:var(--ink); background:#fbfdfe; border:1.5px solid var(--rule); border-radius:7px; padding:11px 14px; cursor:pointer; transition:border-color .12s ease, background .12s ease}
+.opt:hover:not([disabled]){border-color:var(--rule-strong); background:#fff}
+.opt .mark{flex:0 0 auto; width:20px; height:20px; border-radius:50%; border:1.5px solid var(--rule-strong); display:flex; align-items:center; justify-content:center; font-size:.8rem; line-height:1; margin-top:1px; font-weight:600; color:transparent}
+.opt[disabled]{cursor:default}
+.opt.correct{border-color:var(--blue); background:var(--blue-wash); color:var(--blue); font-weight:500}
+.opt.correct .mark{border-color:var(--blue); background:var(--blue); color:#fff}
+.opt.incorrect{border-color:var(--wrong); background:var(--wrong-wash); color:var(--wrong)}
+.opt.incorrect .mark{border-color:var(--wrong); background:var(--wrong); color:#fff}
+.opt.dim{opacity:.5}
+.verdict{margin-top:14px; padding-top:13px; border-top:1px solid var(--rule); display:none}
+.verdict.show{display:block}
+.verdict .vt{font-family:var(--sans); font-size:.86rem; font-weight:600; margin:0 0 5px}
+.verdict.ok .vt{color:var(--blue)}
+.verdict.no .vt{color:var(--wrong)}
+.verdict p.why{margin:0; font-size:1rem; color:var(--ink-soft); max-width:60ch}
+.hintbtn{font-family:var(--sans); font-size:.76rem; background:transparent; border:1px solid var(--rule); border-radius:5px; color:var(--ink-faint); padding:5px 10px; cursor:pointer; margin-top:12px}
+.hintbtn:hover{color:var(--blue); border-color:var(--blue)}
+.hinttext{font-family:var(--sans); font-size:.84rem; color:var(--ink-soft); margin:10px 0 0; display:none; font-style:italic}
+.hinttext.show{display:block}
+
+.score{background:var(--sheet); border:2px solid var(--blue); border-radius:10px; padding:22px 24px; margin-top:18px; display:none}
+.score.show{display:block}
+.score h3{margin:0 0 6px; font-size:1.3rem}
+.score p{margin:0; color:var(--ink-soft); max-width:58ch}
+.score .big{font-family:var(--sans); font-size:2.4rem; font-weight:600; color:var(--blue); line-height:1; margin-bottom:10px; font-variant-numeric:tabular-nums}
+
+.toolbar{display:flex; gap:9px; flex-wrap:wrap; margin:18px 0 0}
+.tool{font-family:var(--sans); font-size:.8rem; font-weight:500; background:var(--sheet); color:var(--blue); border:1.5px solid var(--blue); border-radius:6px; padding:8px 15px; cursor:pointer}
+.tool:hover{background:var(--blue); color:#fff}
+.tool.ghost{border-color:var(--rule-strong); color:var(--ink-soft)}
+.tool.ghost:hover{background:var(--ink-soft); color:#fff; border-color:var(--ink-soft)}
+
+.foot{margin-top:60px; padding-top:22px; border-top:1px solid var(--rule); font-family:var(--sans); font-size:.82rem; color:var(--ink-faint); display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
+.foot a{color:var(--blue); text-decoration:none; font-weight:500}
+.foot a:hover{text-decoration:underline}
+.scrim{position:fixed; inset:var(--nav-h) 0 0 0; background:rgba(20,30,38,.42); z-index:35; display:none}
+.scrim.on{display:block}
+
+@media (max-width:1040px){
+  .burger{display:block}
+  .side{transform:translateX(-100%); transition:transform .22s ease; box-shadow:0 0 40px rgba(0,0,0,.14)}
+  .side.open{transform:translateX(0)}
+  .wrap{margin-left:0}
+  main{padding:0 22px 90px}
+  .nav-btn.hideable{display:none}
+}
+@media (max-width:620px){
+  body{font-size:17.5px}
+  .nav{gap:10px; padding:0 12px}
+  .nav-title{font-size:.94rem}
+  .nav-title span{display:none}
+  table.obs{font-size:.76rem}
+  table.obs input{font-size:.77rem; padding:8px 5px}
+  .sheet{padding:14px}
+}
+@media print{
+  .nav,.side,.scrim,.toolbar,.hintbtn{display:none!important}
+  .wrap{margin:0; padding:0}
+  main{max-width:none; padding:0}
+  body{background:#fff; font-size:11pt}
+  section{padding-top:20px}
+  h2.sec{page-break-after:avoid}
+  .sheet,.box,.qcard,figure.boxes,.rulebox,pre{page-break-inside:avoid}
+  textarea,input.line{min-height:62px; background:#fff}
+  .verdict{display:none!important}
+  a.link::after{content:' (' attr(href) ')'; font-size:8pt; color:#555}
+}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <button class="burger" id="burger" aria-label="Άνοιγμα καταλόγου μαθημάτων" aria-expanded="false">☰</button>
+  <h1 class="nav-title"><a href="fysiki.html" title="Όλα τα μαθήματα Φυσικής">Μαθήματα Φυσικής Β΄ Γυμνασίου</a><span>Φύλλο μαθητή</span></h1>
+  <div class="nav-spacer"></div>
+  <div class="nav-actions">
+    <a class="nav-btn hideable" href="fysiki-01.html">Οδηγός καθηγητή</a>
+    <button class="nav-btn solid" id="printBtn">Εκτύπωση</button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<nav class="side" id="side" aria-label="Κατάλογος μαθημάτων">
+  <h2>Κεφάλαιο 1 · Εισαγωγή</h2>
+  <ol>
+    <li><a href="fysiki-01-mathitis.html" aria-current="page"><span class="num">01</span><span class="ttl">Τι κάνει ο φυσικός;</span></a></li>
+    <li><a href="fysiki-02-mathitis.html"><span class="num">02</span><span class="ttl">Μεγέθη &amp; μονάδες</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 2 · Κινήσεις</h2>
+  <ol>
+    <li><a href="fysiki-03-mathitis.html"><span class="num">03</span><span class="ttl">Περιγραφή της κίνησης</span></a></li>
+    <li><a href="fysiki-04-mathitis.html" class="pending"><span class="num">04</span><span class="ttl">Η έννοια της ταχύτητας</span></a></li>
+    <li><a href="fysiki-05-mathitis.html" class="pending"><span class="num">05</span><span class="ttl">Κίνηση με σταθερή ταχύτητα</span></a></li>
+    <li><a href="fysiki-06-mathitis.html" class="pending"><span class="num">06</span><span class="ttl">Μεταβαλλόμενη ταχύτητα</span></a></li>
+    <li><a href="fysiki-07-mathitis.html" class="pending"><span class="num">07</span><span class="ttl">Ελεύθερη πτώση</span></a></li>
+    <li><a href="fysiki-08-mathitis.html" class="pending"><span class="num">08</span><span class="ttl">Ολοκλήρωση: ανάλυση βίντεο</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 3 · Δυνάμεις</h2>
+  <ol>
+    <li><a href="fysiki-09-mathitis.html" class="pending"><span class="num">09</span><span class="ttl">Η έννοια της δύναμης</span></a></li>
+    <li><a href="fysiki-10-mathitis.html" class="pending"><span class="num">10</span><span class="ttl">Βάρος &amp; τριβή</span></a></li>
+    <li><a href="fysiki-11-mathitis.html" class="pending"><span class="num">11</span><span class="ttl">Ελατήρια &amp; νόμος του Χουκ</span></a></li>
+    <li><a href="fysiki-12-mathitis.html" class="pending"><span class="num">12</span><span class="ttl">Σύνθεση &amp; ανάλυση δυνάμεων</span></a></li>
+    <li><a href="fysiki-13-mathitis.html" class="pending"><span class="num">13</span><span class="ttl">Ισορροπία υλικού σημείου</span></a></li>
+    <li><a href="fysiki-14-mathitis.html" class="pending"><span class="num">14</span><span class="ttl">Πρώτος νόμος — αδράνεια</span></a></li>
+    <li><a href="fysiki-15-mathitis.html" class="pending"><span class="num">15</span><span class="ttl">Δεύτερος νόμος — F = m·a</span></a></li>
+    <li><a href="fysiki-16-mathitis.html" class="pending"><span class="num">16</span><span class="ttl">Τρίτος νόμος — αλληλεπίδραση</span></a></li>
+    <li><a href="fysiki-17-mathitis.html" class="pending"><span class="num">17</span><span class="ttl">Βολή, μέρος 1</span></a></li>
+    <li><a href="fysiki-18-mathitis.html" class="pending"><span class="num">18</span><span class="ttl">Βολή, μέρος 2</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 4 · Πίεση</h2>
+  <ol>
+    <li><a href="fysiki-19-mathitis.html" class="pending"><span class="num">19</span><span class="ttl">Πίεση</span></a></li>
+    <li><a href="fysiki-20-mathitis.html" class="pending"><span class="num">20</span><span class="ttl">Υδροστατική πίεση</span></a></li>
+    <li><a href="fysiki-21-mathitis.html" class="pending"><span class="num">21</span><span class="ttl">Ατμοσφαιρική πίεση</span></a></li>
+    <li><a href="fysiki-22-mathitis.html" class="pending"><span class="num">22</span><span class="ttl">Αρχή του Πασκάλ</span></a></li>
+    <li><a href="fysiki-23-mathitis.html" class="pending"><span class="num">23</span><span class="ttl">Άνωση — Αρχή του Αρχιμήδη</span></a></li>
+    <li><a href="fysiki-24-mathitis.html" class="pending"><span class="num">24</span><span class="ttl">Πλεύση &amp; πρόκληση σχεδιασμού</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 5 · Ενέργεια</h2>
+  <ol>
+    <li><a href="fysiki-25-mathitis.html" class="pending"><span class="num">25</span><span class="ttl">Έργο και ενέργεια</span></a></li>
+    <li><a href="fysiki-26-mathitis.html" class="pending"><span class="num">26</span><span class="ttl">Δυναμική &amp; κινητική ενέργεια</span></a></li>
+    <li><a href="fysiki-27-mathitis.html" class="pending"><span class="num">27</span><span class="ttl">Διατήρηση της ενέργειας</span></a></li>
+    <li><a href="fysiki-28-mathitis.html" class="pending"><span class="num">28</span><span class="ttl">Εκκρεμές με αισθητήρες</span></a></li>
+    <li><a href="fysiki-29-mathitis.html" class="pending"><span class="num">29</span><span class="ttl">Βαρύτητα &amp; τροχιές</span></a></li>
+  </ol>
+  <h2>Κλείσιμο</h2>
+  <ol>
+    <li><a href="fysiki-30-mathitis.html" class="pending"><span class="num">30</span><span class="ttl">Έκθεση φακέλου</span></a></li>
+  </ol>
+  <p class="side-note">Ο κύκλος σημαίνει ότι το φύλλο αυτού του μαθήματος δεν έχει γραφτεί ακόμη.</p>
+</nav>
+
+<div class="wrap">
+<main>
+
+  <div class="hero">
+    <p class="kicker">Εβδομάδα 1 · Φύλλο μαθητή</p>
+    <h1>Πώς ξέρουμε ότι κάτι είναι αλήθεια;</h1>
+    <p class="hero-lede">Δύο σφραγισμένα κουτιά. Δεν επιτρέπεται να τα ανοίξεις — ούτε σήμερα, ούτε την επόμενη εβδομάδα. Και παρ’ όλα αυτά, μέχρι το τέλος της ώρας θα ξέρεις πράγματα για το τι έχουν μέσα.</p>
+
+    <figure class="boxes">
+      <svg viewBox="0 0 500 178" role="img" aria-label="Δύο πανομοιότυπα σφραγισμένα κουτιά με ερωτηματικά">
+        <g id="bx"></g>
+      </svg>
+      <figcaption>Τα δύο κουτιά</figcaption>
+    </figure>
+  </div>
+
+  <section id="idea">
+    <h2 class="sec">Πριν αρχίσεις</h2>
+    <p class="sec-sub">Μία ιδέα που αξίζει να κρατήσεις</p>
+    <div class="rulebox">
+      <span class="bt">Η ιδέα</span>
+      <p>Κανένας φυσικός δεν έχει δει ποτέ άτομο με τα μάτια του. Κανείς δεν έχει πάει στο κέντρο της Γης. Κι όμως ξέρουμε πράγματα γι’ αυτά.</p>
+    </div>
+    <p>Το ερώτημα δεν είναι λοιπόν «πώς βλέπω τι έχει μέσα το κουτί», αλλά κάτι πολύ πιο ενδιαφέρον: <strong>πόσα μπορώ να συμπεράνω, και πόσο σίγουρος μπορώ να είμαι;</strong></p>
+
+    <h3>Ο κανόνας</h3>
+    <p>Σε ό,τι γράψεις σήμερα, θα κρατάς χωριστά δύο πράγματα:</p>
+    <ul>
+      <li><strong>Τι παρατήρησα</strong> — μόνο ό,τι κατέγραψαν οι αισθήσεις σου. «Ακούστηκε ένας ήχος μετά από περίπου ένα δευτερόλεπτο.»</li>
+      <li><strong>Τι συμπεραίνω</strong> — η ερμηνεία σου. «Άρα κάτι κύλησε από τη μια άκρη στην άλλη.»</li>
+    </ul>
+    <p>Και τα δύο είναι χρήσιμα. Αλλά αν τα μπερδέψεις, δεν θα καταλάβεις ποτέ πού ακριβώς έκανες λάθος όταν κάνεις λάθος.</p>
+  </section>
+
+  <section id="ereuna">
+    <h2 class="sec">Η έρευνά σου</h2>
+    <p class="sec-sub">Κούνα, γείρε, άκουσε, ζύγισε. Κάθε τι που δοκιμάζεις είναι πείραμα.</p>
+
+    <div class="sheet">
+      <div style="overflow-x:auto">
+        <table class="obs">
+          <thead><tr><th style="width:34px">#</th><th style="width:26%">Τι έκανα</th><th style="width:37%">Τι παρατήρησα</th><th>Τι συμπεραίνω</th></tr></thead>
+          <tbody id="obsBody"></tbody>
+        </table>
+      </div>
+
+      <div class="field" style="margin-top:22px">
+        <label for="ypoth">Γράψε <strong>δύο διαφορετικές</strong> εξηγήσεις που ταιριάζουν με ό,τι παρατήρησες μέχρι τώρα.</label>
+        <p class="hintline">Αν σου έρχεται μόνο μία, δεν έχεις παρατηρήσει αρκετά ακόμη.</p>
+        <textarea id="ypoth" placeholder="Εξήγηση Α: … / Εξήγηση Β: …"></textarea>
+      </div>
+
+      <div class="field">
+        <label for="test">Ποιο πείραμα θα ξεχώριζε τη μία εξήγηση από την άλλη;</label>
+        <p class="hintline">Αυτή είναι η σημαντικότερη ερώτηση όλου του μαθήματος.</p>
+        <textarea id="test" placeholder="Θα… και αν ισχύει η Α θα δω…, ενώ αν ισχύει η Β θα δω…"></textarea>
+      </div>
+
+      <div class="field" style="margin-bottom:0">
+        <label for="sigouria">Η τελική σου πρόβλεψη — και πόσο σίγουρος είσαι, από 1 έως 10;</label>
+        <textarea id="sigouria" placeholder="Κουτί Α: … / Κουτί Β: … / Σιγουριά: …/10 επειδή…"></textarea>
+      </div>
+    </div>
+
+    <div class="box safety">
+      <p class="bt">Τα κουτιά μένουν κλειστά</p>
+      <p>Θα τα ανοίξετε στην <strong>Εβδομάδα 8</strong>, όταν θα ξέρεις να αναλύεις κίνηση από βίντεο και θα μπορείς να επιστρέψεις με κανονικά εργαλεία. Γράψε την πρόβλεψή σου, δίπλωσέ την και κόλλησέ την πάνω στο κουτί. Στην πραγματική επιστήμη η επιβεβαίωση αργεί χρόνια — αυτό είναι μέρος της δουλειάς, όχι εμπόδιο.</p>
+    </div>
+  </section>
+
+  <section id="metrisi">
+    <h2 class="sec">Μέτρηση</h2>
+    <p class="sec-sub">Πόσο σίγουρος είναι ένας αριθμός;</p>
+
+    <p>Ζύγισε <strong>το ίδιο</strong> κουτί πέντε φορές. Κάθε φορά βγάλ’ το τελείως από τη ζυγαριά και ξαναβάλ’ το.</p>
+
+    <div class="sheet">
+      <table class="meas">
+        <tbody>
+          <tr><td class="lbl">Μέτρηση 1</td><td><input type="text" aria-label="Μέτρηση 1" placeholder="g"></td></tr>
+          <tr><td class="lbl">Μέτρηση 2</td><td><input type="text" aria-label="Μέτρηση 2" placeholder="g"></td></tr>
+          <tr><td class="lbl">Μέτρηση 3</td><td><input type="text" aria-label="Μέτρηση 3" placeholder="g"></td></tr>
+          <tr><td class="lbl">Μέτρηση 4</td><td><input type="text" aria-label="Μέτρηση 4" placeholder="g"></td></tr>
+          <tr><td class="lbl">Μέτρηση 5</td><td><input type="text" aria-label="Μέτρηση 5" placeholder="g"></td></tr>
+          <tr><td class="lbl"><strong>Μέσος όρος</strong></td><td><input type="text" aria-label="Μέσος όρος" placeholder="g"></td></tr>
+          <tr><td class="lbl"><strong>Απόκλιση (±)</strong></td><td><input type="text" aria-label="Απόκλιση" placeholder="± … g"></td></tr>
+        </tbody>
+      </table>
+
+      <div class="field" style="margin-top:18px; margin-bottom:0">
+        <label for="grapse">Γράψε τη μάζα του κουτιού όπως θα την έγραφε ένας φυσικός.</label>
+        <input class="line" id="grapse" type="text" placeholder="π.χ. 482 ± 2 g">
+      </div>
+    </div>
+
+    <div class="rulebox">
+      <span class="bt">Η πρόταση της ημέρας</span>
+      <p>Ένας αριθμός χωρίς εκτίμηση του σφάλματός του δεν είναι μέτρηση.</p>
+    </div>
+
+    <p>Η διασπορά στις μετρήσεις σου <em>δεν</em> είναι αποτυχία. Σημαίνει ότι μετράς σωστά και είσαι αρκετά προσεκτικός ώστε να τη δεις. Όποιος παίρνει πάντα ακριβώς τον ίδιο αριθμό, συνήθως δεν κοιτάζει προσεκτικά.</p>
+
+    <ul class="ask">
+      <li>Ποια μέτρηση από τις πέντε έπεσε πιο μακριά από τον μέσο όρο, και γιατί νομίζεις;</li>
+      <li>Αν μετρούσες τον χρόνο με το χρονόμετρο, η διασπορά θα ήταν μεγαλύτερη ή μικρότερη; Ποιος φταίει — εσύ ή το όργανο;</li>
+    </ul>
+  </section>
+
+  <section id="ergaleia">
+    <h2 class="sec">Τα εργαλεία σου φέτος</h2>
+    <p class="sec-sub">Τέσσερα, όλα δωρεάν</p>
+
+    <div class="box digital">
+      <p class="bt">phyphox — το κινητό σου γίνεται εργαστήριο</p>
+      <p><a class="link" href="https://phyphox.org">phyphox.org</a> · Android &amp; iOS. Μέσα στο κινητό σου υπάρχουν ήδη επιταχυνσιόμετρο, γυροσκόπιο, βαρόμετρο, μαγνητόμετρο και αισθητήρας φωτός. Το phyphox σου τα δίνει όλα με γραφικές παραστάσεις σε πραγματικό χρόνο.</p>
+      <p><strong>Δοκίμασε τώρα:</strong> άνοιξε το <em>Acceleration (without g)</em> και κούνα το χέρι σου. Μετά βάλε το κινητό σε μια τσάντα και κούνα την — μπορείς να καταλάβεις τι έγινε μέσα χωρίς να την ανοίξεις. Θυμίζει κάτι;</p>
+    </div>
+
+    <div class="box digital">
+      <p class="bt">PhET — προσομοιώσεις, πολλές στα ελληνικά</p>
+      <p><a class="link" href="https://phet.colorado.edu/el/simulations/filter?subjects=physics">phet.colorado.edu/el</a> · τρέχει στον browser, τίποτα να εγκαταστήσεις. Διάλεξε όποια θέλεις και παίξε.</p>
+    </div>
+
+    <div class="box digital">
+      <p class="bt">Algodoo — ζωγραφίζεις, και υπακούει στη φυσική</p>
+      <p><a class="link" href="http://www.algodoo.com">algodoo.com</a> · δωρεάν για Windows και Mac. Σχεδιάζεις ό,τι θέλεις με το ποντίκι, πατάς play, και τα πάντα πέφτουν, κυλούν και συγκρούονται σωστά. Είναι το πιο κοντινό σε «ζωγραφική που ζωντανεύει».</p>
+    </div>
+
+    <div class="box digital">
+      <p class="bt">GlowScript — Python που κάνει φυσική</p>
+      <p><a class="link" href="https://www.glowscript.org">glowscript.org</a> · γράφεις Python στον browser και βλέπεις τρισδιάστατα αντικείμενα να κινούνται. Επειδή ξέρεις ήδη Python, ξεκινάς κατευθείαν από εδώ.</p>
+    </div>
+  </section>
+
+  <section id="kodikas">
+    <h2 class="sec">Ο πρώτος σου κώδικας</h2>
+    <p class="sec-sub">Δώδεκα γραμμές που κρύβουν όλη τη χρονιά</p>
+
+<pre><span class="c"># Ένα σώμα που κινείται με σταθερή ταχύτητα</span>
+Web VPython 3.2
+
+<span class="c"># το αντικείμενο</span>
+soma = box(pos=vector(-5,0,0), size=vector(1,1,1), color=color.orange)
+
+<span class="c"># η ταχύτητά του και το βήμα του χρόνου</span>
+v  = vector(2,0,0)
+dt = 0.01
+t  = 0
+
+<span class="k">while</span> t &lt; 5:
+    rate(100)
+    soma.pos = soma.pos + v*dt
+    t = t + dt
+</pre>
+
+    <p>Η γραμμή <code>soma.pos = soma.pos + v*dt</code> είναι ο ορισμός της ταχύτητας γραμμένος έτσι ώστε να μη σηκώνει καμία παρεξήγηση: <em>νέα θέση = παλιά θέση + ταχύτητα επί χρόνο</em>. Ο υπολογιστής δεν δέχεται αοριστίες — γι’ αυτό το να γράψεις έναν νόμο σε κώδικα είναι ο αυστηρότερος έλεγχος του αν τον έχεις καταλάβει.</p>
+
+    <div class="sheet">
+      <div class="field"><label for="c1">Πριν το τρέξεις: τι θα γίνει αν κάνεις το <code>v</code> διπλάσιο;</label><input class="line" id="c1" type="text"></div>
+      <div class="field"><label for="c2">Και αν κάνεις το <code>dt</code> δέκα φορές μεγαλύτερο; Δοκίμασέ το και γράψε τι έγινε στην πραγματικότητα.</label><textarea id="c2"></textarea></div>
+      <div class="field" style="margin-bottom:0"><label for="c3">Πώς θα έκανες το σώμα να κινείται προς τα πάνω αντί για δεξιά;</label><input class="line" id="c3" type="text"></div>
+    </div>
+  </section>
+
+  <section id="kouiz">
+    <h2 class="sec">Έλεγξε τον εαυτό σου</h2>
+    <p class="sec-sub">Πέντε ερωτήσεις. Κάνε κλικ σε μια απάντηση και θα δεις αμέσως αν είναι σωστή. Δεν μπαίνει βαθμός πουθενά.</p>
+    <div id="quiz"></div>
+    <div class="score" id="score" role="status" aria-live="polite">
+      <div class="big" id="scoreBig">0 / 5</div>
+      <h3 id="scoreTitle"></h3>
+      <p id="scoreText"></p>
+    </div>
+    <div class="toolbar"><button class="tool ghost" id="quizReset">Ξαναπροσπάθησε</button></div>
+  </section>
+
+  <section id="apostoli">
+    <h2 class="sec">Η αποστολή σου</h2>
+    <p class="sec-sub">Για το σπίτι, αν σου αρέσει</p>
+    <p>Φτιάξε <strong>δικό σου μυστήριο κουτί</strong> και δώσ’ το στον πατέρα σου την επόμενη εβδομάδα. Θα ανακαλύψεις κάτι περίεργο: για να φτιάξεις ένα καλό αίνιγμα, πρέπει να σκεφτείς σαν αυτόν που θα το λύσει. Αυτό ακριβώς κάνει κάποιος όταν σχεδιάζει πείραμα.</p>
+    <p>Και η πρώτη σελίδα του τετραδίου σου: εξώφυλλο δικό σου, με τίτλο δικό σου. Μετά, σχέδια των δύο κουτιών με τις υποθέσεις σου σημειωμένες γύρω τους — σαν σελίδα από σημειωματάριο ερευνητή.</p>
+
+    <div class="toolbar">
+      <button class="tool" id="printBtn2">Εκτύπωση φύλλου</button>
+      <button class="tool ghost" id="clearAll">Καθάρισε τι έγραψα</button>
+    </div>
+
+    <div class="foot">
+      <span>Εβδομάδα 1 από 30</span>
+      <a href="fysiki-02-mathitis.html">Επόμενο: Μεγέθη &amp; μονάδες</a>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+
+  /* Δύο κουτιά */
+  var g=document.getElementById('bx');
+  if(g){
+    function mk(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);g.appendChild(e);return e;}
+    [[62,'Α'],[272,'Β']].forEach(function(pair){
+      var x=pair[0], y=48, w=134, h=74, d=28;
+      mk('path',{d:'M'+x+' '+y+' l'+d+' -'+d+' h'+w+' l-'+d+' '+d+' z', fill:'#dbe3ea', stroke:'#8fa2b3','stroke-width':1.3,'stroke-linejoin':'round'});
+      mk('path',{d:'M'+(x+w)+' '+y+' l'+d+' -'+d+' v'+h+' l-'+d+' '+d+' z', fill:'#c3d0da', stroke:'#8fa2b3','stroke-width':1.3,'stroke-linejoin':'round'});
+      mk('rect',{x:x,y:y,width:w,height:h,fill:'#eef2f6',stroke:'#8fa2b3','stroke-width':1.3});
+      mk('rect',{x:x+w/2-10,y:y-d,width:20,height:h+d,fill:'#a8571f',opacity:.28});
+      var q=mk('text',{x:x+w/2,y:y+h/2+13,'text-anchor':'middle','font-family':"'Alegreya',serif",'font-size':36,fill:'#17456b','font-weight':700});
+      q.textContent='?';
+      var t=mk('text',{x:x+w/2,y:y+h+25,'text-anchor':'middle','font-family':"'IBM Plex Sans',sans-serif",'font-size':12,fill:'#47555f','font-weight':600});
+      t.textContent='Κουτί '+pair[1];
+    });
+  }
+
+  /* Πίνακας παρατήρησης */
+  var body=document.getElementById('obsBody');
+  if(body){
+    for(var r=1;r<=8;r++){
+      var tr=document.createElement('tr');
+      var html='<td class="n">'+r+'</td>';
+      for(var c=0;c<3;c++) html+='<td><input type="text" aria-label="Γραμμή '+r+', στήλη '+(c+1)+'"></td>';
+      tr.innerHTML=html; body.appendChild(tr);
+    }
+  }
+
+  /* Drawer */
+  var side=document.getElementById('side'),burger=document.getElementById('burger'),scrim=document.getElementById('scrim');
+  function setDrawer(o){side.classList.toggle('open',o);scrim.classList.toggle('on',o);burger.setAttribute('aria-expanded',o?'true':'false');}
+  burger.addEventListener('click',function(){setDrawer(!side.classList.contains('open'));});
+  scrim.addEventListener('click',function(){setDrawer(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setDrawer(false);});
+
+  /* Quiz */
+  var QS=[
+    {q:'Ποια από τις παρακάτω είναι <strong>παρατήρηση</strong> και όχι συμπέρασμα;',
+     hint:'Ποια θα μπορούσε να γράψει κάποιος που δεν έχει ιδέα τι υπάρχει μέσα;',
+     opts:['Μέσα στο κουτί Α υπάρχει κάτι μεταλλικό',
+           'Όταν γέρνω το κουτί Α, ακούγεται ένας μόνο ήχος μετά από περίπου ένα δευτερόλεπτο',
+           'Το κουτί Α είναι πιο ενδιαφέρον από το Β',
+           'Τα δύο κουτιά έχουν το ίδιο πράγμα μέσα'],
+     a:1, ok:'Ακριβώς αυτό.', no:'Όχι ακόμα.',
+     why:'Παρατήρηση είναι μόνο ό,τι κατέγραψαν οι αισθήσεις σου, με όση ακρίβεια μπόρεσες. Όλα τα υπόλοιπα είναι ερμηνείες — μπορεί σωστές, αλλά δεν τις είδες.'},
+
+    {q:'Τα δύο κουτιά ζυγίζουν ακριβώς το ίδιο. Τι αποδεικνύει αυτό;',
+     hint:'Σε ποια ερώτηση ακριβώς απαντάει μια ζυγαριά;',
+     opts:['Ότι έχουν το ίδιο περιεχόμενο',
+           'Ότι έχουν τον ίδιο όγκο υλικού μέσα',
+           'Μόνο ότι η συνολική τους μάζα είναι ίδια, τίποτε άλλο',
+           'Ότι δεν μπορούμε να μάθουμε τίποτα γι’ αυτά'],
+     a:2, ok:'Σωστά.', no:'Σκέψου το ξανά.',
+     why:'Κάθε όργανο απαντά σε μία και μόνο ερώτηση. Η ζυγαριά απαντά «πόση μάζα» — όχι «τι σχήμα», «πόσα κομμάτια» ή «πώς κινείται μέσα». Το να ξέρεις τι <em>δεν</em> σου λέει ένα όργανο είναι εξίσου σημαντικό.'},
+
+    {q:'Ζυγίζεις το ίδιο κουτί πέντε φορές και παίρνεις 481, 483, 482, 484, 482 g. Ποια είναι η σωστή απάντηση;',
+     hint:'Μήπως η «σωστή απάντηση» δεν είναι ένας μόνο αριθμός;',
+     opts:['Το 481, γιατί ήταν η πρώτη μέτρηση',
+           'Το 484, γιατί ήταν η μεγαλύτερη',
+           'Περίπου 482 g, με αβεβαιότητα γύρω στα ±2 g',
+           'Καμία — η ζυγαριά είναι χαλασμένη'],
+     a:2, ok:'Ναι — αριθμός συν αβεβαιότητα.', no:'Κοντά, αλλά λείπει κάτι.',
+     why:'Η διασπορά δεν σημαίνει αποτυχία, σημαίνει ότι μετράς σωστά. Κάθε πραγματική μέτρηση έχει σκέδαση· η δουλειά σου είναι να την εκτιμήσεις και να τη γράψεις, όχι να την κρύψεις.'},
+
+    {q:'Ποια υπόθεση <strong>δεν</strong> είναι επιστημονική;',
+     hint:'Ψάξε αυτήν που κανένα πείραμα δεν θα μπορούσε ποτέ να διαψεύσει.',
+     opts:['Μέσα στο κουτί υπάρχει κάτι μεταλλικό',
+           'Μέσα στο κουτί υπάρχουν δύο κομμάτια αντί για ένα',
+           'Μέσα στο κουτί υπάρχει κάτι που εξαφανίζεται κάθε φορά που κοιτάζουμε',
+           'Το περιεχόμενο είναι βαρύ αλλά μικρό'],
+     a:2, ok:'Ακριβώς.', no:'Δοκίμασε ξανά.',
+     why:'Οι άλλες τρεις μπορούν να ελεγχθούν: υπάρχει πείραμα που θα τις διέψευδε. Αυτή είναι φτιαγμένη ώστε να μην μπορεί ποτέ να ελεγχθεί — και μια υπόθεση που τίποτα δεν μπορεί να τη διαψεύσει δεν λέει τελικά τίποτα για τον κόσμο.'},
+
+    {q:'Στον κώδικα, τι κάνει η γραμμή <code>soma.pos = soma.pos + v*dt</code>;',
+     hint:'Διάβασέ τη δυνατά σαν πρόταση, από δεξιά προς τα αριστερά.',
+     opts:['Ζωγραφίζει το σώμα στην οθόνη',
+           'Ορίζει πόσο γρήγορα τρέχει το πρόγραμμα',
+           'Μετακινεί το σώμα κατά όσο προλαβαίνει να διανύσει σε χρόνο dt',
+           'Σταματάει τον βρόχο όταν τελειώσει ο χρόνος'],
+     a:2, ok:'Σωστά.', no:'Σχεδόν.',
+     why:'Είναι ο ορισμός της ταχύτητας γραμμένος σε κώδικα: νέα θέση = παλιά θέση + ταχύτητα επί χρόνο. Στην Εβδομάδα 6 θα προσθέσεις μία ακόμη γραμμή από πάνω της και θα μπορείς να προσομοιώνεις οτιδήποτε επιταχύνεται.'}
+  ];
+
+  var answered=0,right=0;
+  var quiz=document.getElementById('quiz');
+  var scoreEl=document.getElementById('score'),scoreBig=document.getElementById('scoreBig'),
+      scoreTitle=document.getElementById('scoreTitle'),scoreText=document.getElementById('scoreText');
+
+  function build(){
+    quiz.innerHTML=''; answered=0; right=0; scoreEl.classList.remove('show');
+    QS.forEach(function(item,qi){
+      var card=document.createElement('div'); card.className='qcard';
+      var head='<div class="qhead"><span class="qnum">'+(qi+1)+'</span><p class="qtext">'+item.q+'</p></div>';
+      var opts='<div class="opts" role="group" aria-label="Επιλογές ερώτησης '+(qi+1)+'">';
+      item.opts.forEach(function(o,oi){
+        opts+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'"><span class="mark" aria-hidden="true"></span><span>'+o+'</span></button>';
+      });
+      opts+='</div>';
+      var extra='<button class="hintbtn" data-hint="'+qi+'">Δώσε μου μια βοήθεια</button>'+
+                '<p class="hinttext" id="hint'+qi+'">'+item.hint+'</p>'+
+                '<div class="verdict" id="v'+qi+'"><p class="vt"></p><p class="why">'+item.why+'</p></div>';
+      card.innerHTML=head+opts+extra;
+      quiz.appendChild(card);
+    });
+  }
+
+  quiz.addEventListener('click',function(e){
+    var hb=e.target.closest('.hintbtn');
+    if(hb){document.getElementById('hint'+hb.dataset.hint).classList.add('show'); hb.remove(); return;}
+    var btn=e.target.closest('.opt');
+    if(!btn||btn.disabled) return;
+    var qi=+btn.dataset.q, oi=+btn.dataset.o, item=QS[qi], card=btn.closest('.qcard');
+    card.querySelectorAll('.opt').forEach(function(b){b.disabled=true;b.classList.add('dim');});
+    var ok=card.querySelector('.opt[data-o="'+item.a+'"]');
+    ok.classList.remove('dim'); ok.classList.add('correct'); ok.querySelector('.mark').textContent='✓';
+    var v=document.getElementById('v'+qi);
+    if(oi===item.a){right++; v.classList.add('ok'); v.querySelector('.vt').textContent=item.ok;}
+    else{btn.classList.remove('dim'); btn.classList.add('incorrect'); btn.querySelector('.mark').textContent='✕';
+         v.classList.add('no'); v.querySelector('.vt').textContent=item.no;}
+    v.classList.add('show');
+    answered++; if(answered===QS.length) finish();
+  });
+
+  function finish(){
+    scoreBig.textContent=right+' / '+QS.length;
+    var t,x;
+    if(right===5){t='Πλήρες.';x='Κατάλαβες τη διαφορά παρατήρησης και συμπεράσματος, και γιατί μια μέτρηση χρειάζεται αβεβαιότητα. Όλη η χρονιά χτίζεται πάνω σε αυτά τα δύο.';}
+    else if(right===4){t='Πολύ καλά.';x='Ένα σου ξέφυγε. Διάβασε την εξήγησή του και θα κάτσει αμέσως.';}
+    else if(right===3){t='Καλή αρχή.';x='Οι μισές ιδέες είναι εκεί. Ξαναδές τις εξηγήσεις των υπολοίπων και ρώτα ό,τι δεν βγάζει νόημα.';}
+    else{t='Αξίζει μια δεύτερη ματιά.';x='Δεν πειράζει καθόλου — αυτές οι ερωτήσεις πιάνουν πράγματα που ο περισσότερος κόσμος τα έχει λάθος. Διάβασε τις εξηγήσεις και ξαναπροσπάθησε.';}
+    scoreTitle.textContent=t; scoreText.textContent=x;
+    scoreEl.classList.add('show'); scoreEl.scrollIntoView({block:'nearest'});
+  }
+
+  document.getElementById('quizReset').addEventListener('click',function(){build();document.getElementById('kouiz').scrollIntoView();});
+
+  function doPrint(){window.print();}
+  document.getElementById('printBtn').addEventListener('click',doPrint);
+  document.getElementById('printBtn2').addEventListener('click',doPrint);
+  document.getElementById('clearAll').addEventListener('click',function(){
+    if(!confirm('Να σβηστούν όλα όσα έγραψες σε αυτό το φύλλο;')) return;
+    document.querySelectorAll('main input[type="text"], main textarea').forEach(function(f){f.value='';});
+  });
+
+  build();
+})();
+</script>
+</body>
+</html>

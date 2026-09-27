@@ -1,0 +1,590 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Εβδομάδα 2 · Πόσο σίγουρη είναι μια μέτρηση; — Μαθήματα Φυσικής Β΄ Γυμνασίου</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141e26; --ink-soft:#47555f; --ink-faint:#78868f;
+  --ground:#f0f3f6; --sheet:#ffffff; --rule:#d4dce3; --rule-strong:#b3bfc9;
+
+  /* Φυσική: μπλε = δομή · κεχριμπάρι = ασφάλεια · πράσινο = ψηφιακά */
+  --blue:#17456b; --blue-wash:#e5ecf3;
+  --amber:#a8571f; --amber-wash:#f8efe4;
+  --teal:#0f5d52; --teal-wash:#e7f0ec;
+
+  --serif:'Alegreya', Georgia, 'Times New Roman', serif;
+  --sans:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --nav-h:60px; --side-w:288px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0; background:var(--ground); color:var(--ink); font-family:var(--serif); font-size:18px; line-height:1.68; -webkit-font-smoothing:antialiased}
+
+.nav{position:fixed; inset:0 0 auto 0; height:var(--nav-h); z-index:50; display:flex; align-items:center; gap:16px; padding:0 20px; background:var(--blue); color:#e8eef4; border-bottom:1px solid #0e3252}
+.nav-title{font-family:var(--serif); font-weight:700; font-size:1.06rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.nav-title span{display:block; font-family:var(--sans); font-weight:400; font-size:.7rem; color:#9db9d0; line-height:1.2; margin-top:1px}
+.nav-title a{color:inherit; text-decoration:none}
+.nav-title a:hover{text-decoration:underline; text-underline-offset:3px}
+.burger{display:none; background:none; border:1px solid rgba(255,255,255,.28); color:inherit; border-radius:5px; width:36px; height:34px; cursor:pointer; font-size:1.05rem; line-height:1; flex:0 0 auto}
+.nav-spacer{flex:1}
+.timer{display:flex; align-items:center; gap:10px; font-family:var(--sans); flex:0 0 auto}
+.timer-read{min-width:132px; text-align:right; line-height:1.15}
+.timer-clock{font-size:1.02rem; font-weight:600; font-variant-numeric:tabular-nums; display:block}
+.timer-seg{font-size:.68rem; color:#9db9d0; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:210px}
+.timer-btn{font-family:var(--sans); font-size:.78rem; font-weight:500; background:#e8eef4; color:var(--blue); border:0; border-radius:5px; padding:8px 13px; cursor:pointer; text-decoration:none; display:inline-block}
+.timer-btn:hover{background:#fff}
+.timer-btn.reset{background:transparent; color:#9db9d0; border:1px solid rgba(255,255,255,.25)}
+.timer-btn.reset:hover{color:#e8eef4}
+:focus-visible{outline:2.5px solid #f0b27a; outline-offset:2px}
+
+.side{position:fixed; top:var(--nav-h); bottom:0; left:0; width:var(--side-w); z-index:40; overflow-y:auto; background:var(--sheet); border-right:1px solid var(--rule); font-family:var(--sans); padding:20px 0 48px}
+.side h2{font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--ink-faint); margin:22px 20px 8px; padding-top:14px; border-top:1px solid var(--rule)}
+.side h2:first-child{border-top:0; padding-top:0; margin-top:4px}
+.side ol{list-style:none; margin:0; padding:0}
+.side a{display:grid; grid-template-columns:30px 1fr; align-items:baseline; gap:4px; padding:6px 20px 6px 16px; text-decoration:none; color:var(--ink-soft); font-size:.83rem; line-height:1.35; border-left:3px solid transparent}
+.side a:hover{background:var(--blue-wash); color:var(--ink)}
+.side .num{font-variant-numeric:tabular-nums; font-size:.74rem; color:var(--ink-faint)}
+.side a[aria-current="page"]{border-left-color:var(--blue); background:var(--blue-wash); color:var(--blue); font-weight:600}
+.side a[aria-current="page"] .num{color:var(--blue)}
+.side a.pending{color:#9aa6ad}
+.side a.pending .ttl::after{content:''; display:inline-block; width:5px; height:5px; margin-left:7px; border:1px solid #c0cad2; border-radius:50%; vertical-align:.12em}
+.side-note{font-size:.72rem; color:var(--ink-faint); line-height:1.5; margin:20px 20px 0; padding-top:14px; border-top:1px solid var(--rule)}
+
+.wrap{margin-left:var(--side-w); padding-top:var(--nav-h)}
+main{max-width:830px; margin:0 auto; padding:0 32px 120px}
+
+.hero{padding:52px 0 34px; border-bottom:1px solid var(--rule)}
+.hero-week{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--blue); margin:0 0 10px}
+.hero h1{font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.6vw,2.9rem); line-height:1.14; margin:0 0 18px; letter-spacing:-.012em; max-width:16ch}
+.hero-lede{font-size:1.12rem; color:var(--ink-soft); max-width:60ch; margin:0 0 26px}
+.hero-lede em{color:var(--ink); font-style:italic}
+.facts{display:flex; flex-wrap:wrap; gap:0; font-family:var(--sans); font-size:.79rem; border:1px solid var(--rule); border-radius:7px; overflow:hidden; background:var(--sheet)}
+.fact{padding:11px 16px; border-right:1px solid var(--rule); flex:1 1 auto}
+.fact:last-child{border-right:0}
+.fact dt{color:var(--ink-faint); font-size:.71rem; margin-bottom:2px}
+.fact dd{margin:0; font-weight:500; color:var(--ink)}
+
+figure.boxes{margin:34px 0 0; padding:26px 22px 20px; background:var(--sheet); border:1px solid var(--rule); border-radius:8px}
+figure.boxes svg{display:block; width:100%; height:auto; max-width:520px; margin:0 auto}
+figure.boxes figcaption{font-family:var(--sans); font-size:.79rem; color:var(--ink-soft); margin-top:16px; text-align:center; line-height:1.55; max-width:56ch; margin-left:auto; margin-right:auto}
+figure.boxes figcaption b{color:var(--amber); font-weight:600}
+
+section{padding-top:46px}
+h2.sec{font-family:var(--serif); font-weight:700; font-size:1.62rem; line-height:1.2; margin:0 0 6px; letter-spacing:-.008em}
+.sec-sub{font-family:var(--sans); font-size:.79rem; color:var(--ink-faint); margin:0 0 22px}
+h3{font-family:var(--serif); font-weight:700; font-size:1.2rem; margin:30px 0 8px}
+h4{font-family:var(--sans); font-weight:600; font-size:.92rem; margin:22px 0 6px}
+p{margin:0 0 14px; max-width:68ch}
+a.link{color:var(--teal); text-underline-offset:3px; text-decoration-thickness:1px}
+a.link:hover{background:var(--teal-wash)}
+ul,ol.body{max-width:66ch; padding-left:22px; margin:0 0 16px}
+li{margin-bottom:7px}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:.86em; background:#eef2f5; padding:1px 5px; border-radius:3px}
+
+table{width:100%; border-collapse:collapse; font-family:var(--sans); font-size:.83rem; background:var(--sheet); border:1px solid var(--rule); border-radius:8px; overflow:hidden; margin:16px 0 22px}
+th,td{padding:9px 13px; text-align:right; border-bottom:1px solid var(--rule); vertical-align:top}
+th{background:var(--blue-wash); color:var(--blue); font-weight:600; font-size:.76rem}
+tbody tr:last-child td{border-bottom:0}
+td.n{width:38px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+
+.rail{margin:22px 0 8px; border-left:2px solid var(--rule-strong)}
+.tick{position:relative; display:grid; grid-template-columns:74px 1fr; gap:16px; padding:13px 14px 13px 18px; border-radius:0 7px 7px 0}
+.tick::before{content:''; position:absolute; left:-2px; top:0; bottom:0; width:2px; background:transparent}
+.tick[data-active="true"]{background:var(--blue-wash)}
+.tick[data-active="true"]::before{background:var(--blue)}
+.tick .t{font-family:var(--sans); font-size:.78rem; font-weight:600; font-variant-numeric:tabular-nums; color:var(--ink-faint); padding-top:2px}
+.tick[data-active="true"] .t{color:var(--blue)}
+.tick .lab{font-family:var(--sans); font-size:.9rem; font-weight:500}
+.tick .lab small{display:block; font-weight:400; font-size:.79rem; color:var(--ink-soft); margin-top:2px; line-height:1.45}
+
+.box{border:1px solid var(--rule); border-left-width:4px; border-radius:0 8px 8px 0; background:var(--sheet); padding:16px 20px; margin:20px 0}
+.box p:last-child{margin-bottom:0}
+.box .bt{font-family:var(--sans); font-size:.78rem; font-weight:600; margin:0 0 6px}
+.box.safety{border-left-color:var(--amber); background:var(--amber-wash)}
+.box.safety .bt{color:var(--amber)}
+.box.digital{border-left-color:var(--teal); background:var(--teal-wash)}
+.box.digital .bt{color:var(--teal)}
+.box.key{border-left-color:var(--blue); background:var(--blue-wash)}
+.box.key .bt{color:var(--blue)}
+
+.ask{margin:16px 0; padding:0; list-style:none; max-width:66ch; border-top:1px solid var(--rule)}
+.ask li{margin:0; padding:12px 4px 12px 34px; border-bottom:1px solid var(--rule); position:relative; font-style:italic; font-size:1.02rem; line-height:1.55}
+.ask li::before{content:'?'; position:absolute; left:6px; top:12px; font-family:var(--sans); font-style:normal; font-weight:600; font-size:.86rem; color:var(--blue)}
+
+.dialogue{margin:18px 0; max-width:60ch}
+.dialogue p{margin:0 0 4px; padding-left:18px; border-left:2px solid var(--rule)}
+.dialogue p.you{font-weight:500}
+.dialogue p.him{color:var(--ink-soft); font-style:italic}
+
+pre{background:#13202b; color:#dce6ee; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:.82rem; line-height:1.6; padding:16px 18px; border-radius:8px; overflow-x:auto; margin:14px 0}
+pre .c{color:#7d94a6}
+pre .k{color:#8fc4e8}
+pre .s{color:#9ee0b6}
+
+.quiz{margin:18px 0}
+details.q{background:var(--sheet); border:1px solid var(--rule); border-radius:8px; margin-bottom:9px; overflow:hidden}
+details.q[open]{border-color:var(--rule-strong)}
+details.q summary{cursor:pointer; padding:14px 18px; font-size:1rem; font-weight:500; list-style:none; display:flex; gap:12px; align-items:baseline}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary::after{content:'+'; margin-left:auto; font-family:var(--sans); color:var(--ink-faint); font-size:1.05rem; line-height:1}
+details.q[open] summary::after{content:'–'}
+details.q summary .qn{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--blue); flex:0 0 auto; padding-top:3px}
+.q-body{padding:14px 18px 16px 48px; border-top:1px solid var(--rule)}
+.q-body .opt{font-family:var(--sans); font-size:.85rem; color:var(--ink-soft); margin:0 0 4px}
+.q-body .opt.right{color:var(--blue); font-weight:600}
+.q-body .why{font-size:.97rem; color:var(--ink-soft); margin:12px 0 0; max-width:62ch}
+
+.foot{margin-top:64px; padding-top:22px; border-top:1px solid var(--rule); font-family:var(--sans); font-size:.82rem; color:var(--ink-faint); display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
+.foot a{color:var(--blue); text-decoration:none; font-weight:500}
+.foot a:hover{text-decoration:underline}
+.scrim{position:fixed; inset:var(--nav-h) 0 0 0; background:rgba(20,30,38,.42); z-index:35; display:none}
+.scrim.on{display:block}
+
+@media (max-width:1040px){
+  .burger{display:block}
+  .side{transform:translateX(-100%); transition:transform .22s ease; box-shadow:0 0 40px rgba(0,0,0,.14)}
+  .side.open{transform:translateX(0)}
+  .wrap{margin-left:0}
+  main{padding:0 22px 90px}
+  .timer-read{min-width:auto}
+  .timer-seg{display:none}
+  #studentLink{display:none}
+}
+@media (max-width:620px){
+  body{font-size:17px}
+  .nav{gap:10px; padding:0 12px}
+  .nav-title{font-size:.94rem}
+  .nav-title span{display:none}
+  .timer-btn{padding:7px 10px; font-size:.74rem}
+  .tick{grid-template-columns:56px 1fr; gap:10px; padding-left:12px}
+  table{font-size:.78rem}
+  th,td{padding:7px 9px}
+}
+@media print{
+  .nav,.side,.scrim,.timer{display:none!important}
+  .wrap{margin:0; padding:0}
+  main{max-width:none; padding:0}
+  body{background:#fff; font-size:11pt}
+  section{padding-top:22px}
+  h2.sec{page-break-after:avoid}
+  .box,figure.boxes,table,.tick,pre{page-break-inside:avoid}
+  details.q{page-break-inside:avoid}
+  details.q .q-body{display:block!important}
+  a.link::after{content:' (' attr(href) ')'; font-size:8pt; color:#555; word-break:break-all}
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <button class="burger" id="burger" aria-label="Άνοιγμα καταλόγου μαθημάτων" aria-expanded="false">☰</button>
+  <h1 class="nav-title"><a href="fysiki.html" title="Όλα τα μαθήματα Φυσικής">Μαθήματα Φυσικής Β΄ Γυμνασίου</a><span>Εμπλουτισμένο πρόγραμμα 30 εβδομάδων</span></h1>
+  <div class="nav-spacer"></div>
+  <a class="timer-btn reset" id="studentLink" href="fysiki-02-mathitis.html">Φύλλο μαθητή</a>
+  <div class="timer">
+    <div class="timer-read">
+      <span class="timer-clock" id="clock">00:00</span>
+      <span class="timer-seg" id="segname">Το μάθημα δεν έχει ξεκινήσει</span>
+    </div>
+    <button class="timer-btn" id="toggle">Έναρξη</button>
+    <button class="timer-btn reset" id="reset">Μηδενισμός</button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<nav class="side" id="side" aria-label="Κατάλογος μαθημάτων">
+  <h2>Κεφάλαιο 1 · Εισαγωγή</h2>
+  <ol>
+    <li><a href="fysiki-01.html"><span class="num">01</span><span class="ttl">Τι κάνει ο φυσικός;</span></a></li>
+    <li><a href="fysiki-02.html" aria-current="page"><span class="num">02</span><span class="ttl">Μεγέθη &amp; μονάδες</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 2 · Κινήσεις</h2>
+  <ol>
+    <li><a href="fysiki-03.html"><span class="num">03</span><span class="ttl">Περιγραφή της κίνησης</span></a></li>
+    <li><a href="fysiki-04.html" class="pending"><span class="num">04</span><span class="ttl">Η έννοια της ταχύτητας</span></a></li>
+    <li><a href="fysiki-05.html" class="pending"><span class="num">05</span><span class="ttl">Κίνηση με σταθερή ταχύτητα</span></a></li>
+    <li><a href="fysiki-06.html" class="pending"><span class="num">06</span><span class="ttl">Μεταβαλλόμενη ταχύτητα</span></a></li>
+    <li><a href="fysiki-07.html" class="pending"><span class="num">07</span><span class="ttl">Ελεύθερη πτώση</span></a></li>
+    <li><a href="fysiki-08.html" class="pending"><span class="num">08</span><span class="ttl">Ολοκλήρωση: ανάλυση βίντεο</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 3 · Δυνάμεις</h2>
+  <ol>
+    <li><a href="fysiki-09.html" class="pending"><span class="num">09</span><span class="ttl">Η έννοια της δύναμης</span></a></li>
+    <li><a href="fysiki-10.html" class="pending"><span class="num">10</span><span class="ttl">Βάρος &amp; τριβή</span></a></li>
+    <li><a href="fysiki-11.html" class="pending"><span class="num">11</span><span class="ttl">Ελατήρια &amp; νόμος του Χουκ</span></a></li>
+    <li><a href="fysiki-12.html" class="pending"><span class="num">12</span><span class="ttl">Σύνθεση &amp; ανάλυση δυνάμεων</span></a></li>
+    <li><a href="fysiki-13.html" class="pending"><span class="num">13</span><span class="ttl">Ισορροπία υλικού σημείου</span></a></li>
+    <li><a href="fysiki-14.html" class="pending"><span class="num">14</span><span class="ttl">Πρώτος νόμος — αδράνεια</span></a></li>
+    <li><a href="fysiki-15.html" class="pending"><span class="num">15</span><span class="ttl">Δεύτερος νόμος — F = m·a</span></a></li>
+    <li><a href="fysiki-16.html" class="pending"><span class="num">16</span><span class="ttl">Τρίτος νόμος — αλληλεπίδραση</span></a></li>
+    <li><a href="fysiki-17.html" class="pending"><span class="num">17</span><span class="ttl">Βολή, μέρος 1</span></a></li>
+    <li><a href="fysiki-18.html" class="pending"><span class="num">18</span><span class="ttl">Βολή, μέρος 2</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 4 · Πίεση</h2>
+  <ol>
+    <li><a href="fysiki-19.html" class="pending"><span class="num">19</span><span class="ttl">Πίεση</span></a></li>
+    <li><a href="fysiki-20.html" class="pending"><span class="num">20</span><span class="ttl">Υδροστατική πίεση</span></a></li>
+    <li><a href="fysiki-21.html" class="pending"><span class="num">21</span><span class="ttl">Ατμοσφαιρική πίεση</span></a></li>
+    <li><a href="fysiki-22.html" class="pending"><span class="num">22</span><span class="ttl">Αρχή του Πασκάλ</span></a></li>
+    <li><a href="fysiki-23.html" class="pending"><span class="num">23</span><span class="ttl">Άνωση — Αρχή του Αρχιμήδη</span></a></li>
+    <li><a href="fysiki-24.html" class="pending"><span class="num">24</span><span class="ttl">Πλεύση &amp; πρόκληση σχεδιασμού</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 5 · Ενέργεια</h2>
+  <ol>
+    <li><a href="fysiki-25.html" class="pending"><span class="num">25</span><span class="ttl">Έργο και ενέργεια</span></a></li>
+    <li><a href="fysiki-26.html" class="pending"><span class="num">26</span><span class="ttl">Δυναμική &amp; κινητική ενέργεια</span></a></li>
+    <li><a href="fysiki-27.html" class="pending"><span class="num">27</span><span class="ttl">Διατήρηση της ενέργειας</span></a></li>
+    <li><a href="fysiki-28.html" class="pending"><span class="num">28</span><span class="ttl">Εκκρεμές με αισθητήρες</span></a></li>
+    <li><a href="fysiki-29.html" class="pending"><span class="num">29</span><span class="ttl">Βαρύτητα &amp; τροχιές</span></a></li>
+  </ol>
+  <h2>Κλείσιμο</h2>
+  <ol>
+    <li><a href="fysiki-30.html" class="pending"><span class="num">30</span><span class="ttl">Έκθεση φακέλου</span></a></li>
+  </ol>
+  <p class="side-note">Ο κύκλος δίπλα σε ένα μάθημα σημαίνει ότι η σελίδα του δεν έχει γραφτεί ακόμη.</p>
+</nav>
+
+<div class="wrap">
+<main>
+
+  <div class="hero">
+    <p class="hero-week">Εβδομάδα 2 · Κεφάλαιο 1.3 · 60 λεπτά</p>
+    <h1>Πόσο σίγουρη είναι μια μέτρηση;</h1>
+    <p class="hero-lede">Η Εβδομάδα 1 έσπειρε την ιδέα του ±. Σήμερα γίνεται σύστημα: <em>από πού</em> έρχεται το σφάλμα, πώς το ξεχωρίζεις σε όργανο και άνθρωπο, και πώς ονομάζεις αυτό που μετράς ώστε να σε καταλάβει ένας φυσικός στην Ιαπωνία.</p>
+
+    <dl class="facts">
+      <div class="fact"><dt>Ερώτημα-οδηγός</dt><dd>Πόσο γρήγορα αντιδράς — και τι σημαίνει αυτό για κάθε χρονομέτρηση;</dd></div>
+      <div class="fact"><dt>Παρανόηση-στόχος</dt><dd>«Το όργανο με τα περισσότερα δεκαδικά είναι το πιο ακριβές»</dd></div>
+      <div class="fact"><dt>Ψηφιακά</dt><dd>phyphox Acoustic Stopwatch · Python</dd></div>
+    </dl>
+
+    <figure class="boxes">
+      <svg viewBox="0 0 520 210" role="img" aria-label="Χάρακας που πέφτει ανάμεσα σε δύο δάχτυλα">
+        <g id="ruler"></g>
+      </svg>
+      <figcaption>Το πείραμα του χάρακα μετράει κάτι που ο μαθητής δεν μπορεί να νιώσει: τον δικό του <b>χρόνο αντίδρασης</b>. Και αποδεικνύει μόνο του γιατί το χρονόμετρο στο χέρι έχει ταβάνι.</figcaption>
+    </figure>
+  </div>
+
+  <!-- PREP -->
+  <section id="prep">
+    <h2 class="sec">Πριν το μάθημα</h2>
+    <p class="sec-sub">Προετοιμασία δέκα λεπτών</p>
+
+    <h3>Στο τραπέζι</h3>
+    <table>
+      <thead><tr><th>Τι</th><th>Γιατί</th></tr></thead>
+      <tbody>
+        <tr><td>Χάρακας 30 cm, πλαστικός ή ξύλινος</td><td>Το πείραμα αντίδρασης. Ο πλαστικός αναπηδά λιγότερο.</td></tr>
+        <tr><td>Χάρακας, μεζούρα, ζυγαριά κουζίνας, κινητό</td><td>Ο μαθητής βρίσκει την ανάλυση καθενός</td></tr>
+        <tr><td>Το κινητό με phyphox, ήχος ανοιχτός</td><td>Acoustic Stopwatch — δοκίμασέ το πριν, σε ήσυχο δωμάτιο</td></tr>
+        <tr><td>Laptop με Python ή GlowScript</td><td>Ο μετατροπέας μονάδων</td></tr>
+        <tr><td>Το τετράδιο και το χαρτάκι με την πρόβλεψη από τα κουτιά</td><td>Τα κουτιά μένουν κλειστά — αλλά αξίζει να το θυμίσεις</td></tr>
+      </tbody>
+    </table>
+
+    <div class="box digital">
+      <p class="bt">Δοκίμασε το Acoustic Stopwatch μόνος σου πρώτα</p>
+      <p>Άνοιξε phyphox → <em>Acoustic Stopwatch</em>. Έχει ένα κατώφλι ευαισθησίας (threshold) — αν το δωμάτιο έχει θόρυβο, το ανεβάζεις. Άφησε τον χάρακα από 1 m πάνω σε ξύλινο τραπέζι με ένα παλαμάκι στην αφή. Αν το κινητό πιάνει καθαρά και τους δύο ήχους, είσαι έτοιμος. Αν όχι, βάλ' το πιο κοντά στο τραπέζι. Η επιτυχία του μαθήματος κρέμεται από αυτά τα δύο λεπτά προετοιμασίας.</p>
+    </div>
+
+    <h3>Τι αλλάζει σε σχέση με το βιβλίο</h3>
+    <p>Το σχολικό 1.3 δίνει τον πίνακα SI και σταματάει εκεί. Εμείς τον φτάνουμε <em>μέσα από</em> το σφάλμα: πρώτα ο μαθητής νιώθει ότι το χέρι του είναι το αδύναμο σημείο, μετά μαθαίνει τη γλώσσα (μεγέθη, μονάδες, ανάλυση) για να το περιγράψει. Η σειρά είναι σκόπιμη — η γλώσσα κολλάει όταν έχεις κάτι να πεις.</p>
+  </section>
+
+  <!-- TIMELINE -->
+  <section id="roi">
+    <h2 class="sec">Η ροή των 60 λεπτών</h2>
+    <p class="sec-sub">Πάτα «Έναρξη» πάνω δεξιά και το τρέχον τμήμα θα φωτίζεται μόνο του</p>
+    <div class="rail" id="rail">
+      <div class="tick" data-from="0" data-to="5"><span class="t">0΄ – 5΄</span><span class="lab">Ανάκληση<small>Τρεις ερωτήσεις από την Εβδομάδα 1</small></span></div>
+      <div class="tick" data-from="5" data-to="17"><span class="t">5΄ – 17΄</span><span class="lab">Ο χάρακας που πέφτει<small>Πρόβλεψη, πέντε προσπάθειες, ο χρόνος αντίδρασης</small></span></div>
+      <div class="tick" data-from="17" data-to="30"><span class="t">17΄ – 30΄</span><span class="lab">Μεγέθη, μονάδες, ανάλυση<small>Θεμελιώδη και παράγωγα, προθέματα, το όριο κάθε οργάνου</small></span></div>
+      <div class="tick" data-from="30" data-to="42"><span class="t">30΄ – 42΄</span><span class="lab">Acoustic Stopwatch<small>Ο άνθρωπος εναντίον του αισθητήρα</small></span></div>
+      <div class="tick" data-from="42" data-to="52"><span class="t">42΄ – 52΄</span><span class="lab">Μετατροπές και κώδικας<small>km/h σε m/s, ο μετατροπέας</small></span></div>
+      <div class="tick" data-from="52" data-to="56"><span class="t">52΄ – 56΄</span><span class="lab">Τετράδιο<small>Το σχέδιο και η μπάρα αβεβαιότητας</small></span></div>
+      <div class="tick" data-from="56" data-to="60"><span class="t">56΄ – 60΄</span><span class="lab">Exit ticket<small>Πέντε ερωτήσεις</small></span></div>
+    </div>
+  </section>
+
+  <!-- 0-5 -->
+  <section id="s1">
+    <h2 class="sec">Ανάκληση</h2>
+    <p class="sec-sub">0΄ – 5΄ · χωρίς σημειώσεις, χωρίς βαθμό</p>
+    <ul class="ask">
+      <li>Πες μου μία παρατήρηση και ένα συμπέρασμα από τα κουτιά της προηγούμενης φοράς.</li>
+      <li>Τι σημαίνει το «± 2» στο «482 ± 2 g»;</li>
+      <li>Ποια γραμμή του κώδικα ήταν «η φυσική»;</li>
+    </ul>
+    <p>Αν η δεύτερη ερώτηση σκοντάψει, σήμερα είναι ακριβώς η μέρα που θα φτιαχτεί — μην τη διορθώσεις τώρα. Αν τα κουτιά τον απασχόλησαν μέσα στην εβδομάδα, ρώτα τι σκέφτηκε, σημείωσέ το στο χαρτάκι, και άφησέ τα κλειστά.</p>
+  </section>
+
+  <!-- 5-17 -->
+  <section id="s2">
+    <h2 class="sec">Ο χάρακας που πέφτει</h2>
+    <p class="sec-sub">5΄ – 17΄ · η καρδιά του μαθήματος</p>
+
+    <p>Κρατάς τον χάρακα κατακόρυφα με το 0 προς τα κάτω. Τα δάχτυλά του ανοιχτά γύρω από το 0, χωρίς επαφή. Τον αφήνεις χωρίς προειδοποίηση — μέτρα μέσα σου 1 έως 5 δευτερόλεπτα, διαφορετικά κάθε φορά, αλλιώς θα μάθει τον ρυθμό σου.</p>
+
+    <div class="box key">
+      <p class="bt">Πρώτα η πρόβλεψη, πάντα</p>
+      <p>Πριν την πρώτη πτώση: «Πόσα εκατοστά νομίζεις ότι θα πέσει;» Οι περισσότεροι λένε 2 έως 5 cm. Η πραγματικότητα είναι 12 έως 20. Η έκπληξη είναι το μάθημα — δεν μπορείς να νιώσεις τον χρόνο αντίδρασής σου, μόνο να τον μετρήσεις.</p>
+    </div>
+
+    <p>Πέντε προσπάθειες, τις γράφει στον πίνακα του φύλλου. Μετατρέπει cm σε ms από τον πίνακα (ο τύπος έρχεται στην Εβδομάδα 7 — για σήμερα είναι «χάρτης»). Μέσος όρος, απόκλιση.</p>
+
+    <h3>Οι ερωτήσεις που κάνουν τη δουλειά</h3>
+    <ul class="ask">
+      <li>Οι πέντε τιμές διαφέρουν. Φταίει ο χάρακας ή εσύ;</li>
+      <li>Αν ο χάρακας είχε γραμμές κάθε μισό χιλιοστό αντί για χιλιοστό, θα ήταν οι τιμές σου πιο κοντά μεταξύ τους;</li>
+      <li>Ένα αυτοκίνητο στα 50 km/h κάνει 14 μέτρα το δευτερόλεπτο. Πόσα μέτρα προλαβαίνει μέσα στον χρόνο αντίδρασής σου;</li>
+    </ul>
+    <p>Η δεύτερη ερώτηση είναι το κλειδί ολόκληρης της εβδομάδας. Η απάντηση είναι όχι — και τη στιγμή που το καταλαβαίνει, έχει ξεχωρίσει το σφάλμα του οργάνου από το σφάλμα του ανθρώπου χωρίς να του το πεις.</p>
+
+    <div class="box key">
+      <p class="bt">Πες το ακριβώς έτσι</p>
+      <p>«Τα 0,2 δευτερόλεπτα που μόλις μέτρησες είναι το ταβάνι σου. Οτιδήποτε χρονομετρήσεις με το χέρι φέτος, θα το κουβαλάει. Δεν είναι κακό — είναι κάτι που ξέρεις τώρα, και ο περισσότερος κόσμος δεν το ξέρει ποτέ.»</p>
+    </div>
+  </section>
+
+  <!-- 17-30 -->
+  <section id="s3">
+    <h2 class="sec">Μεγέθη, μονάδες, ανάλυση</h2>
+    <p class="sec-sub">17΄ – 30΄</p>
+
+    <p>Τώρα έχει κάτι να πει, οπότε του δίνεις τη γλώσσα. Τρία πράγματα, όχι διάλεξη:</p>
+
+    <h4>Θεμελιώδη και παράγωγα</h4>
+    <p>Μήκος, μάζα, χρόνος — τα τρία θεμέλια. Ο πίνακας του φύλλου του ζητάει να «κατασκευάσει» εμβαδόν, όγκο, ταχύτητα, πυκνότητα από αυτά. Άσ' τον να το κάνει μόνος του· η πυκνότητα θα τον δυσκολέψει και θα δέσει με τη Χημεία της επόμενης εβδομάδας.</p>
+    <ul class="ask">
+      <li>Μπορείς να μου φτιάξεις χρόνο από μήκος και μάζα; Γιατί όχι;</li>
+      <li>Αν σου πω «η ταχύτητα είναι 27», τι λείπει;</li>
+    </ul>
+
+    <h4>Προθέματα</h4>
+    <p>kilo, centi, milli είναι στον πίνακα. Mega και micro τα συμπληρώνει μόνος του — αν ξέρει ότι το κινητό του έχει «megapixel» και ότι το φαρμακείο μετράει σε «μικρογραμμάρια», τα έχει ήδη.</p>
+
+    <h4>Η ανάλυση κάθε οργάνου</h4>
+    <p>Δίνεις τα όργανα στο χέρι του: χάρακα, μεζούρα, ζυγαριά, κινητό. Για καθένα, «ποιο είναι το μικρότερο βήμα που μπορεί να δείξει;». Το χρονόμετρο του κινητού είναι η παγίδα — δείχνει 0,01 s.</p>
+
+    <div class="box key">
+      <p class="bt">Η παρανόηση της ημέρας</p>
+      <p>«Το όργανο με τα περισσότερα δεκαδικά είναι το πιο ακριβές.» Το χρονόμετρο δείχνει 0,01 s, το χέρι του αντιδρά σε 0,2 s. Ρώτα: «Ποιο από τα δύο καθορίζει πόσο καλή είναι η μέτρηση;» Αν δυσκολευτεί, γύρνα στον χάρακα: «Αν το χρονόμετρο έδειχνε χιλιοστά του δευτερολέπτου, θα άλλαζε κάτι;»</p>
+      <p>Η πρόταση που θέλεις να κρατήσει: <strong>το σφάλμα είναι το μεγαλύτερο από τα δύο — ανάλυση οργάνου ή διασπορά επαναλήψεων.</strong></p>
+    </div>
+
+    <div class="box safety">
+      <p class="bt">Η ιστορία που κάνει τις μονάδες σοβαρές</p>
+      <p>Mars Climate Orbiter, 1999: λίβρες εναντίον νιούτον, 327 εκατομμύρια δολάρια σκόνη στην ατμόσφαιρα του Άρη. Το ανέφερες φευγαλέα την Εβδομάδα 1 — τώρα είναι η στιγμή να το πεις ολόκληρο. Αν θέλει κι άλλη: το Gimli Glider, 1983 — ένα Boeing 767 της Air Canada ξέμεινε από καύσιμα στον αέρα επειδή το γέμισαν σε λίβρες αντί για κιλά. Προσγειώθηκε χωρίς κινητήρες σε εγκαταλελειμμένο αεροδρόμιο. Όλοι επέζησαν.</p>
+    </div>
+  </section>
+
+  <!-- 30-42 -->
+  <section id="s4">
+    <h2 class="sec">Acoustic Stopwatch</h2>
+    <p class="sec-sub">30΄ – 42΄ · ο άνθρωπος εναντίον του αισθητήρα</p>
+
+    <div class="box digital">
+      <p class="bt">Το πείραμα</p>
+      <p>Ο χάρακας πέφτει από 1 m στο τραπέζι. Παλαμάκι τη στιγμή που τον αφήνει· ο χάρακας δίνει τον δεύτερο ήχο. Πέντε φορές με το χρονόμετρο στο χέρι (εσύ χρονομετρείς, αυτός αφήνει — ή αντίστροφα), πέντε φορές με το phyphox. Δύο στήλες στο φύλλο, μέσος όρος και απόκλιση για καθεμία.</p>
+    </div>
+
+    <p>Το αποτέλεσμα που θα δείτε: η στήλη του χεριού έχει διασπορά ±0,1 έως ±0,2 s. Η στήλη του phyphox ±0,01 ή λιγότερο. Ίδιο γεγονός, ίδιο κινητό — άλλος «μετρητής».</p>
+
+    <ul class="ask">
+      <li>Ποια στήλη έχει μικρότερη διασπορά; Ποιος ήταν ο εχθρός της μέτρησης;</li>
+      <li>Το phyphox έχει κι αυτό σφάλμα. Πού νομίζεις ότι κρύβεται; <em>(Στην ταχύτητα του ήχου — ο ήχος από το τραπέζι θέλει χρόνο να φτάσει στο μικρόφωνο. Ένα μέτρο = 3 ms. Αξίζει να το πεις μόνο αν ρωτήσει.)</em></li>
+    </ul>
+
+    <div class="box digital">
+      <p class="bt">Ο αισθητήρας που δεν ησυχάζει · 2 λεπτά</p>
+      <p>Κινητό ακίνητο στο τραπέζι, <em>Acceleration (without g)</em>. Η γραμμή τρέμει γύρω από το μηδέν. Αυτό είναι το «όριο» του αισθητήρα, το ίδιο πράγμα που είναι η γραμμή του χιλιοστού στον χάρακα. Κλείνει τον κύκλο: κάθε όργανο, από τον χάρακα μέχρι τον αισθητήρα, έχει ένα.</p>
+    </div>
+  </section>
+
+  <!-- 42-52 -->
+  <section id="s5">
+    <h2 class="sec">Μετατροπές και κώδικας</h2>
+    <p class="sec-sub">42΄ – 52΄</p>
+
+    <p>Τρεις μετατροπές με το χέρι πρώτα — 100 km/h σε m/s, ο Bolt σε km/h, ο χρόνος αντίδρασής του σε δευτερόλεπτα. Μετά ο υπολογιστής:</p>
+
+<pre><span class="c"># Μετατροπέας μονάδων — Εβδομάδα 2</span>
+kmh = float(input(<span class="s">"Ταχύτητα σε km/h: "</span>))
+ms = kmh * 1000 / 3600
+print(f<span class="s">"{kmh} km/h = {ms:.2f} m/s"</span>)
+</pre>
+
+    <p>Τέσσερις γραμμές. Τις ξέρει όλες από τα μαθήματα Python — αυτό είναι το νόημα: η φυσική δεν του ζητάει καινούριο κώδικα, του ζητάει να βάλει τη σωστή πράξη στη σωστή γραμμή. Αυτός στο πληκτρολόγιο.</p>
+    <ul class="ask">
+      <li>Γιατί 1000 και γιατί 3600; Δείξε μου πού είναι το καθένα στη μονάδα.</li>
+      <li>Πρόσθεσε cm σε m. Τι αλλάζει;</li>
+      <li>Το <code>:.2f</code> κόβει στα δύο δεκαδικά. Τι σχέση έχει αυτό με την ανάλυση ενός οργάνου;</li>
+    </ul>
+    <p>Η τρίτη ερώτηση δένει τον κώδικα με το μάθημα: τα δεκαδικά που εμφανίζεις είναι μια δήλωση για το πόσο σίγουρος είσαι. Ένα «27,7777777 m/s» από μια μέτρηση ±2 km/h είναι ψέμα.</p>
+  </section>
+
+  <!-- 52-56 -->
+  <section id="s6">
+    <h2 class="sec">Τετράδιο</h2>
+    <p class="sec-sub">52΄ – 56΄</p>
+    <p>Δύο πράγματα. Το σχέδιο του πειράματος — δάχτυλα, χάρακας, η απόσταση με βέλος. Και η <strong>μπάρα αβεβαιότητας</strong>: μια οριζόντια γραμμή, ο μέσος όρος ως τελεία στη μέση, τα άκρα στο ±. Είναι ο τρόπος που κάθε επιστημονική δημοσίευση ζωγραφίζει το «δεν είμαι απόλυτα σίγουρος», και για κάποιον που σχεδιάζει, το να τη σχεδιάσει με το χέρι μία φορά αξίζει περισσότερο από δέκα εξηγήσεις.</p>
+    <p>Δύο στήλες όπως πάντα: τι είδα, τι σκέφτομαι.</p>
+  </section>
+
+  <!-- QUIZ -->
+  <section id="quiz">
+    <h2 class="sec">Exit ticket</h2>
+    <p class="sec-sub">56΄ – 60΄ · πέντε ερωτήσεις, χωρίς βαθμό</p>
+
+    <div class="quiz">
+      <details class="q">
+        <summary><span class="qn">1</span><span>Ποιο είναι θεμελιώδες μέγεθος και όχι παράγωγο;</span></summary>
+        <div class="q-body">
+          <p class="opt">Ταχύτητα</p>
+          <p class="opt">Όγκος</p>
+          <p class="opt right">Χρόνος</p>
+          <p class="opt">Πυκνότητα</p>
+          <p class="why">Τα άλλα τρία κατασκευάζονται από μήκος, μάζα, χρόνο. Ο χρόνος δεν κατασκευάζεται από τίποτα.</p>
+        </div>
+      </details>
+      <details class="q">
+        <summary><span class="qn">2</span><span>Πόσα μέτρα είναι τα 3,5 km;</span></summary>
+        <div class="q-body">
+          <p class="opt">35 m</p>
+          <p class="opt">350 m</p>
+          <p class="opt right">3.500 m</p>
+          <p class="opt">35.000 m</p>
+          <p class="why">kilo = × 1000.</p>
+        </div>
+      </details>
+      <details class="q">
+        <summary><span class="qn">3</span><span>Τι σημαίνει «12,3 ± 0,2 cm»;</span></summary>
+        <div class="q-body">
+          <p class="opt">Το μήκος είναι ακριβώς 12,3 cm</p>
+          <p class="opt right">Το μήκος είναι κάπου ανάμεσα σε 12,1 και 12,5 cm</p>
+          <p class="opt">Έκανα λάθος 0,2 cm και πρέπει να ξαναμετρήσω</p>
+          <p class="opt">Το μήκος είναι 12,5 cm</p>
+          <p class="why">Το ± είναι η περιοχή μέσα στην οποία βρίσκεται η πραγματική τιμή. Πληροφορία, όχι λάθος.</p>
+        </div>
+      </details>
+      <details class="q">
+        <summary><span class="qn">4</span><span>Γεγονός 0,3 s, χρονόμετρο με 0,01 s. Θα το μετρήσεις με το χέρι;</span></summary>
+        <div class="q-body">
+          <p class="opt">Ναι, αφού το χρονόμετρο βλέπει 0,01 s</p>
+          <p class="opt right">Όχι, γιατί ο χρόνος αντίδρασής μου είναι σχεδόν όσο όλο το γεγονός</p>
+          <p class="opt">Ναι, αν το ξανακάνω πολλές φορές</p>
+          <p class="opt">Όχι, γιατί το κινητό δεν είναι ακριβές</p>
+          <p class="why">Η ερώτηση-κλειδί της εβδομάδας. Αν τη βρει, έχει ξεχωρίσει ανάλυση οργάνου από ανθρώπινο σφάλμα. Αν διαλέξει την τρίτη, αξίζει συζήτηση: οι επαναλήψεις μειώνουν το τυχαίο σφάλμα, αλλά όχι το ότι κάθε μέτρηση ξεκινά 0,2 s αργά.</p>
+        </div>
+      </details>
+      <details class="q">
+        <summary><span class="qn">5</span><span>«120 cm» ή «120,0 ± 0,5 cm» — ποια είναι πιο επιστημονική;</span></summary>
+        <div class="q-body">
+          <p class="opt">Του Α, γιατί είναι πιο απλή</p>
+          <p class="opt right">Του Β, γιατί δηλώνει την αβεβαιότητα</p>
+          <p class="opt">Είναι ίδιες</p>
+          <p class="opt">Καμία — χρειάζεται λέιζερ</p>
+          <p class="why">Η πρόταση της Εβδομάδας 1, σε νέα ρούχα. Αν τη βρει, το ± έχει καθίσει.</p>
+        </div>
+      </details>
+    </div>
+  </section>
+
+  <!-- AFTER -->
+  <section id="meta">
+    <h2 class="sec">Μετά το μάθημα</h2>
+    <p class="sec-sub">Εργασία, επεκτάσεις, και τι να προσέξεις</p>
+
+    <h3>Εργασία για το σπίτι — προαιρετική</h3>
+    <p>Δέκα μετρήσεις ενός γεγονότος στο σπίτι, γραμμένες ως μέσος όρος ± απόκλιση, με μονάδα, και μία πρόταση για το ποιος ήταν ο εχθρός της μέτρησης. Και ο μετατροπέας με τρεις τουλάχιστον μετατροπές — θα τον ξαναχρειαστεί την Εβδομάδα 4.</p>
+
+    <h3>Going further</h3>
+    <p>Αν ρωτήσει πώς βγαίνει ο πίνακας cm→ms: <code>t = √(2d/g)</code>. Μην το διδάξεις σήμερα — πες του ότι το ίδιο πείραμα, με το ίδιο κινητό, θα του δώσει το g στην Εβδομάδα 7, και τότε ο πίνακας θα γίνει δικός του. Αν θέλει κώδικα: να βάλει τον υπολογιστή να φτιάξει τον πίνακα cm→ms μόνος του, με τον τύπο μέσα.</p>
+
+    <h3>Τι να προσέξεις</h3>
+    <ul>
+      <li><strong>Αν πιάνει τον χάρακα «πολύ γρήγορα» (κάτω από 8 cm):</strong> μαντεύει τον ρυθμό σου. Άλλαξε τον χρόνο αναμονής πιο τυχαία, ή ζήτησέ του να κλείσει τα μάτια και να αντιδρά στο «τώρα».</li>
+      <li><strong>Αν το Acoustic Stopwatch δεν πιάνει τον δεύτερο ήχο:</strong> πιο σκληρή επιφάνεια, ή το κινητό πιο κοντά. Αν χαθούν πάνω από τρία λεπτά, εγκατέλειψέ το και κράτα μόνο τον αισθητήρα-που-τρέμει — το μάθημα στέκεται και χωρίς αυτό.</li>
+      <li><strong>Αν ο πίνακας των παραγώγων μεγεθών τον κουράσει:</strong> κράτα ταχύτητα και πυκνότητα, άφησε τα άλλα. Η πυκνότητα είναι η γέφυρα με τη Χημεία.</li>
+      <li><strong>Αν τα μαθηματικά των μετατροπών μπλοκάρουν:</strong> ο κώδικας τα κάνει. Η ιδέα είναι «πού είναι το 1000 και πού το 3600», όχι η αριθμητική.</li>
+    </ul>
+
+    <div class="box key">
+      <p class="bt">Το σημάδι ότι πέτυχε</p>
+      <p>Αν την επόμενη φορά που γράψει έναν αριθμό στο τετράδιο βάλει από μόνος του μονάδα και ±.</p>
+    </div>
+
+    <div class="foot">
+      <span>Εβδομάδα 2 από 30 · Κεφάλαιο 1.3</span>
+      <a href="fysiki-03.html">Επόμενο: Περιγραφή της κίνησης</a>
+    </div>
+  </section>
+
+</main>
+</div>
+
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+
+  var g=document.getElementById('ruler');
+  if(g){
+    function mk(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);g.appendChild(e);return e;}
+    var rx=242, top=18, h=168, w=36;
+    mk('rect',{x:rx,y:top-10,width:w,height:h,rx:3,fill:'none',stroke:'#c0cad2','stroke-width':1,'stroke-dasharray':'4 4'});
+    mk('rect',{x:rx,y:top,width:w,height:h,rx:3,fill:'#f4e9c8',stroke:'#8fa2b3','stroke-width':1.3});
+    for(var i=0;i<=30;i++){
+      var y=top+h-4-i*(h-8)/30;
+      var len=(i%10===0)?14:(i%5===0)?10:6;
+      mk('line',{x1:rx,y1:y,x2:rx+len,y2:y,stroke:'#47555f','stroke-width':(i%10===0)?1.2:0.8});
+      if(i%10===0){var t=mk('text',{x:rx+18,y:y+3.5,'font-family':"'IBM Plex Sans',sans-serif",'font-size':8,fill:'#47555f'});t.textContent=String(i);}
+    }
+    var yc=top+h-4-12*(h-8)/30;
+    mk('path',{d:'M'+(rx-6)+' '+(yc-16)+' q-26 0 -26 18 q0 18 26 18',fill:'none',stroke:'#17456b','stroke-width':2.2,'stroke-linecap':'round'});
+    mk('path',{d:'M'+(rx+w+6)+' '+(yc-16)+' q26 0 26 18 q0 18 -26 18',fill:'none',stroke:'#17456b','stroke-width':2.2,'stroke-linecap':'round'});
+    var y0=top+h-4;
+    mk('line',{x1:rx-52,y1:yc,x2:rx-52,y2:y0,stroke:'#a8571f','stroke-width':1.4});
+    mk('line',{x1:rx-58,y1:yc,x2:rx-46,y2:yc,stroke:'#a8571f','stroke-width':1.4});
+    mk('line',{x1:rx-58,y1:y0,x2:rx-46,y2:y0,stroke:'#a8571f','stroke-width':1.4});
+    var lbl=mk('text',{x:rx-64,y:(yc+y0)/2+4,'text-anchor':'end','font-family':"'IBM Plex Sans',sans-serif",'font-size':11,fill:'#a8571f','font-weight':600});
+    lbl.textContent='≈ 12–20 cm · 0,15–0,20 s';
+  }
+
+  var side=document.getElementById('side'),burger=document.getElementById('burger'),scrim=document.getElementById('scrim');
+  function setDrawer(o){side.classList.toggle('open',o);scrim.classList.toggle('on',o);burger.setAttribute('aria-expanded',o?'true':'false');}
+  burger.addEventListener('click',function(){setDrawer(!side.classList.contains('open'));});
+  scrim.addEventListener('click',function(){setDrawer(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setDrawer(false);});
+
+  var ticks=[].slice.call(document.querySelectorAll('.tick'));
+  var clock=document.getElementById('clock'),segname=document.getElementById('segname');
+  var toggle=document.getElementById('toggle'),reset=document.getElementById('reset');
+  var started=null, elapsed=0, id=null;
+  function fmt(s){var m=Math.floor(s/60),r=Math.floor(s%60);return (m<10?'0':'')+m+':'+(r<10?'0':'')+r;}
+  function paint(){
+    var secs=elapsed+(started?(Date.now()-started)/1000:0), mins=secs/60;
+    clock.textContent=fmt(secs);
+    var found=null;
+    ticks.forEach(function(t){var a=+t.dataset.from,b=+t.dataset.to,on=mins>=a&&mins<b;t.setAttribute('data-active',on?'true':'false');if(on)found=t;});
+    if(!started&&elapsed===0) segname.textContent='Το μάθημα δεν έχει ξεκινήσει';
+    else if(found) segname.textContent=found.querySelector('.lab').firstChild.textContent.trim();
+    else segname.textContent='Το μάθημα ολοκληρώθηκε';
+  }
+  toggle.addEventListener('click',function(){
+    if(started){elapsed+=(Date.now()-started)/1000;started=null;clearInterval(id);id=null;toggle.textContent='Συνέχεια';}
+    else{started=Date.now();toggle.textContent='Παύση';id=setInterval(paint,1000);}
+    paint();
+  });
+  reset.addEventListener('click',function(){clearInterval(id);id=null;started=null;elapsed=0;toggle.textContent='Έναρξη';paint();});
+  paint();
+})();
+</script>
+</body>
+</html>

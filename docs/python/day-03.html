@@ -1,0 +1,1535 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ημέρα 3 — Control Flow &amp; Logical Operators · Programming Lessons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700;800&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — a school notebook: ballpoint ink on graph paper.
+   Every pen colour has a job. Nothing here is decoration.
+   ============================================================ */
+:root{
+  --paper:      #FCFCFA;
+  --paper-2:    #F4F6F8;
+  --grid:       #E4EAF0;
+  --grid-major: #D6DFE8;
+
+  --ink:        #17263B;   /* blue-black ballpoint  */
+  --ink-soft:   #5A6B80;
+  --ink-faint:  #94A3B4;
+
+  --pen-blue:   #2A4FC4;   /* links, active state   */
+  --pen-red:    #C63B32;   /* errors, warnings      */
+  --pen-green:  #1B7A4C;   /* correct               */
+  --marker:     #FFE9A8;   /* highlighter           */
+  --marker-2:   #FFF6DC;
+
+  --rule:       #DDE4EC;
+  --shadow:     0 1px 0 var(--rule);
+
+  --nav-h:      60px;
+  --side-w:     288px;
+
+  --f-ui:   'Commissioner', 'Helvetica Neue', Arial, sans-serif;
+  --f-body: 'Alegreya', Georgia, 'Times New Roman', serif;
+  --f-code: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
+body{
+  margin:0;
+  font-family:var(--f-body);
+  font-size:18px;
+  line-height:1.72;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:26px 26px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.nav{
+  position:fixed;inset:0 0 auto 0;height:var(--nav-h);z-index:60;
+  display:flex;align-items:center;gap:16px;padding:0 20px;
+  background:rgba(252,252,250,.94);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.nav__burger{
+  display:none;width:38px;height:38px;flex:0 0 auto;
+  border:1px solid var(--rule);border-radius:8px;background:var(--paper);
+  color:var(--ink);cursor:pointer;align-items:center;justify-content:center;
+}
+.nav__mark{
+  width:30px;height:30px;flex:0 0 auto;border-radius:7px;
+  background:var(--ink);color:var(--paper);
+  display:grid;place-items:center;
+  font-family:var(--f-code);font-size:15px;font-weight:700;
+}
+.nav__title{
+  font-family:var(--f-ui);font-weight:700;font-size:17px;
+  letter-spacing:-.01em;margin:0;white-space:nowrap;
+}
+.nav__spacer{flex:1}
+.nav__progress{display:flex;align-items:center;gap:10px}
+.nav__progress span{
+  font-family:var(--f-ui);font-size:13px;font-weight:500;color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+}
+.bar{width:110px;height:7px;border-radius:4px;background:var(--paper-2);
+  border:1px solid var(--rule);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--pen-green);
+  transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.side{
+  position:fixed;top:var(--nav-h);bottom:0;left:0;width:var(--side-w);z-index:50;
+  overflow-y:auto;padding:20px 14px 60px;
+  background:var(--paper);border-right:1px solid var(--rule);
+  font-family:var(--f-ui);
+}
+.side__label{
+  font-family:var(--f-ui);font-size:12px;font-weight:600;color:var(--ink-faint);
+  margin:0 0 12px 10px;
+}
+.day{border-bottom:1px solid var(--rule)}
+.day:last-child{border-bottom:0}
+.day > summary{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:center;gap:10px;
+  padding:11px 10px;border-radius:8px;
+  font-size:14.5px;font-weight:500;color:var(--ink);
+}
+.day > summary::-webkit-details-marker{display:none}
+.day > summary:hover{background:var(--paper-2)}
+.day > summary:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.day__n{
+  flex:0 0 auto;width:26px;height:26px;border-radius:6px;
+  display:grid;place-items:center;
+  font-family:var(--f-code);font-size:12px;font-weight:600;
+  background:var(--paper-2);color:var(--ink-soft);border:1px solid var(--rule);
+}
+.day__t{flex:1;line-height:1.35}
+.day__chev{flex:0 0 auto;color:var(--ink-faint);transition:transform .2s}
+.day[open] > summary > .day__chev{transform:rotate(90deg)}
+
+.day--now > summary{background:var(--marker-2)}
+.day--now .day__n{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.day--done .day__n{background:var(--pen-green);color:#fff;border-color:var(--pen-green)}
+.day--soon > summary{color:var(--ink-faint);cursor:default}
+.day--soon .day__n{color:var(--ink-faint)}
+
+.day ul{list-style:none;margin:0 0 10px;padding:2px 0 2px 22px}
+.day li a{
+  display:block;padding:6px 10px;border-radius:6px;
+  font-size:14px;color:var(--ink-soft);text-decoration:none;
+  border-left:2px solid var(--rule);
+}
+.day li a:hover{color:var(--ink);background:var(--paper-2)}
+.day li a:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.day li a.is-active{
+  color:var(--pen-blue);font-weight:600;
+  border-left-color:var(--pen-blue);background:var(--paper-2);
+}
+.day li a .tag{
+  font-family:var(--f-code);font-size:10.5px;font-weight:600;
+  color:var(--pen-blue);margin-left:6px;
+}
+.day__soon{
+  padding:4px 10px 12px 32px;font-size:13px;color:var(--ink-faint);font-style:italic;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.main{margin:var(--nav-h) 0 0 var(--side-w);padding:0 0 100px}
+.wrap{max-width:760px;margin:0 auto;padding:0 28px}
+
+/* ============================================================
+   HERO — the day's goal, running.
+   ============================================================ */
+.hero{
+  border-bottom:1px solid var(--rule);
+  background:linear-gradient(180deg,var(--marker-2) 0%,rgba(255,246,220,0) 100%);
+  padding:44px 0 40px;margin-bottom:44px;
+}
+.hero__meta{
+  font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--ink-soft);
+  display:flex;gap:14px;align-items:center;margin-bottom:10px;
+}
+.hero__meta b{
+  font-family:var(--f-code);font-size:12px;font-weight:700;
+  color:var(--paper);background:var(--ink);padding:3px 7px;border-radius:5px;
+}
+.hero h1{
+  font-family:var(--f-ui);font-weight:800;font-size:clamp(30px,5.2vw,44px);
+  line-height:1.1;letter-spacing:-.025em;margin:0 0 14px;
+}
+.hero__sub{font-size:19px;color:var(--ink-soft);margin:0 0 28px;max-width:56ch}
+
+.term{
+  border:1px solid var(--ink);border-radius:10px;overflow:hidden;
+  background:var(--ink);box-shadow:0 6px 22px rgba(23,38,59,.16);
+}
+.term__bar{
+  display:flex;align-items:center;gap:7px;padding:9px 13px;
+  border-bottom:1px solid rgba(255,255,255,.13);
+}
+.term__bar i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.26)}
+.term__bar span{
+  margin-left:8px;font-family:var(--f-code);font-size:11.5px;
+  color:rgba(255,255,255,.55);
+}
+.term pre{
+  margin:0;padding:18px 16px;min-height:186px;
+  font-family:var(--f-code);font-size:13.5px;line-height:1.75;
+  color:#DCE6F2;white-space:pre-wrap;word-break:break-word;
+}
+.term .u{color:#8FE3B4}
+.term .r{color:#FFD98A;font-weight:600}
+.term .caret{
+  display:inline-block;width:8px;height:15px;vertical-align:-2px;
+  background:#8FE3B4;animation:blink 1.05s step-end infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+section{margin:0 0 52px;scroll-margin-top:calc(var(--nav-h) + 16px)}
+h2{
+  font-family:var(--f-ui);font-weight:700;font-size:26px;letter-spacing:-.02em;
+  line-height:1.25;margin:0 0 6px;padding-top:6px;
+  display:flex;align-items:baseline;gap:12px;
+}
+h2 .h2n{
+  font-family:var(--f-code);font-size:13px;font-weight:600;color:var(--ink-faint);
+  flex:0 0 auto;
+}
+h3{font-family:var(--f-ui);font-weight:600;font-size:18.5px;margin:30px 0 8px}
+.lead{color:var(--ink-soft);margin:0 0 20px;font-size:17px}
+p{margin:0 0 16px}
+a{color:var(--pen-blue)}
+strong{font-weight:700}
+
+.rule{height:1px;background:var(--rule);border:0;margin:0 0 34px}
+
+/* inline + block code */
+code{
+  font-family:var(--f-code);font-size:.855em;
+  background:var(--paper-2);border:1px solid var(--rule);
+  padding:1px 5px;border-radius:4px;white-space:nowrap;
+}
+.codewrap{position:relative;margin:0 0 20px}
+.codewrap pre{
+  margin:0;padding:16px 18px;overflow-x:auto;
+  background:var(--ink);border-radius:9px;
+  font-family:var(--f-code);font-size:13.5px;line-height:1.68;
+  color:#DCE6F2;
+}
+.codewrap pre code{
+  background:none;border:0;padding:0;font-size:inherit;white-space:pre;
+}
+.copy{
+  position:absolute;top:9px;right:9px;
+  font-family:var(--f-ui);font-size:11.5px;font-weight:600;
+  color:rgba(255,255,255,.62);background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;
+  padding:4px 9px;cursor:pointer;opacity:0;transition:opacity .15s;
+}
+.codewrap:hover .copy,.copy:focus-visible{opacity:1}
+.copy:hover{color:#fff;background:rgba(255,255,255,.17)}
+.copy.ok{color:#8FE3B4;border-color:rgba(143,227,180,.4)}
+.tok-k{color:#9DB8FF;font-weight:500}
+.tok-s{color:#8FE3B4}
+.tok-c{color:#8394AB;font-style:italic}
+.tok-n{color:#FFC98A}
+.tok-b{color:#E7B4FF}
+
+/* callouts */
+.note{
+  border-left:3px solid var(--pen-blue);background:var(--paper-2);
+  padding:14px 18px;border-radius:0 8px 8px 0;margin:0 0 20px;font-size:16.5px;
+}
+.note--warn{border-left-color:var(--pen-red)}
+.note--key{border-left-color:#E8B92E;background:var(--marker-2)}
+.note p:last-child{margin-bottom:0}
+.note b{font-family:var(--f-ui);font-size:15px}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;margin:0 0 22px;font-size:16px}
+.tbl th{
+  font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--ink-soft);
+  text-align:left;padding:8px 12px;border-bottom:2px solid var(--rule);
+}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl code{white-space:nowrap}
+
+/* big ideas */
+.ideas{display:grid;gap:12px;margin:0 0 24px}
+.idea{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--marker-2);border:1px solid #F0DFA8;border-radius:9px;padding:15px 17px;
+}
+.idea__n{
+  flex:0 0 auto;width:27px;height:27px;border-radius:50%;
+  background:var(--ink);color:var(--paper);display:grid;place-items:center;
+  font-family:var(--f-code);font-size:13px;font-weight:700;margin-top:2px;
+}
+.idea p{margin:0;font-size:16.5px}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz{border:1px solid var(--rule);border-radius:11px;background:var(--paper);overflow:hidden}
+.quiz__head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 18px;border-bottom:1px solid var(--rule);background:var(--paper-2);
+}
+.quiz__head h4{font-family:var(--f-ui);font-size:15px;font-weight:600;margin:0}
+.quiz__score{
+  font-family:var(--f-code);font-size:13px;font-weight:600;color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+}
+.q{padding:20px 18px;border-bottom:1px solid var(--rule)}
+.q:last-child{border-bottom:0}
+.q__p{font-family:var(--f-ui);font-size:16px;font-weight:600;margin:0 0 13px;line-height:1.5}
+.q__p .qn{font-family:var(--f-code);font-size:13px;color:var(--ink-faint);margin-right:7px}
+.opts{display:grid;gap:7px}
+.opt{
+  display:flex;align-items:center;gap:11px;width:100%;text-align:right;
+  font-family:var(--f-body);font-size:16.5px;color:var(--ink);
+  background:var(--paper);border:1px solid var(--rule);border-radius:8px;
+  padding:10px 13px;cursor:pointer;transition:background .13s,border-color .13s;
+}
+.opt:hover:not(:disabled){background:var(--paper-2);border-color:var(--ink-faint)}
+.opt:focus-visible{outline:2px solid var(--pen-blue);outline-offset:1px}
+.opt:disabled{cursor:default}
+.opt__k{
+  flex:0 0 auto;width:23px;height:23px;border-radius:50%;
+  border:1px solid var(--rule);display:grid;place-items:center;
+  font-family:var(--f-code);font-size:11.5px;font-weight:600;color:var(--ink-soft);
+}
+.opt__t{flex:1;text-align:left}
+.opt.is-right{border-color:var(--pen-green);background:#EFF8F2}
+.opt.is-right .opt__k{background:var(--pen-green);color:#fff;border-color:var(--pen-green)}
+.opt.is-wrong{border-color:var(--pen-red);background:#FDF0EF}
+.opt.is-wrong .opt__k{background:var(--pen-red);color:#fff;border-color:var(--pen-red)}
+.q__fb{
+  display:none;margin-top:12px;padding:12px 14px;border-radius:8px;
+  font-size:16px;background:var(--paper-2);border-left:3px solid var(--ink-faint);
+}
+.q__fb.show{display:block}
+.q__fb.good{border-left-color:var(--pen-green)}
+.q__fb.bad{border-left-color:var(--pen-red)}
+.q__fb b{font-family:var(--f-ui);font-size:15px}
+.q__hintbtn{
+  margin-top:11px;font-family:var(--f-ui);font-size:13px;font-weight:600;
+  color:var(--pen-blue);background:none;border:0;padding:0;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.q__hint{display:none;margin-top:9px;font-size:16px;color:var(--ink-soft);font-style:italic}
+.q__hint.show{display:block}
+
+/* ============================================================
+   EXERCISES
+   ============================================================ */
+.ex{border:1px solid var(--rule);border-radius:11px;margin:0 0 14px;background:var(--paper);overflow:hidden}
+.ex__head{display:flex;align-items:flex-start;gap:13px;padding:16px 18px}
+.ex__n{
+  flex:0 0 auto;font-family:var(--f-code);font-size:12px;font-weight:700;
+  color:var(--paper);background:var(--ink);border-radius:5px;padding:3px 7px;margin-top:3px;
+}
+.ex__b{flex:1}
+.ex__b h4{font-family:var(--f-ui);font-size:16.5px;font-weight:600;margin:0 0 6px}
+.ex__b p{margin:0 0 8px;font-size:16.5px}
+.ex__out{
+  font-family:var(--f-code);font-size:13px;color:var(--ink-soft);
+  background:var(--paper-2);border:1px dashed var(--rule);border-radius:6px;
+  padding:8px 11px;margin:8px 0 0;
+}
+.ex details{border-top:1px solid var(--rule)}
+.ex details summary{
+  list-style:none;cursor:pointer;padding:11px 18px;
+  font-family:var(--f-ui);font-size:13.5px;font-weight:600;color:var(--pen-blue);
+}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary:hover{background:var(--paper-2)}
+.ex details summary:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.ex details[open] summary{border-bottom:1px solid var(--rule)}
+.ex details .body{padding:15px 18px}
+.ex details .body p:last-child,.ex details .body .codewrap:last-child{margin-bottom:0}
+
+/* ============================================================
+   CHECKLIST
+   ============================================================ */
+.check{border:1px solid var(--rule);border-radius:11px;padding:8px 6px;background:var(--paper)}
+.check label{
+  display:flex;align-items:flex-start;gap:12px;padding:9px 13px;border-radius:8px;
+  cursor:pointer;font-size:16.5px;
+}
+.check label:hover{background:var(--paper-2)}
+.check input{
+  flex:0 0 auto;width:19px;height:19px;margin-top:4px;
+  accent-color:var(--pen-green);cursor:pointer;
+}
+.check input:checked + span{color:var(--ink-faint);text-decoration:line-through}
+
+/* turtle figure */
+.turtle{
+  display:block;margin:0 auto 20px;max-width:280px;width:100%;
+  background:var(--paper);border:1px solid var(--rule);border-radius:9px;padding:10px;
+}
+
+/* footer */
+.foot{
+  border-top:1px solid var(--rule);margin-top:56px;padding-top:24px;
+  font-family:var(--f-ui);font-size:13.5px;color:var(--ink-faint);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.foot a{color:var(--ink-soft);text-decoration:none}
+.foot a:hover{color:var(--pen-blue);text-decoration:underline}
+
+/* scrim for mobile drawer */
+.scrim{
+  display:none;position:fixed;inset:var(--nav-h) 0 0 0;z-index:45;
+  background:rgba(23,38,59,.35);
+}
+.scrim.show{display:block}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:960px){
+  :root{--side-w:280px}
+  .nav__burger{display:flex}
+  .side{transform:translateX(-100%);transition:transform .24s cubic-bezier(.4,0,.2,1);
+    box-shadow:2px 0 18px rgba(23,38,59,.12)}
+  .side.open{transform:none}
+  .main{margin-left:0}
+  .nav__progress span{display:none}
+}
+@media (max-width:600px){
+  body{font-size:17px}
+  .wrap{padding:0 18px}
+  .hero{padding:30px 0 28px;margin-bottom:32px}
+  h2{font-size:22px}
+  .bar{width:70px}
+  .opt{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ NAVBAR ══════════════════ -->
+<header class="nav">
+  <button class="nav__burger" id="burger" aria-label="Άνοιγμα μενού" aria-expanded="false">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M2 4.5h14M2 9h14M2 13.5h14"/>
+    </svg>
+  </button>
+  <div class="nav__mark">Py</div>
+  <p class="nav__title"><a href="../index.html" style="color:inherit;text-decoration:none" title="Όλα τα μαθήματα">Programming Lessons</a></p>
+  <div class="nav__spacer"></div>
+  <div class="nav__progress">
+    <span id="progText">0 / 8</span>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<nav class="side" id="side" aria-label="Περιεχόμενα μαθημάτων">
+  <p class="side__label">Beginner · Ημέρες 1–14</p>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">01</span>
+      <span class="day__t">Μεταβλητές &amp; Variables</span>
+    </summary>
+    <div class="day__soon">Ολοκληρώθηκε. Σύντομα και εδώ.</div>
+  </details>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">02</span>
+      <span class="day__t">Τύποι Δεδομένων &amp; Strings</span>
+    </summary>
+    <ul><li><a href="index.html">Άνοιξε το μάθημα</a></li></ul>
+  </details>
+
+  <details class="day day--now" open>
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">03</span>
+      <span class="day__t">Control Flow &amp; Logical Operators</span>
+    </summary>
+    <ul>
+      <li><a href="#stoxoi">Στόχοι της ημέρας</a></li>
+      <li><a href="#ifelse">if / else</a></li>
+      <li><a href="#modulo">Το modulo <span class="tag">%</span></a></li>
+      <li><a href="#quiz1">Έλεγχος 1 <span class="tag">quiz</span></a></li>
+      <li><a href="#elif">Nested if &amp; elif</a></li>
+      <li><a href="#polla-if">Πολλά if στη σειρά</a></li>
+      <li><a href="#logika">Logical operators</a></li>
+      <li><a href="#quiz2">Έλεγχος 2 <span class="tag">quiz</span></a></li>
+      <li><a href="#project">Treasure Island <span class="tag">project</span></a></li>
+      <li><a href="#askiseis">Ασκήσεις <span class="tag">6</span></a></li>
+      <li><a href="#turtle">Turtle: διάλεξε σχήμα <span class="tag">art</span></a></li>
+      <li><a href="#ai">AI Corner</a></li>
+      <li><a href="#lathi">Συχνά λάθη</a></li>
+      <li><a href="#recap">Ανακεφαλαίωση</a></li>
+    </ul>
+  </details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">04</span><span class="day__t">Randomisation &amp; Lists</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">05</span><span class="day__t">Python Loops</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">06</span><span class="day__t">Functions &amp; Karel</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">07</span><span class="day__t">Hangman</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">08</span><span class="day__t">Parameters &amp; Caesar Cipher</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">09</span><span class="day__t">Dictionaries &amp; Secret Auction</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">10</span><span class="day__t">Functions with Outputs</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">11</span><span class="day__t">Blackjack Capstone</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">12</span><span class="day__t">Scope &amp; Number Guessing</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">13</span><span class="day__t">Debugging</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">14</span><span class="day__t">Higher Lower Game</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+</nav>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main class="main">
+
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero__meta"><b>ΗΜΕΡΑ 03</b> <span>Beginner</span> <span>·</span> <span>2 ώρες 30′</span></div>
+      <h1>Control Flow &amp; Logical Operators</h1>
+      <p class="hero__sub">Μέχρι σήμερα τα προγράμματά σου έτρεχαν από πάνω προς τα κάτω, γραμμή-γραμμή, πάντα το ίδιο. Σήμερα μαθαίνουν να <strong>αποφασίζουν</strong>. Στο τέλος της ημέρας θα έχεις φτιάξει ένα παιχνίδι περιπέτειας που εσύ σχεδίασες:</p>
+
+      <div class="term">
+        <div class="term__bar"><i></i><i></i><i></i><span>treasure_island.py</span></div>
+        <pre id="termOut"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- ─── ΣΤΟΧΟΙ ─── -->
+    <section id="stoxoi">
+      <h2><span class="h2n">§1</span> Στόχοι της ημέρας</h2>
+      <p class="lead">Στο τέλος του μαθήματος θα μπορείς να κάνεις όλα τα παρακάτω χωρίς βοήθεια.</p>
+      <ul>
+        <li>Να γράφεις <code>if</code> / <code>else</code> και να εξηγείς τι είναι ένα <em>code block</em></li>
+        <li>Να χρησιμοποιείς τους τελεστές σύγκρισης <code>&gt;</code> <code>&lt;</code> <code>&gt;=</code> <code>&lt;=</code> <code>==</code> <code>!=</code></li>
+        <li>Να ελέγχεις αν ένας αριθμός διαιρείται ακριβώς, με το <code>%</code></li>
+        <li>Να διακρίνεις πότε θέλεις <code>elif</code> και πότε <em>πολλά</em> <code>if</code> στη σειρά</li>
+        <li>Να συνδυάζεις συνθήκες με <code>and</code>, <code>or</code>, <code>not</code></li>
+        <li>Να σχεδιάσεις ένα διάγραμμα ροής στο χαρτί <strong>πριν</strong> γράψεις κώδικα</li>
+        <li>Να φτιάξεις το Treasure Island — με δική σου ιστορία</li>
+      </ul>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── IF / ELSE ─── -->
+    <section id="ifelse">
+      <h2><span class="h2n">§2</span> if / else — το πρόγραμμα αποφασίζει</h2>
+      <p>Στα λούνα παρκ υπάρχει ένα ταμπελάκι στο τρενάκι: <em>«Πρέπει να είσαι πάνω από 1.20 για να ανέβεις»</em>. Αυτό είναι μια απόφαση με δύο δρόμους. Στην Python γράφεται έτσι:</p>
+
+      <div class="codewrap"><pre><code>print("Welcome to the rollercoaster!")
+height = int(input("What is your height in cm? "))
+
+if height &gt;= 120:
+    print("You can ride the rollercoaster!")
+else:
+    print("Sorry, you have to grow taller before you can ride.")</code></pre></div>
+
+      <h3>Τρία πράγματα που πρέπει να δεις</h3>
+      <ul>
+        <li>Η <strong>άνω-κάτω τελεία</strong> <code>:</code> στο τέλος της γραμμής με το <code>if</code> και το <code>else</code>. Χωρίς αυτήν, τίποτα.</li>
+        <li>Η <strong>εσοχή</strong> (indentation) — τέσσερα κενά. Ό,τι είναι μέσα, ανήκει στο <code>if</code>. Ό,τι ξαναγυρίζει στην αρχή της γραμμής, τρέχει ούτως ή άλλως. Αυτό λέγεται <strong>code block</strong>.</li>
+        <li>Το <code>else</code> δεν έχει συνθήκη. Σημαίνει απλώς «σε κάθε άλλη περίπτωση».</li>
+      </ul>
+
+      <h3>Οι τελεστές σύγκρισης</h3>
+      <table class="tbl">
+        <thead><tr><th>Τελεστής</th><th>Σημαίνει</th><th>Παράδειγμα</th></tr></thead>
+        <tbody>
+          <tr><td><code>&gt;</code></td><td>μεγαλύτερο από</td><td><code>7 &gt; 3</code> → <code>True</code></td></tr>
+          <tr><td><code>&lt;</code></td><td>μικρότερο από</td><td><code>7 &lt; 3</code> → <code>False</code></td></tr>
+          <tr><td><code>&gt;=</code></td><td>μεγαλύτερο ή ίσο</td><td><code>120 &gt;= 120</code> → <code>True</code></td></tr>
+          <tr><td><code>&lt;=</code></td><td>μικρότερο ή ίσο</td><td><code>5 &lt;= 4</code> → <code>False</code></td></tr>
+          <tr><td><code>==</code></td><td><strong>ίσο με</strong> (δύο ίσον!)</td><td><code>3 == 3</code> → <code>True</code></td></tr>
+          <tr><td><code>!=</code></td><td>διαφορετικό από</td><td><code>3 != 4</code> → <code>True</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="note note--warn">
+        <p><b>Το λάθος που θα κάνεις σίγουρα:</b> <code>if age = 18:</code> με ένα ίσον. Το ένα <code>=</code> <em>δίνει τιμή</em>. Το <code>==</code> <em>ρωτάει αν είναι ίσα</em>. Η Python θα σου βγάλει <code>SyntaxError</code> — και τώρα ξέρεις γιατί.</p>
+      </div>
+
+      <h3>Πρόβλεψε πριν τρέξεις</h3>
+      <p>Τι θα τυπώσει το παρακάτω αν ο χρήστης γράψει <code>120</code>; Και αν γράψει <code>119</code>; Πες το δυνατά, μετά τρέξ' το.</p>
+      <div class="codewrap"><pre><code>height = int(input("Height in cm: "))
+if height &gt; 120:
+    print("Ride!")
+else:
+    print("Too short.")
+print("Thanks for visiting.")</code></pre></div>
+      <p>Γιατί το <code>Thanks for visiting</code> τυπώνεται και στις δύο περιπτώσεις; Κοίτα την εσοχή.</p>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── MODULO ─── -->
+    <section id="modulo">
+      <h2><span class="h2n">§3</span> Το modulo — «τι περισσεύει;»</h2>
+      <p>Το <code>%</code> το είδες την Ημέρα 2: δίνει το <strong>υπόλοιπο</strong> μιας διαίρεσης. Σήμερα γίνεται χρήσιμο. Ένας αριθμός είναι ζυγός αν, όταν τον διαιρέσεις με το 2, <em>δεν περισσεύει τίποτα</em>.</p>
+
+      <div class="codewrap"><pre><code>print(10 % 2)    # 0   → το 10 είναι ζυγό
+print(7 % 2)     # 1   → το 7 είναι μονό
+print(15 % 5)    # 0   → το 15 διαιρείται ακριβώς με το 5
+print(17 % 5)    # 2</code></pre></div>
+
+      <div class="codewrap"><pre><code>number = int(input("Which number do you want to check? "))
+
+if number % 2 == 0:
+    print("This is an even number.")
+else:
+    print("This is an odd number.")</code></pre></div>
+
+      <div class="note note--key">
+        <p><b>Ο κανόνας:</b> <code>x % y == 0</code> σημαίνει «το x διαιρείται ακριβώς με το y». Θα το χρειαστείς για τα δίσεκτα έτη σε λίγο — και σε δεκάδες προγράμματα μετά.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── QUIZ 1 ─── -->
+    <section id="quiz1">
+      <h2><span class="h2n">§4</span> Έλεγχος 1 — if, σύγκριση, modulo</h2>
+      <p class="lead">Χωρίς σημειώσεις. Θέλεις 3 στα 4 πριν προχωρήσεις.</p>
+      <div class="quiz" data-quiz="q1"></div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ELIF ─── -->
+    <section id="elif">
+      <h2><span class="h2n">§5</span> Nested if &amp; elif — περισσότεροι από δύο δρόμοι</h2>
+      <p>Το τρενάκι τώρα χρεώνει ανάλογα με την ηλικία. Αυτό είναι μια απόφαση <em>μέσα</em> σε μια άλλη απόφαση: πρώτα «μπορείς να ανέβεις;», και <strong>μόνο αν ναι</strong>, «πόσο πληρώνεις;».</p>
+
+      <div class="codewrap"><pre><code>print("Welcome to the rollercoaster!")
+height = int(input("What is your height in cm? "))
+
+if height &gt;= 120:
+    print("You can ride the rollercoaster!")
+    age = int(input("What is your age? "))
+    if age &lt; 12:
+        print("Child tickets are €5.")
+    elif age &lt;= 18:
+        print("Youth tickets are €7.")
+    else:
+        print("Adult tickets are €12.")
+else:
+    print("Sorry, you have to grow taller before you can ride.")</code></pre></div>
+
+      <h3>Πώς διαβάζεται το elif</h3>
+      <p>Η Python ελέγχει τις συνθήκες <strong>με τη σειρά, από πάνω προς τα κάτω</strong>, και σταματάει στην <strong>πρώτη</strong> που είναι αληθής. Οι υπόλοιπες δεν εξετάζονται καθόλου.</p>
+      <ul>
+        <li>Αν <code>age = 9</code> → <code>age &lt; 12</code> είναι αληθές → «Child» και τέλος.</li>
+        <li>Αν <code>age = 15</code> → <code>age &lt; 12</code> ψευδές, <code>age &lt;= 18</code> αληθές → «Youth».</li>
+        <li>Αν <code>age = 40</code> → τίποτα από τα δύο → <code>else</code> → «Adult».</li>
+      </ul>
+      <p>Πρόσεξε: στο <code>elif age &lt;= 18</code> δεν χρειάζεται να γράψεις «και μεγαλύτερος από 12». Αν έφτασε εκεί, ήδη ξέρουμε ότι <em>δεν</em> ήταν μικρότερος από 12.</p>
+
+      <div class="note note--key">
+        <p><b>Ζωγράφισέ το.</b> Πριν γράψεις ένα πρόγραμμα με πολλά <code>if</code>, σχεδίασε στο χαρτί ένα <strong>διάγραμμα ροής</strong>: ρόμβοι για τις ερωτήσεις, βέλη «ναι» / «όχι», ορθογώνια για τις ενέργειες. Οι επαγγελματίες το κάνουν ακόμα. Για ένα άτομο που σχεδιάζει, είναι το πιο φυσικό εργαλείο προγραμματισμού που υπάρχει.</p>
+      </div>
+
+      <h3>Το δίσεκτο έτος — τρία επίπεδα βάθους</h3>
+      <p>Ένα έτος είναι δίσεκτο αν διαιρείται με το 4 — <em>εκτός</em> αν διαιρείται και με το 100 — <em>εκτός</em> αν διαιρείται και με το 400. Το 2000 ήταν δίσεκτο. Το 1900 όχι. Το 2024 ναι.</p>
+      <p>Πριν δεις τον κώδικα στις ασκήσεις, δοκίμασε να ζωγραφίσεις το διάγραμμα ροής μόνος σου. Τρεις ρόμβοι, ο ένας μέσα στον άλλο.</p>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΠΟΛΛΑ IF ─── -->
+    <section id="polla-if">
+      <h2><span class="h2n">§6</span> Πολλά if στη σειρά — όταν θέλεις όλα να ελεγχθούν</h2>
+      <p>Το <code>elif</code> σταματάει στην πρώτη αληθή συνθήκη. Μερικές φορές όμως θέλεις <strong>κάθε</strong> συνθήκη να ελεγχθεί ξεχωριστά — π.χ. στην πίτσα, μπορείς να θέλεις <em>και</em> πεπερόνι <em>και</em> έξτρα τυρί. Δεν είναι «ή το ένα ή το άλλο».</p>
+
+      <div class="codewrap"><pre><code>print("Welcome to Python Pizza Deliveries!")
+size = input("What size pizza do you want? S, M, or L ")
+add_pepperoni = input("Do you want pepperoni? Y or N ")
+extra_cheese = input("Do you want extra cheese? Y or N ")
+
+bill = 0
+
+if size == "S":
+    bill += 15
+elif size == "M":
+    bill += 20
+else:
+    bill += 25
+
+if add_pepperoni == "Y":
+    if size == "S":
+        bill += 2
+    else:
+        bill += 3
+
+if extra_cheese == "Y":
+    bill += 1
+
+print(f"Your final bill is: €{bill}.")</code></pre></div>
+
+      <p>Δες τη διαφορά: το μέγεθος είναι <code>if / elif / else</code> — μία επιλογή από τρεις. Το πεπερόνι και το τυρί είναι <strong>ξεχωριστά</strong> <code>if</code> — καθένα ελέγχεται ανεξάρτητα.</p>
+
+      <div class="note">
+        <p><b>Νέο σύμβολο:</b> το <code>bill += 15</code> είναι συντομογραφία του <code>bill = bill + 15</code>. «Πρόσθεσε 15 σε ό,τι έχει ήδη το bill». Θα το βλέπεις παντού.</p>
+      </div>
+
+      <table class="tbl">
+        <thead><tr><th>Θέλω…</th><th>Χρησιμοποιώ</th></tr></thead>
+        <tbody>
+          <tr><td>μία επιλογή από πολλές (μέγεθος, κατηγορία ηλικίας)</td><td><code>if / elif / else</code></td></tr>
+          <tr><td>πολλές ανεξάρτητες επιλογές που μπορεί να ισχύουν μαζί (extras)</td><td>πολλά <code>if</code> στη σειρά</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── LOGICAL ─── -->
+    <section id="logika">
+      <h2><span class="h2n">§7</span> Logical operators — and, or, not</h2>
+      <p>Μερικές φορές μια απόφαση χρειάζεται <em>δύο</em> συνθήκες ταυτόχρονα. Αντί να φωλιάζεις <code>if</code> μέσα σε <code>if</code>, τις ενώνεις:</p>
+
+      <table class="tbl">
+        <thead><tr><th>Τελεστής</th><th>Αληθές όταν…</th><th>Παράδειγμα</th></tr></thead>
+        <tbody>
+          <tr><td><code>and</code></td><td><strong>και οι δύο</strong> συνθήκες είναι αληθείς</td><td><code>age &gt;= 45 and age &lt;= 55</code></td></tr>
+          <tr><td><code>or</code></td><td><strong>τουλάχιστον μία</strong> είναι αληθής</td><td><code>score &lt; 10 or score &gt; 90</code></td></tr>
+          <tr><td><code>not</code></td><td>η συνθήκη είναι <strong>ψευδής</strong> (το αντιστρέφει)</td><td><code>not is_raining</code></td></tr>
+        </tbody>
+      </table>
+
+      <div class="codewrap"><pre><code>a = 7
+print(a &gt; 5 and a &lt; 10)     # True  — και τα δύο ισχύουν
+print(a &gt; 5 and a &gt; 10)     # False — το δεύτερο δεν ισχύει
+print(a &gt; 5 or a &gt; 10)      # True  — αρκεί το ένα
+print(not a &gt; 5)            # False — το αντίστροφο του True</code></pre></div>
+
+      <p>Στο τρενάκι, ας πούμε ότι όσοι είναι 45 έως 55 ετών ανεβαίνουν δωρεάν «γιατί περνούν κρίση μέσης ηλικίας»:</p>
+      <div class="codewrap"><pre><code>if age &lt; 12:
+    print("Child tickets are €5.")
+elif age &lt;= 18:
+    print("Youth tickets are €7.")
+elif age &gt;= 45 and age &lt;= 55:
+    print("Everything is going to be ok. Have a free ride on us!")
+else:
+    print("Adult tickets are €12.")</code></pre></div>
+
+      <div class="note note--warn">
+        <p><b>Παγίδα:</b> στα ελληνικά λέμε «αν είναι 3 <em>ή</em> 5». Στην Python <strong>δεν</strong> γράφεις <code>if x == 3 or 5</code>. Γράφεις <code>if x == 3 or x == 5</code>. Κάθε πλευρά του <code>or</code> πρέπει να είναι ολόκληρη σύγκριση.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── QUIZ 2 ─── -->
+    <section id="quiz2">
+      <h2><span class="h2n">§8</span> Έλεγχος 2 — elif &amp; λογικοί τελεστές</h2>
+      <p class="lead">Πρόβλεψε πρώτα, μετά επιβεβαίωσε στον υπολογιστή.</p>
+      <div class="quiz" data-quiz="q2"></div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── PROJECT ─── -->
+    <section id="project">
+      <h2><span class="h2n">§9</span> Project — Treasure Island</h2>
+      <p class="lead">Ένα παιχνίδι «διάλεξε τη δική σου περιπέτεια». Ο παίκτης παίρνει αποφάσεις, και κάθε απόφαση οδηγεί σε άλλο μονοπάτι. Όλο το παιχνίδι είναι <code>if</code> μέσα σε <code>if</code>.</p>
+
+      <h3>Βήμα 0 — το χαρτί πριν τον κώδικα</h3>
+      <p>Πάρε ένα Α4. Σχεδίασε την ιστορία <strong>σου</strong> ως διάγραμμα ροής: πού ξεκινάει ο παίκτης, τι επιλογές έχει, πού τον βγάζει η καθεμία. Τουλάχιστον τρεις αποφάσεις σε βάθος, τουλάχιστον ένας τρόπος να κερδίσεις και τρεις να χάσεις. Αυτό είναι το μισό project — και είναι το μισό που κάνει ένας game designer.</p>
+
+      <h3>Βήμα 1 — η εισαγωγή</h3>
+      <p>Με τρία μονά εισαγωγικά <code>'''</code> μπορείς να τυπώσεις πολλές γραμμές μαζί. Το <code>r</code> μπροστά λέει στην Python «πάρε τις ανάποδες καθέτους <code>\</code> όπως είναι» — αλλιώς τις μπερδεύει με ειδικούς χαρακτήρες. Ιδανικό για ASCII art. Ζωγράφισε δικό σου — ένα νησί, ένα κάστρο, ό,τι ταιριάζει στην ιστορία σου.</p>
+      <div class="codewrap"><pre><code>print(r'''
+        _.--._
+      .'      '.
+     /   ~  ~   \
+    |  ~   /\  ~ |
+     \    /  \  /
+      '._/____\.'
+    ~~~~~~~~~~~~~~
+''')
+print("Welcome to Treasure Island.")
+print("Your mission is to find the treasure.")</code></pre></div>
+
+      <h3>Βήμα 2 — η πρώτη απόφαση</h3>
+      <div class="codewrap"><pre><code>choice1 = input('You are at a crossroad. Where do you want to go? Type "left" or "right".\n').lower()
+
+if choice1 == "left":
+    print("You walk down the left path...")
+else:
+    print("You fell into a hole. Game Over.")</code></pre></div>
+      <p>Τρέξ' το. Δοκίμασε <code>left</code>, <code>Left</code>, <code>LEFT</code>. Γιατί δουλεύουν όλα; Εξαιτίας του <code>.lower()</code> στο τέλος — μετατρέπει ό,τι έγραψε ο χρήστης σε πεζά, ώστε να το συγκρίνουμε με σιγουριά. Χωρίς αυτό, το <code>"Left" == "left"</code> είναι <code>False</code>.</p>
+
+      <h3>Βήμα 3 — φωλιάζεις τη δεύτερη απόφαση μέσα στην πρώτη</h3>
+      <div class="codewrap"><pre><code>if choice1 == "left":
+    choice2 = input('You come to a lake. Type "wait" for a boat or "swim" to cross.\n').lower()
+    if choice2 == "wait":
+        print("A boat arrives and takes you to the island.")
+    else:
+        print("You get attacked by an angry trout. Game Over.")
+else:
+    print("You fell into a hole. Game Over.")</code></pre></div>
+      <p>Πρόσεξε την εσοχή: το δεύτερο <code>if</code> είναι <em>μέσα</em> στο πρώτο. Τρέχει μόνο αν ο παίκτης πήγε αριστερά.</p>
+
+      <h3>Βήμα 4 — η τρίτη απόφαση, με elif</h3>
+      <div class="codewrap"><pre><code>    if choice2 == "wait":
+        choice3 = input("You reach a house with three doors: red, yellow, blue. Which one?\n").lower()
+        if choice3 == "yellow":
+            print("You found the treasure! You win!")
+        elif choice3 == "red":
+            print("The room is full of fire. Game Over.")
+        elif choice3 == "blue":
+            print("You enter a room of beasts. Game Over.")
+        else:
+            print("You chose a door that doesn't exist. Game Over.")</code></pre></div>
+      <p>Το τελευταίο <code>else</code> πιάνει ό,τι <em>δεν</em> περιμέναμε — αν ο παίκτης γράψει «πράσινη». Ένα καλό πρόγραμμα δεν σκάει ποτέ επειδή ο χρήστης έγραψε κάτι περίεργο.</p>
+
+      <div class="note note--key">
+        <p><b>Τώρα άλλαξέ το όλο.</b> Το από πάνω είναι ο σκελετός. Η δική σου έκδοση έχει δική σου ιστορία, δικό σου ASCII art, δικές σου επιλογές — και τουλάχιστον ένα μονοπάτι που κανείς δεν περιμένει. Αν θέλεις να γράψεις τα μηνύματα στα ελληνικά, γράψ' τα. Ο κώδικας μένει αγγλικός, η ιστορία είναι δική σου.</p>
+      </div>
+
+      <div class="note">
+        <p><b>Θέλεις ASCII art;</b> Στο <a href="https://patorjk.com/software/taag/" target="_blank" rel="noopener">patorjk.com/software/taag</a> γράφεις μια λέξη και σου τη φτιάχνει σε δεκάδες στυλ. Το <a href="https://www.asciiart.eu" target="_blank" rel="noopener">asciiart.eu</a> έχει έτοιμα σχέδια. Το δικό σου, όμως, μετράει περισσότερο.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΑΣΚΗΣΕΙΣ ─── -->
+    <section id="askiseis">
+      <h2><span class="h2n">§10</span> Ασκήσεις</h2>
+      <p class="lead">Κάνε την Α0 και την Α2 οπωσδήποτε, μετά διάλεξε δύο ακόμα. Πριν από κάθε άσκηση με πάνω από δύο συνθήκες: <strong>διάγραμμα ροής στο χαρτί</strong>.</p>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α0</span>
+          <div class="ex__b">
+            <h4>Odd or Even</h4>
+            <p>Ζήτα έναν αριθμό και τύπωσε αν είναι ζυγός ή μονός.</p>
+            <p class="ex__out">This is an odd number.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Ένας αριθμός είναι ζυγός αν το υπόλοιπο της διαίρεσης με το 2 είναι μηδέν. Ποιος τελεστής δίνει το υπόλοιπο;</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>number = int(input("Which number do you want to check? "))
+
+if number % 2 == 0:
+    print("This is an even number.")
+else:
+    print("This is an odd number.")</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α1</span>
+          <div class="ex__b">
+            <h4>Κατάσταση του νερού</h4>
+            <p>Ζήτα μια θερμοκρασία σε °C. Τύπωσε αν το νερό είναι πάγος (0 ή κάτω), υγρό (πάνω από 0 και κάτω από 100) ή ατμός (100 και πάνω). Θα το ξαναδείς στη Χημεία.</p>
+            <p class="ex__out">At 25°C water is liquid.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Τρεις περιοχές → <code>if / elif / else</code>. Ξεκίνα από τη χαμηλότερη θερμοκρασία. Χρειάζεσαι <code>float()</code>, όχι <code>int()</code> — η θερμοκρασία μπορεί να είναι 36.6.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>temp = float(input("Temperature in °C: "))
+
+if temp &lt;= 0:
+    state = "ice"
+elif temp &lt; 100:
+    state = "liquid"
+else:
+    state = "steam"
+
+print(f"At {temp}°C water is {state}.")</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α2</span>
+          <div class="ex__b">
+            <h4>Leap Year</h4>
+            <p>Ζήτα ένα έτος και τύπωσε αν είναι δίσεκτο. Κανόνας: διαιρείται με το 4, εκτός αν διαιρείται με το 100, εκτός αν διαιρείται και με το 400. Δοκίμασε με 2024, 1900 και 2000.</p>
+            <p class="ex__out">2024 is a leap year.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Τρία <code>if</code> φωλιασμένα, το ένα μέσα στο άλλο, καθένα με <code>% == 0</code>. Ή, αν θέλεις πρόκληση, μία μόνο γραμμή με <code>and</code> και <code>or</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>year = int(input("Which year do you want to check? "))
+
+if year % 4 == 0:
+    if year % 100 == 0:
+        if year % 400 == 0:
+            print(f"{year} is a leap year.")
+        else:
+            print(f"{year} is not a leap year.")
+    else:
+        print(f"{year} is a leap year.")
+else:
+    print(f"{year} is not a leap year.")
+
+# Η ίδια λογική σε μία γραμμή — για αργότερα:
+# if (year % 4 == 0 and year % 100 != 0) or year % 400 == 0:</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α3</span>
+          <div class="ex__b">
+            <h4>Pizza Order</h4>
+            <p>Small €15, Medium €20, Large €25. Πεπερόνι: +€2 στη small, +€3 στις άλλες. Έξτρα τυρί: +€1 σε όλες. Ζήτα μέγεθος, πεπερόνι (Y/N), τυρί (Y/N) και τύπωσε τον λογαριασμό.</p>
+            <p class="ex__out">Your final bill is: €18.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Το μέγεθος είναι <em>μία</em> επιλογή → <code>elif</code>. Τα extras είναι <em>ανεξάρτητα</em> → ξεχωριστά <code>if</code>. Ξεκίνα με <code>bill = 0</code> και πρόσθετε με <code>+=</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <p>Είναι ακριβώς ο κώδικας της ενότητας §6. Γράψ' τον από μνήμης πρώτα, μετά σύγκρινε.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α4</span>
+          <div class="ex__b">
+            <h4>Love Calculator</h4>
+            <p>Ζήτα δύο ονόματα. Μέτρησε πόσες φορές εμφανίζονται τα γράμματα της λέξης TRUE και στα δύο μαζί, και πόσες τα γράμματα της LOVE. Κόλλησε τους δύο αριθμούς σε έναν διψήφιο. Κάτω από 10 ή πάνω από 90: «you go together like coke and mentos». 40–50: «you are alright together». Αλλιώς μόνο το σκορ.</p>
+            <p class="ex__out">Your score is 53, you are alright together.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Δύο νέα εργαλεία: <code>.lower()</code> κάνει το κείμενο πεζά, <code>.count("t")</code> μετράει πόσες φορές υπάρχει ένα γράμμα. Για να κολλήσεις 5 και 3 σε 53: <code>int(str(5) + str(3))</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>print("Welcome to the Love Calculator!")
+name1 = input("What is your name? \n")
+name2 = input("What is their name? \n")
+
+combined = (name1 + name2).lower()
+
+t = combined.count("t")
+r = combined.count("r")
+u = combined.count("u")
+e = combined.count("e")
+true = t + r + u + e
+
+l = combined.count("l")
+o = combined.count("o")
+v = combined.count("v")
+love = l + o + v + e
+
+score = int(str(true) + str(love))
+
+if score &lt; 10 or score &gt; 90:
+    print(f"Your score is {score}, you go together like coke and mentos.")
+elif score &gt;= 40 and score &lt;= 50:
+    print(f"Your score is {score}, you are alright together.")
+else:
+    print(f"Your score is {score}.")</code></pre></div>
+          <p>Δοκίμασε «Angela Yu» και «Jack Bauer» — βγάζει 53. Μετά δοκίμασε δύο ήρωες από αγαπημένο σου παιχνίδι.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α5</span>
+          <div class="ex__b">
+            <h4>Εισιτήριο στον ζωολογικό κήπο</h4>
+            <p>Κάτω από 3: δωρεάν. Κάτω από 12: €5. 65 και πάνω: €4. Αλλιώς €8. Τις Κυριακές όλα τα εισιτήρια μισή τιμή. Ζήτα ηλικία και αν είναι Κυριακή (Y/N), τύπωσε την τιμή με 2 δεκαδικά.</p>
+            <p class="ex__out">Your ticket costs €2.00.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Πρώτα η ηλικία με <code>if / elif / else</code> — προσοχή στη σειρά, ξεκίνα από τη μικρότερη. Μετά ένα <em>ξεχωριστό</em> <code>if</code> για την Κυριακή που διαιρέζει την τιμή με το 2.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>age = int(input("How old are you? "))
+sunday = input("Is it Sunday? Y or N ").upper()
+
+if age &lt; 3:
+    price = 0
+elif age &lt; 12:
+    price = 5
+elif age &gt;= 65:
+    price = 4
+else:
+    price = 8
+
+if sunday == "Y":
+    price = price / 2
+
+print(f"Your ticket costs €{price:.2f}.")</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="note">
+        <p><b>Θέλεις κι άλλες;</b> <a href="https://codingbat.com/python/Logic-1" target="_blank" rel="noopener">CodingBat → Logic-1</a> είναι ακριβώς αυτό: μικρά προβλήματα με if και λογικούς τελεστές, με αυτόματο έλεγχο. Ξεκίνα από <code>cigar_party</code> και <code>date_fashion</code>.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── TURTLE ─── -->
+    <section id="turtle">
+      <h2><span class="h2n">§11</span> Turtle — διάλεξε σχήμα</h2>
+      <p class="lead">Η χελώνα ρωτάει τον χρήστη τι να ζωγραφίσει, και αποφασίζει με if.</p>
+
+      <svg class="turtle" viewBox="0 0 260 200" role="img" aria-label="Τρίγωνο, τετράγωνο και αστέρι σχεδιασμένα με turtle">
+        <defs><pattern id="gp3" width="13" height="13" patternUnits="userSpaceOnUse">
+          <path d="M13 0H0V13" fill="none" stroke="#E4EAF0" stroke-width="1"/></pattern></defs>
+        <rect width="260" height="200" fill="url(#gp3)"/>
+        <path d="M30 140 L70 70 L110 140 Z" fill="none" stroke="#2A4FC4" stroke-width="3" stroke-linejoin="round" stroke-dasharray="250" stroke-dashoffset="250">
+          <animate attributeName="stroke-dashoffset" from="250" to="0" dur="1.4s" begin="0.3s" fill="freeze"/></path>
+        <rect x="120" y="80" width="60" height="60" fill="none" stroke="#1B7A4C" stroke-width="3" stroke-linejoin="round" stroke-dasharray="240" stroke-dashoffset="240">
+          <animate attributeName="stroke-dashoffset" from="240" to="0" dur="1.4s" begin="1.6s" fill="freeze"/></rect>
+        <path d="M213 76 L221.2 100.7 L247.2 100.9 L226.3 116.3 L234.2 141.1 L213 126 L191.8 141.1 L199.7 116.3 L178.8 100.9 L204.8 100.7 Z" fill="none" stroke="#C63B32" stroke-width="3" stroke-linejoin="round" stroke-dasharray="330" stroke-dashoffset="330">
+          <animate attributeName="stroke-dashoffset" from="330" to="0" dur="1.6s" begin="2.9s" fill="freeze"/></path>
+        <text x="130" y="182" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="12" fill="#17263B" opacity="0">
+          <animate attributeName="opacity" from="0" to="1" dur=".5s" begin="4.4s" fill="freeze"/>triangle · square · star</text>
+      </svg>
+
+      <div class="codewrap"><pre><code>import turtle
+
+shape = input("What shape? triangle, square or star: ").lower()
+colour = input("What colour? ")
+
+pen = turtle.Turtle()
+pen.pensize(4)
+pen.color(colour)
+
+if shape == "triangle":
+    pen.forward(120)
+    pen.left(120)
+    pen.forward(120)
+    pen.left(120)
+    pen.forward(120)
+elif shape == "square":
+    pen.forward(100)
+    pen.left(90)
+    pen.forward(100)
+    pen.left(90)
+    pen.forward(100)
+    pen.left(90)
+    pen.forward(100)
+elif shape == "star":
+    pen.forward(150)
+    pen.right(144)
+    pen.forward(150)
+    pen.right(144)
+    pen.forward(150)
+    pen.right(144)
+    pen.forward(150)
+    pen.right(144)
+    pen.forward(150)
+else:
+    pen.write("I don't know that shape!", font=("Arial", 16, "normal"))
+
+turtle.done()</code></pre></div>
+
+      <div class="note note--key">
+        <p><b>Δικό σου τώρα.</b> Πρόσθεσε ένα τέταρτο σχήμα. Άλλαξε το τι ελέγχει ο χρήστης — το μέγεθος; το πάχος; Κάνε το πρόγραμμα να ζωγραφίζει <em>δύο</em> σχήματα αν ο χρήστης γράψει «both». Και παρατήρησε κάτι: το αστέρι είναι πέντε φορές οι ίδιες δύο γραμμές. Την Ημέρα 5 θα μάθεις να το γράφεις σε <em>δύο</em> γραμμές αντί για δέκα.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── AI ─── -->
+    <section id="ai">
+      <h2><span class="h2n">§12</span> AI Corner — το πρώτο chatbot ήταν ένα σωρό if</h2>
+      <p>Το 1966 ένας καθηγητής στο MIT έφτιαξε την <strong>ELIZA</strong>, το πρώτο πρόγραμμα που «συζητούσε». Ο κόσμος ενθουσιάστηκε. Κάποιοι νόμιζαν ότι τους καταλάβαινε. Δεν καταλάβαινε τίποτα — ήταν μια σειρά από κανόνες: <em>αν η πρόταση περιέχει τη λέξη «μητέρα», απάντησε «Πες μου για την οικογένειά σου»</em>.</p>
+      <p>Με όσα έμαθες σήμερα, μπορείς να φτιάξεις μια μίνι ELIZA σε δέκα γραμμές:</p>
+
+      <div class="codewrap"><pre><code>message = input("Tell me something: ").lower()
+
+if "hello" in message or "hi" in message:
+    print("Hello! How are you feeling today?")
+elif "sad" in message or "tired" in message:
+    print("I'm sorry to hear that. What happened?")
+elif "happy" in message or "great" in message:
+    print("That's wonderful! Tell me more.")
+elif "?" in message:
+    print("Why do you ask?")
+else:
+    print("I see. Go on.")</code></pre></div>
+
+      <p>Το <code>in</code> είναι καινούριο: ρωτάει «υπάρχει αυτή η λέξη μέσα στο κείμενο;» και δίνει <code>True</code> ή <code>False</code>. Πρόσθεσε πέντε δικούς σου κανόνες. Μετά δοκίμασε να το «σπάσεις» — γράψε κάτι που το μπερδεύει.</p>
+
+      <div class="note">
+        <p><b>Η ερώτηση που μετράει:</b> Πόσα <code>elif</code> θα χρειαζόσουν για να καταλαβαίνει το chatbot <em>οποιαδήποτε</em> πρόταση; Χίλια; Ένα εκατομμύριο; Δεν φτάνουν ποτέ. Αυτός είναι ο λόγος που η σύγχρονη AI <strong>δεν</strong> είναι ένας τεράστιος σωρός από if. Αντί να γράφει κάποιος τους κανόνες, ο υπολογιστής τους <em>βρίσκει μόνος του</em> από εκατομμύρια παραδείγματα. Αυτό λέγεται machine learning, και θα το δούμε από κοντά αργότερα μέσα στη χρονιά.</p>
+        <p>Παίξε πέντε λεπτά <a href="https://el.akinator.com" target="_blank" rel="noopener">Akinator</a>. Το τζίνι μαντεύει τον χαρακτήρα που σκέφτεσαι κάνοντας ερωτήσεις ναι/όχι. Είναι ένα γιγάντιο διάγραμμα ροής — ακριβώς ό,τι ζωγράφισες σήμερα, με εκατομμύρια ρόμβους.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΛΑΘΗ ─── -->
+    <section id="lathi">
+      <h2><span class="h2n">§13</span> Συχνά λάθη</h2>
+      <p class="lead">Όταν σκάσει κάτι, ψάξ' το εδώ πρώτα.</p>
+      <table class="tbl">
+        <thead><tr><th>Error</th><th>Τι φταίει</th></tr></thead>
+        <tbody>
+          <tr><td><code>SyntaxError</code> στο <code>if</code></td><td>Ξέχασες την άνω-κάτω τελεία <code>:</code> στο τέλος — ή έγραψες <code>=</code> αντί για <code>==</code>.</td></tr>
+          <tr><td><code>IndentationError</code></td><td>Η γραμμή κάτω από το <code>if</code> δεν έχει εσοχή, ή έχει διαφορετική από τις διπλανές της. Τέσσερα κενά, πάντα.</td></tr>
+          <tr><td><code>TypeError: '&gt;' not supported between 'str' and 'int'</code></td><td>Συγκρίνεις κείμενο με αριθμό. Ξέχασες το <code>int()</code> στο <code>input()</code> — η παγίδα της Ημέρας 2.</td></tr>
+          <tr><td>Το <code>else</code> τρέχει ενώ έγραψα τη σωστή λέξη</td><td>Ο χρήστης έγραψε <code>Left</code> και εσύ συγκρίνεις με <code>"left"</code>. Βάλε <code>.lower()</code>.</td></tr>
+          <tr><td>Το <code>or</code> «πάντα» βγαίνει True</td><td>Έγραψες <code>x == 3 or 5</code>. Το <code>5</code> μόνο του μετράει ως True. Θέλεις <code>x == 3 or x == 5</code>.</td></tr>
+          <tr><td>Τυπώνει δύο μηνύματα αντί για ένα</td><td>Χρησιμοποίησες δύο <code>if</code> ενώ ήθελες <code>if / elif</code>. Ήθελες <em>μία</em> επιλογή, όχι ανεξάρτητους ελέγχους.</td></tr>
+          <tr><td><code>SyntaxError</code> στο <code>elif</code></td><td>Έβαλες <code>elif</code> <em>μετά</em> το <code>else</code>. Το <code>else</code> είναι πάντα τελευταίο.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── RECAP ─── -->
+    <section id="recap">
+      <h2><span class="h2n">§14</span> Ανακεφαλαίωση</h2>
+      <p class="lead">Κράτησέ το. Από εδώ και πέρα, σχεδόν κάθε πρόγραμμα που θα γράψεις έχει τουλάχιστον ένα <code>if</code>.</p>
+
+      <h3>Οι τρεις μεγάλες ιδέες</h3>
+      <div class="ideas">
+        <div class="idea"><span class="idea__n">1</span><p>Το <code>if</code> ανοίγει ένα <strong>code block</strong>: ό,τι έχει εσοχή από κάτω τρέχει μόνο αν η συνθήκη είναι αληθής.</p></div>
+        <div class="idea"><span class="idea__n">2</span><p><code>if / elif / else</code> = <strong>μία</strong> επιλογή από πολλές, σταματάει στην πρώτη αληθή. Πολλά <code>if</code> στη σειρά = <strong>ανεξάρτητοι</strong> έλεγχοι, τρέχουν όλοι.</p></div>
+        <div class="idea"><span class="idea__n">3</span><p>Ζωγράφισε το <strong>διάγραμμα ροής</strong> πριν γράψεις κώδικα. Αν δεν βγαίνει στο χαρτί, δεν θα βγει ούτε στον υπολογιστή.</p></div>
+      </div>
+
+      <h3>Κάρτα αναφοράς</h3>
+      <div class="codewrap"><pre><code># ΑΠΟΦΑΣΗ ΜΕ ΔΥΟ ΔΡΟΜΟΥΣ
+if height &gt;= 120:
+    print("Ride!")          # τέσσερα κενά εσοχή
+else:
+    print("Too short.")
+
+# ΠΟΛΛΟΙ ΔΡΟΜΟΙ — μία επιλογή
+if age &lt; 12:
+    price = 5
+elif age &lt;= 18:
+    price = 7
+else:
+    price = 12
+
+# ΣΥΓΚΡΙΣΗ
+==  !=  &gt;  &lt;  &gt;=  &lt;=      # το == έχει ΔΥΟ ίσον
+
+# ΥΠΟΛΟΙΠΟ
+number % 2 == 0           # ζυγός;
+year % 4 == 0             # διαιρείται με το 4;
+
+# ΛΟΓΙΚΟΙ ΤΕΛΕΣΤΕΣ
+a and b     # και τα δύο
+a or b      # τουλάχιστον ένα
+not a       # το αντίστροφο
+
+# ΧΡΗΣΙΜΑ ΓΙΑ STRINGS
+text.lower()          # πεζά — πριν συγκρίνεις input
+text.count("e")       # πόσες φορές υπάρχει το e
+"word" in text        # υπάρχει μέσα; True/False
+
+# ΣΥΝΤΟΜΟΓΡΑΦΙΑ
+bill += 5             # bill = bill + 5</code></pre></div>
+
+      <h3>Μπορώ να…</h3>
+      <p>Τσέκαρε μόνο ό,τι μπορείς να κάνεις <strong>χωρίς</strong> να κοιτάξεις σημειώσεις. Η πρόοδος αποθηκεύεται σε αυτόν τον υπολογιστή.</p>
+      <div class="check" id="checklist">
+        <label><input type="checkbox" data-ck="c1"><span>…γράψω ένα <code>if / else</code> χωρίς να ξεχάσω την άνω-κάτω τελεία</span></label>
+        <label><input type="checkbox" data-ck="c2"><span>…εξηγήσω τη διαφορά <code>=</code> και <code>==</code></span></label>
+        <label><input type="checkbox" data-ck="c3"><span>…ελέγξω αν ένας αριθμός είναι ζυγός με το <code>%</code></span></label>
+        <label><input type="checkbox" data-ck="c4"><span>…πω πότε θέλω <code>elif</code> και πότε δύο ξεχωριστά <code>if</code></span></label>
+        <label><input type="checkbox" data-ck="c5"><span>…γράψω μια συνθήκη με <code>and</code> ή <code>or</code></span></label>
+        <label><input type="checkbox" data-ck="c6"><span>…εξηγήσω γιατί βάζω <code>.lower()</code> στο <code>input()</code></span></label>
+        <label><input type="checkbox" data-ck="c7"><span>…σχεδιάσω διάγραμμα ροής για ένα πρόβλημα με τρεις αποφάσεις</span></label>
+        <label><input type="checkbox" data-ck="c8"><span>…φτιάξω το Treasure Island από την αρχή, με δική μου ιστορία</span></label>
+      </div>
+
+      <h3>Λέξεις που έμαθα σήμερα</h3>
+      <p><code>control flow</code> <code>condition</code> <code>if</code> <code>else</code> <code>elif</code> <code>code block</code> <code>indentation</code> <code>comparison operator</code> <code>modulo</code> <code>nested if</code> <code>logical operator</code> <code>and</code> <code>or</code> <code>not</code> <code>flowchart</code> <code>.lower()</code> <code>.count()</code> <code>in</code> <code>+=</code> <code>IndentationError</code></p>
+    </section>
+
+    <footer class="foot">
+      <span>Ημέρα 03 · Control Flow &amp; Logical Operators</span>
+      <a href="#stoxoi">Πίσω στην αρχή</a>
+    </footer>
+
+  </div>
+</main>
+
+<script>
+'use strict';
+
+/* ── ασφαλής αποθήκευση: δουλεύει στο GitHub Pages, δεν σκάει πουθενά ── */
+var store = {
+  get: function(k){ try { return window.localStorage.getItem(k); } catch(e){ return null; } },
+  set: function(k,v){ try { window.localStorage.setItem(k,v); } catch(e){} }
+};
+
+/* ══════════════════ ΔΕΔΟΜΕΝΑ QUIZ ══════════════════ */
+var QUIZZES = {
+  q1: { title:'if, σύγκριση, modulo', questions:[
+    { p:'Ποιος τελεστής ρωτάει αν δύο τιμές είναι <strong>ίσες</strong>;',
+      o:['<code>=</code>','<code>==</code>','<code>=&gt;</code>','<code>equals</code>'], a:1,
+      h:'Το ένα ίσον κάνει κάτι άλλο — το είδες από την Ημέρα 1.',
+      e:'Το <code>=</code> <em>δίνει</em> τιμή σε μεταβλητή. Το <code>==</code> <em>συγκρίνει</em>. Το <code>if age = 18:</code> είναι SyntaxError.' },
+    { p:'Τι τυπώνει το <code>print(17 % 5)</code>;',
+      o:['3','3.4','2','0'], a:2,
+      h:'Το modulo δεν κάνει τη διαίρεση — δίνει ό,τι περισσεύει.',
+      e:'17 = 3 × 5 + <strong>2</strong>. Το υπόλοιπο είναι 2.' },
+    { p:'Τι θα συμβεί εδώ;<br><code>if x &gt; 5:</code><br><code>print("big")</code> &nbsp;(χωρίς εσοχή)',
+      o:['Τυπώνει big','Δεν τυπώνει τίποτα','IndentationError','TypeError'], a:2,
+      h:'Πώς ξέρει η Python ποιες γραμμές ανήκουν στο if;',
+      e:'Μετά από <code>if …:</code> η Python περιμένει ένα code block με εσοχή. Αν δεν βρει, σκάει με <code>IndentationError: expected an indented block</code>.' },
+    { p:'Ένας αριθμός <code>n</code> διαιρείται ακριβώς με το 3. Ποια συνθήκη είναι αληθής;',
+      o:['<code>n / 3 == 0</code>','<code>n % 3 == 0</code>','<code>n // 3 == 0</code>','<code>n == 3</code>'], a:1,
+      h:'«Διαιρείται ακριβώς» σημαίνει «δεν περισσεύει τίποτα».',
+      e:'Το <code>%</code> δίνει το υπόλοιπο. Αν είναι 0, η διαίρεση είναι ακριβής. Το <code>n / 3 == 0</code> θα ίσχυε μόνο για n = 0.' }
+  ]},
+  q2: { title:'elif & λογικοί τελεστές', questions:[
+    { p:'<code>x = 15</code>. Τι τυπώνει;<br><code>if x &gt; 10: print("A")</code><br><code>if x &gt; 5: print("B")</code>',
+      o:['Μόνο A','Μόνο B','A και B','Τίποτα'], a:2,
+      h:'Είναι δύο ξεχωριστά if ή ένα if με elif;',
+      e:'Δύο ανεξάρτητα <code>if</code> — ελέγχονται <strong>και τα δύο</strong>. Το 15 είναι και &gt; 10 και &gt; 5, άρα τυπώνει A και B. Με <code>elif</code> θα τύπωνε μόνο A.' },
+    { p:'Τι δίνει το <code>True and False</code>;',
+      o:['True','False','Error','Εξαρτάται'], a:1,
+      h:'Το and θέλει και τα δύο.',
+      e:'Το <code>and</code> είναι αληθές μόνο όταν <strong>και οι δύο</strong> πλευρές είναι αληθείς. Εδώ η μία είναι ψευδής.' },
+    { p:'Τι δίνει το <code>not (3 &gt; 2)</code>;',
+      o:['True','False','1','Error'], a:1,
+      h:'Πρώτα η παρένθεση, μετά το not.',
+      e:'Το <code>3 &gt; 2</code> είναι True. Το <code>not</code> το αντιστρέφει: <strong>False</strong>.' },
+    { p:'<code>year = 1900</code>. Τι δίνει το <code>year % 4 == 0 and year % 100 != 0</code>;',
+      o:['True','False','1900','Error'], a:1,
+      h:'Το 1900 διαιρείται με το 4; Και με το 100;',
+      e:'1900 % 4 == 0 είναι True, αλλά 1900 % 100 != 0 είναι <strong>False</strong> (διαιρείται ακριβώς με το 100). True and False = False. Γι\' αυτό το 1900 δεν ήταν δίσεκτο.' }
+  ]}
+};
+
+/* ══════════════════ RENDER QUIZ ══════════════════ */
+var KEYS = ['Α','Β','Γ','Δ'];
+
+function buildQuiz(host, id){
+  var data = QUIZZES[id];
+  var total = data.questions.length;
+  var answered = 0, right = 0;
+
+  var head = document.createElement('div');
+  head.className = 'quiz__head';
+  head.innerHTML = '<h4>' + data.title + '</h4><span class="quiz__score">— / ' + total + '</span>';
+  host.appendChild(head);
+  var scoreEl = head.querySelector('.quiz__score');
+
+  data.questions.forEach(function(q, qi){
+    var wrap = document.createElement('div');
+    wrap.className = 'q';
+
+    var prompt = document.createElement('p');
+    prompt.className = 'q__p';
+    prompt.innerHTML = '<span class="qn">' + (qi+1) + '.</span>' + q.p;
+    wrap.appendChild(prompt);
+
+    var opts = document.createElement('div');
+    opts.className = 'opts';
+    wrap.appendChild(opts);
+
+    var fb = document.createElement('div');
+    fb.className = 'q__fb';
+
+    var hintBtn = document.createElement('button');
+    hintBtn.type = 'button';
+    hintBtn.className = 'q__hintbtn';
+    hintBtn.textContent = 'Θέλω μια βοήθεια';
+    var hint = document.createElement('p');
+    hint.className = 'q__hint';
+    hint.innerHTML = q.h;
+    hintBtn.addEventListener('click', function(){
+      hint.classList.add('show');
+      hintBtn.style.display = 'none';
+    });
+
+    q.o.forEach(function(text, oi){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.innerHTML = '<span class="opt__k">' + KEYS[oi] + '</span><span class="opt__t">' + text + '</span>';
+      b.addEventListener('click', function(){
+        if (wrap.dataset.done) return;
+        wrap.dataset.done = '1';
+        answered++;
+        var ok = (oi === q.a);
+        if (ok) right++;
+
+        Array.prototype.forEach.call(opts.children, function(el, i){
+          el.disabled = true;
+          if (i === q.a) el.classList.add('is-right');
+          else if (i === oi) el.classList.add('is-wrong');
+        });
+
+        fb.className = 'q__fb show ' + (ok ? 'good' : 'bad');
+        fb.innerHTML = '<b>' + (ok ? 'Σωστά. ' : 'Όχι ακόμα. ') + '</b>' + q.e;
+        hintBtn.style.display = 'none';
+        hint.classList.remove('show');
+        scoreEl.textContent = right + ' / ' + total;
+        if (answered === total) {
+          scoreEl.style.color = (right === total) ? 'var(--pen-green)' : 'var(--ink)';
+        }
+      });
+      opts.appendChild(b);
+    });
+
+    wrap.appendChild(hintBtn);
+    wrap.appendChild(hint);
+    wrap.appendChild(fb);
+    host.appendChild(wrap);
+  });
+}
+
+document.querySelectorAll('[data-quiz]').forEach(function(el){
+  buildQuiz(el, el.dataset.quiz);
+});
+
+/* ══════════════════ ΧΡΩΜΑΤΙΣΜΟΣ ΚΩΔΙΚΑ ══════════════════ */
+var KW = /^(False|None|True|and|as|assert|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield)$/;
+var BI = /^(print|input|int|float|str|bool|type|len|round|range|abs|sum|min|max|list|dict|set|tuple|turtle|forward|left|right|color|write|goto|pensize|lower|upper|count)$/;
+
+function esc(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlight(src){
+  var re = /(#[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|(\b\d+\.?\d*\b)|([A-Za-z_][A-Za-z0-9_]*)/g;
+  var out = '', last = 0, m;
+  while ((m = re.exec(src)) !== null) {
+    out += esc(src.slice(last, m.index));
+    if (m[1])      out += '<span class="tok-c">' + esc(m[1]) + '</span>';
+    else if (m[2]) out += '<span class="tok-s">' + esc(m[2]) + '</span>';
+    else if (m[3]) out += '<span class="tok-n">' + esc(m[3]) + '</span>';
+    else if (m[4]) {
+      if (KW.test(m[4]))      out += '<span class="tok-k">' + m[4] + '</span>';
+      else if (BI.test(m[4])) out += '<span class="tok-b">' + m[4] + '</span>';
+      else                    out += esc(m[4]);
+    }
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+
+document.querySelectorAll('.codewrap pre code').forEach(function(code){
+  var raw = code.textContent;
+  code.innerHTML = highlight(raw);
+
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'copy';
+  btn.textContent = 'Αντιγραφή';
+  btn.addEventListener('click', function(){
+    var done = function(){
+      btn.textContent = 'Έγινε';
+      btn.classList.add('ok');
+      setTimeout(function(){ btn.textContent = 'Αντιγραφή'; btn.classList.remove('ok'); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(raw).then(done, function(){});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = raw; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(e){}
+      document.body.removeChild(ta);
+    }
+  });
+  code.parentNode.parentNode.appendChild(btn);
+});
+
+/* ══════════════════ CHECKLIST + ΠΡΟΟΔΟΣ ══════════════════ */
+var boxes = document.querySelectorAll('#checklist input[type=checkbox]');
+var progBar = document.getElementById('progBar');
+var progText = document.getElementById('progText');
+
+function paintProgress(){
+  var done = 0;
+  boxes.forEach(function(b){ if (b.checked) done++; });
+  progText.textContent = done + ' / ' + boxes.length;
+  progBar.style.width = (done / boxes.length * 100) + '%';
+}
+
+boxes.forEach(function(b){
+  var key = 'day03.' + b.dataset.ck;
+  if (store.get(key) === '1') b.checked = true;
+  b.addEventListener('change', function(){
+    store.set(key, b.checked ? '1' : '0');
+    paintProgress();
+  });
+});
+paintProgress();
+
+/* ══════════════════ SCROLLSPY ══════════════════ */
+var links = Array.prototype.slice.call(document.querySelectorAll('.day--now li a'));
+var targets = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+
+if ('IntersectionObserver' in window) {
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      var i = targets.indexOf(en.target);
+      if (i < 0) return;
+      links.forEach(function(a){ a.classList.remove('is-active'); });
+      links[i].classList.add('is-active');
+    });
+  }, { rootMargin: '-70px 0px -72% 0px', threshold: 0 });
+  targets.forEach(function(t){ if (t) io.observe(t); });
+}
+
+/* ══════════════════ ΜΕΝΟΥ ΓΙΑ ΚΙΝΗΤΟ ══════════════════ */
+var side = document.getElementById('side');
+var scrim = document.getElementById('scrim');
+var burger = document.getElementById('burger');
+
+function toggleSide(open){
+  side.classList.toggle('open', open);
+  scrim.classList.toggle('show', open);
+  burger.setAttribute('aria-expanded', String(open));
+}
+burger.addEventListener('click', function(){ toggleSide(!side.classList.contains('open')); });
+scrim.addEventListener('click', function(){ toggleSide(false); });
+side.addEventListener('click', function(e){
+  if (e.target.closest('a') && window.innerWidth <= 960) toggleSide(false);
+});
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && side.classList.contains('open')) toggleSide(false);
+});
+
+/* ══════════════════ HERO: ΤΟ ΠΡΟΓΡΑΜΜΑ ΤΡΕΧΕΙ ══════════════════ */
+(function(){
+  var out = document.getElementById('termOut');
+  if (!out) return;
+
+  var script = [
+    { t:'Welcome to Treasure Island.\n', d:22 },
+    { t:'Your mission is to find the treasure.\n\n', d:22 },
+    { t:'You are at a crossroad. Type "left" or "right".\n', d:16 },
+    { t:'left\n', d:90, c:'u' },
+    { t:'You come to a lake. Type "wait" or "swim".\n', d:16 },
+    { t:'wait\n', d:90, c:'u' },
+    { t:'A house with three doors: red, yellow, blue. Which one?\n', d:14 },
+    { t:'yellow\n\n', d:90, c:'u' },
+    { t:'You found the treasure! You win!\n', d:26, c:'r' }
+  ];
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduce) {
+    out.innerHTML = script.map(function(s){
+      var t = s.t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      return s.c ? '<span class="' + s.c + '">' + t + '</span>' : t;
+    }).join('');
+    return;
+  }
+
+  var si = 0, ci = 0, buf = '';
+  var caret = '<span class="caret"></span>';
+
+  function step(){
+    if (si >= script.length) { out.innerHTML = buf; return; }
+    var seg = script[si];
+    if (ci === 0 && seg.c) buf += '<span class="' + seg.c + '">';
+    var ch = seg.t.charAt(ci);
+    buf += (ch === '<' ? '&lt;' : ch === '&' ? '&amp;' : ch);
+    ci++;
+    if (ci >= seg.t.length) {
+      if (seg.c) buf += '</span>';
+      si++; ci = 0;
+    }
+    out.innerHTML = buf + caret;
+    setTimeout(step, seg.d);
+  }
+  setTimeout(step, 380);
+})();
+</script>
+</body>
+</html>
