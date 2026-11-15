@@ -1,0 +1,1509 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ημέρα 4 — Randomisation &amp; Python Lists · Programming Lessons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700;800&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — a school notebook: ballpoint ink on graph paper.
+   Every pen colour has a job. Nothing here is decoration.
+   ============================================================ */
+:root{
+  --paper:      #FCFCFA;
+  --paper-2:    #F4F6F8;
+  --grid:       #E4EAF0;
+  --grid-major: #D6DFE8;
+
+  --ink:        #17263B;   /* blue-black ballpoint  */
+  --ink-soft:   #5A6B80;
+  --ink-faint:  #94A3B4;
+
+  --pen-blue:   #2A4FC4;   /* links, active state   */
+  --pen-red:    #C63B32;   /* errors, warnings      */
+  --pen-green:  #1B7A4C;   /* correct               */
+  --marker:     #FFE9A8;   /* highlighter           */
+  --marker-2:   #FFF6DC;
+
+  --rule:       #DDE4EC;
+  --shadow:     0 1px 0 var(--rule);
+
+  --nav-h:      60px;
+  --side-w:     288px;
+
+  --f-ui:   'Commissioner', 'Helvetica Neue', Arial, sans-serif;
+  --f-body: 'Alegreya', Georgia, 'Times New Roman', serif;
+  --f-code: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
+body{
+  margin:0;
+  font-family:var(--f-body);
+  font-size:18px;
+  line-height:1.72;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:26px 26px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.nav{
+  position:fixed;inset:0 0 auto 0;height:var(--nav-h);z-index:60;
+  display:flex;align-items:center;gap:16px;padding:0 20px;
+  background:rgba(252,252,250,.94);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.nav__burger{
+  display:none;width:38px;height:38px;flex:0 0 auto;
+  border:1px solid var(--rule);border-radius:8px;background:var(--paper);
+  color:var(--ink);cursor:pointer;align-items:center;justify-content:center;
+}
+.nav__mark{
+  width:30px;height:30px;flex:0 0 auto;border-radius:7px;
+  background:var(--ink);color:var(--paper);
+  display:grid;place-items:center;
+  font-family:var(--f-code);font-size:15px;font-weight:700;
+}
+.nav__title{
+  font-family:var(--f-ui);font-weight:700;font-size:17px;
+  letter-spacing:-.01em;margin:0;white-space:nowrap;
+}
+.nav__spacer{flex:1}
+.nav__progress{display:flex;align-items:center;gap:10px}
+.nav__progress span{
+  font-family:var(--f-ui);font-size:13px;font-weight:500;color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+}
+.bar{width:110px;height:7px;border-radius:4px;background:var(--paper-2);
+  border:1px solid var(--rule);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--pen-green);
+  transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.side{
+  position:fixed;top:var(--nav-h);bottom:0;left:0;width:var(--side-w);z-index:50;
+  overflow-y:auto;padding:20px 14px 60px;
+  background:var(--paper);border-right:1px solid var(--rule);
+  font-family:var(--f-ui);
+}
+.side__label{
+  font-family:var(--f-ui);font-size:12px;font-weight:600;color:var(--ink-faint);
+  margin:0 0 12px 10px;
+}
+.day{border-bottom:1px solid var(--rule)}
+.day:last-child{border-bottom:0}
+.day > summary{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:center;gap:10px;
+  padding:11px 10px;border-radius:8px;
+  font-size:14.5px;font-weight:500;color:var(--ink);
+}
+.day > summary::-webkit-details-marker{display:none}
+.day > summary:hover{background:var(--paper-2)}
+.day > summary:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.day__n{
+  flex:0 0 auto;width:26px;height:26px;border-radius:6px;
+  display:grid;place-items:center;
+  font-family:var(--f-code);font-size:12px;font-weight:600;
+  background:var(--paper-2);color:var(--ink-soft);border:1px solid var(--rule);
+}
+.day__t{flex:1;line-height:1.35}
+.day__chev{flex:0 0 auto;color:var(--ink-faint);transition:transform .2s}
+.day[open] > summary > .day__chev{transform:rotate(90deg)}
+
+.day--now > summary{background:var(--marker-2)}
+.day--now .day__n{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.day--done .day__n{background:var(--pen-green);color:#fff;border-color:var(--pen-green)}
+.day--soon > summary{color:var(--ink-faint);cursor:default}
+.day--soon .day__n{color:var(--ink-faint)}
+
+.day ul{list-style:none;margin:0 0 10px;padding:2px 0 2px 22px}
+.day li a{
+  display:block;padding:6px 10px;border-radius:6px;
+  font-size:14px;color:var(--ink-soft);text-decoration:none;
+  border-left:2px solid var(--rule);
+}
+.day li a:hover{color:var(--ink);background:var(--paper-2)}
+.day li a:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.day li a.is-active{
+  color:var(--pen-blue);font-weight:600;
+  border-left-color:var(--pen-blue);background:var(--paper-2);
+}
+.day li a .tag{
+  font-family:var(--f-code);font-size:10.5px;font-weight:600;
+  color:var(--pen-blue);margin-left:6px;
+}
+.day__soon{
+  padding:4px 10px 12px 32px;font-size:13px;color:var(--ink-faint);font-style:italic;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.main{margin:var(--nav-h) 0 0 var(--side-w);padding:0 0 100px}
+.wrap{max-width:760px;margin:0 auto;padding:0 28px}
+
+/* ============================================================
+   HERO — the day's goal, running.
+   ============================================================ */
+.hero{
+  border-bottom:1px solid var(--rule);
+  background:linear-gradient(180deg,var(--marker-2) 0%,rgba(255,246,220,0) 100%);
+  padding:44px 0 40px;margin-bottom:44px;
+}
+.hero__meta{
+  font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--ink-soft);
+  display:flex;gap:14px;align-items:center;margin-bottom:10px;
+}
+.hero__meta b{
+  font-family:var(--f-code);font-size:12px;font-weight:700;
+  color:var(--paper);background:var(--ink);padding:3px 7px;border-radius:5px;
+}
+.hero h1{
+  font-family:var(--f-ui);font-weight:800;font-size:clamp(30px,5.2vw,44px);
+  line-height:1.1;letter-spacing:-.025em;margin:0 0 14px;
+}
+.hero__sub{font-size:19px;color:var(--ink-soft);margin:0 0 28px;max-width:56ch}
+
+.term{
+  border:1px solid var(--ink);border-radius:10px;overflow:hidden;
+  background:var(--ink);box-shadow:0 6px 22px rgba(23,38,59,.16);
+}
+.term__bar{
+  display:flex;align-items:center;gap:7px;padding:9px 13px;
+  border-bottom:1px solid rgba(255,255,255,.13);
+}
+.term__bar i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.26)}
+.term__bar span{
+  margin-left:8px;font-family:var(--f-code);font-size:11.5px;
+  color:rgba(255,255,255,.55);
+}
+.term pre{
+  margin:0;padding:18px 16px;min-height:186px;
+  font-family:var(--f-code);font-size:13.5px;line-height:1.75;
+  color:#DCE6F2;white-space:pre-wrap;word-break:break-word;
+}
+.term .u{color:#8FE3B4}
+.term .r{color:#FFD98A;font-weight:600}
+.term .caret{
+  display:inline-block;width:8px;height:15px;vertical-align:-2px;
+  background:#8FE3B4;animation:blink 1.05s step-end infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+section{margin:0 0 52px;scroll-margin-top:calc(var(--nav-h) + 16px)}
+h2{
+  font-family:var(--f-ui);font-weight:700;font-size:26px;letter-spacing:-.02em;
+  line-height:1.25;margin:0 0 6px;padding-top:6px;
+  display:flex;align-items:baseline;gap:12px;
+}
+h2 .h2n{
+  font-family:var(--f-code);font-size:13px;font-weight:600;color:var(--ink-faint);
+  flex:0 0 auto;
+}
+h3{font-family:var(--f-ui);font-weight:600;font-size:18.5px;margin:30px 0 8px}
+.lead{color:var(--ink-soft);margin:0 0 20px;font-size:17px}
+p{margin:0 0 16px}
+a{color:var(--pen-blue)}
+strong{font-weight:700}
+
+.rule{height:1px;background:var(--rule);border:0;margin:0 0 34px}
+
+/* inline + block code */
+code{
+  font-family:var(--f-code);font-size:.855em;
+  background:var(--paper-2);border:1px solid var(--rule);
+  padding:1px 5px;border-radius:4px;white-space:nowrap;
+}
+.codewrap{position:relative;margin:0 0 20px}
+.codewrap pre{
+  margin:0;padding:16px 18px;overflow-x:auto;
+  background:var(--ink);border-radius:9px;
+  font-family:var(--f-code);font-size:13.5px;line-height:1.68;
+  color:#DCE6F2;
+}
+.codewrap pre code{
+  background:none;border:0;padding:0;font-size:inherit;white-space:pre;
+}
+.copy{
+  position:absolute;top:9px;right:9px;
+  font-family:var(--f-ui);font-size:11.5px;font-weight:600;
+  color:rgba(255,255,255,.62);background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;
+  padding:4px 9px;cursor:pointer;opacity:0;transition:opacity .15s;
+}
+.codewrap:hover .copy,.copy:focus-visible{opacity:1}
+.copy:hover{color:#fff;background:rgba(255,255,255,.17)}
+.copy.ok{color:#8FE3B4;border-color:rgba(143,227,180,.4)}
+.tok-k{color:#9DB8FF;font-weight:500}
+.tok-s{color:#8FE3B4}
+.tok-c{color:#8394AB;font-style:italic}
+.tok-n{color:#FFC98A}
+.tok-b{color:#E7B4FF}
+
+/* callouts */
+.note{
+  border-left:3px solid var(--pen-blue);background:var(--paper-2);
+  padding:14px 18px;border-radius:0 8px 8px 0;margin:0 0 20px;font-size:16.5px;
+}
+.note--warn{border-left-color:var(--pen-red)}
+.note--key{border-left-color:#E8B92E;background:var(--marker-2)}
+.note p:last-child{margin-bottom:0}
+.note b{font-family:var(--f-ui);font-size:15px}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;margin:0 0 22px;font-size:16px}
+.tbl th{
+  font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--ink-soft);
+  text-align:left;padding:8px 12px;border-bottom:2px solid var(--rule);
+}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl code{white-space:nowrap}
+
+/* big ideas */
+.ideas{display:grid;gap:12px;margin:0 0 24px}
+.idea{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--marker-2);border:1px solid #F0DFA8;border-radius:9px;padding:15px 17px;
+}
+.idea__n{
+  flex:0 0 auto;width:27px;height:27px;border-radius:50%;
+  background:var(--ink);color:var(--paper);display:grid;place-items:center;
+  font-family:var(--f-code);font-size:13px;font-weight:700;margin-top:2px;
+}
+.idea p{margin:0;font-size:16.5px}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz{border:1px solid var(--rule);border-radius:11px;background:var(--paper);overflow:hidden}
+.quiz__head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 18px;border-bottom:1px solid var(--rule);background:var(--paper-2);
+}
+.quiz__head h4{font-family:var(--f-ui);font-size:15px;font-weight:600;margin:0}
+.quiz__score{
+  font-family:var(--f-code);font-size:13px;font-weight:600;color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+}
+.q{padding:20px 18px;border-bottom:1px solid var(--rule)}
+.q:last-child{border-bottom:0}
+.q__p{font-family:var(--f-ui);font-size:16px;font-weight:600;margin:0 0 13px;line-height:1.5}
+.q__p .qn{font-family:var(--f-code);font-size:13px;color:var(--ink-faint);margin-right:7px}
+.opts{display:grid;gap:7px}
+.opt{
+  display:flex;align-items:center;gap:11px;width:100%;text-align:right;
+  font-family:var(--f-body);font-size:16.5px;color:var(--ink);
+  background:var(--paper);border:1px solid var(--rule);border-radius:8px;
+  padding:10px 13px;cursor:pointer;transition:background .13s,border-color .13s;
+}
+.opt:hover:not(:disabled){background:var(--paper-2);border-color:var(--ink-faint)}
+.opt:focus-visible{outline:2px solid var(--pen-blue);outline-offset:1px}
+.opt:disabled{cursor:default}
+.opt__k{
+  flex:0 0 auto;width:23px;height:23px;border-radius:50%;
+  border:1px solid var(--rule);display:grid;place-items:center;
+  font-family:var(--f-code);font-size:11.5px;font-weight:600;color:var(--ink-soft);
+}
+.opt__t{flex:1;text-align:left}
+.opt.is-right{border-color:var(--pen-green);background:#EFF8F2}
+.opt.is-right .opt__k{background:var(--pen-green);color:#fff;border-color:var(--pen-green)}
+.opt.is-wrong{border-color:var(--pen-red);background:#FDF0EF}
+.opt.is-wrong .opt__k{background:var(--pen-red);color:#fff;border-color:var(--pen-red)}
+.q__fb{
+  display:none;margin-top:12px;padding:12px 14px;border-radius:8px;
+  font-size:16px;background:var(--paper-2);border-left:3px solid var(--ink-faint);
+}
+.q__fb.show{display:block}
+.q__fb.good{border-left-color:var(--pen-green)}
+.q__fb.bad{border-left-color:var(--pen-red)}
+.q__fb b{font-family:var(--f-ui);font-size:15px}
+.q__hintbtn{
+  margin-top:11px;font-family:var(--f-ui);font-size:13px;font-weight:600;
+  color:var(--pen-blue);background:none;border:0;padding:0;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.q__hint{display:none;margin-top:9px;font-size:16px;color:var(--ink-soft);font-style:italic}
+.q__hint.show{display:block}
+
+/* ============================================================
+   EXERCISES
+   ============================================================ */
+.ex{border:1px solid var(--rule);border-radius:11px;margin:0 0 14px;background:var(--paper);overflow:hidden}
+.ex__head{display:flex;align-items:flex-start;gap:13px;padding:16px 18px}
+.ex__n{
+  flex:0 0 auto;font-family:var(--f-code);font-size:12px;font-weight:700;
+  color:var(--paper);background:var(--ink);border-radius:5px;padding:3px 7px;margin-top:3px;
+}
+.ex__b{flex:1}
+.ex__b h4{font-family:var(--f-ui);font-size:16.5px;font-weight:600;margin:0 0 6px}
+.ex__b p{margin:0 0 8px;font-size:16.5px}
+.ex__out{
+  font-family:var(--f-code);font-size:13px;color:var(--ink-soft);
+  background:var(--paper-2);border:1px dashed var(--rule);border-radius:6px;
+  padding:8px 11px;margin:8px 0 0;
+}
+.ex details{border-top:1px solid var(--rule)}
+.ex details summary{
+  list-style:none;cursor:pointer;padding:11px 18px;
+  font-family:var(--f-ui);font-size:13.5px;font-weight:600;color:var(--pen-blue);
+}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary:hover{background:var(--paper-2)}
+.ex details summary:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.ex details[open] summary{border-bottom:1px solid var(--rule)}
+.ex details .body{padding:15px 18px}
+.ex details .body p:last-child,.ex details .body .codewrap:last-child{margin-bottom:0}
+
+/* ============================================================
+   CHECKLIST
+   ============================================================ */
+.check{border:1px solid var(--rule);border-radius:11px;padding:8px 6px;background:var(--paper)}
+.check label{
+  display:flex;align-items:flex-start;gap:12px;padding:9px 13px;border-radius:8px;
+  cursor:pointer;font-size:16.5px;
+}
+.check label:hover{background:var(--paper-2)}
+.check input{
+  flex:0 0 auto;width:19px;height:19px;margin-top:4px;
+  accent-color:var(--pen-green);cursor:pointer;
+}
+.check input:checked + span{color:var(--ink-faint);text-decoration:line-through}
+
+/* turtle figure */
+.turtle{
+  display:block;margin:0 auto 20px;max-width:280px;width:100%;
+  background:var(--paper);border:1px solid var(--rule);border-radius:9px;padding:10px;
+}
+
+/* footer */
+.foot{
+  border-top:1px solid var(--rule);margin-top:56px;padding-top:24px;
+  font-family:var(--f-ui);font-size:13.5px;color:var(--ink-faint);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.foot a{color:var(--ink-soft);text-decoration:none}
+.foot a:hover{color:var(--pen-blue);text-decoration:underline}
+
+/* scrim for mobile drawer */
+.scrim{
+  display:none;position:fixed;inset:var(--nav-h) 0 0 0;z-index:45;
+  background:rgba(23,38,59,.35);
+}
+.scrim.show{display:block}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:960px){
+  :root{--side-w:280px}
+  .nav__burger{display:flex}
+  .side{transform:translateX(-100%);transition:transform .24s cubic-bezier(.4,0,.2,1);
+    box-shadow:2px 0 18px rgba(23,38,59,.12)}
+  .side.open{transform:none}
+  .main{margin-left:0}
+  .nav__progress span{display:none}
+}
+@media (max-width:600px){
+  body{font-size:17px}
+  .wrap{padding:0 18px}
+  .hero{padding:30px 0 28px;margin-bottom:32px}
+  h2{font-size:22px}
+  .bar{width:70px}
+  .opt{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ NAVBAR ══════════════════ -->
+<header class="nav">
+  <button class="nav__burger" id="burger" aria-label="Άνοιγμα μενού" aria-expanded="false">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M2 4.5h14M2 9h14M2 13.5h14"/>
+    </svg>
+  </button>
+  <div class="nav__mark">Py</div>
+  <p class="nav__title"><a href="../index.html" style="color:inherit;text-decoration:none" title="Όλα τα μαθήματα">Programming Lessons</a></p>
+  <div class="nav__spacer"></div>
+  <div class="nav__progress">
+    <span id="progText">0 / 8</span>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<nav class="side" id="side" aria-label="Περιεχόμενα μαθημάτων">
+  <p class="side__label">Beginner · Ημέρες 1–14</p>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">01</span>
+      <span class="day__t">Μεταβλητές &amp; Variables</span>
+    </summary>
+    <div class="day__soon">Ολοκληρώθηκε. Σύντομα και εδώ.</div>
+  </details>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">02</span>
+      <span class="day__t">Τύποι Δεδομένων &amp; Strings</span>
+    </summary>
+    <ul><li><a href="index.html">Άνοιξε το μάθημα</a></li></ul>
+  </details>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">03</span>
+      <span class="day__t">Control Flow &amp; Logical Operators</span>
+    </summary>
+    <ul><li><a href="day-03.html">Άνοιξε το μάθημα</a></li></ul>
+  </details>
+
+  <details class="day day--now" open>
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">04</span>
+      <span class="day__t">Randomisation &amp; Lists</span>
+    </summary>
+    <ul>
+      <li><a href="#stoxoi">Στόχοι της ημέρας</a></li>
+      <li><a href="#random">Το random module</a></li>
+      <li><a href="#quiz1">Έλεγχος 1 <span class="tag">quiz</span></a></li>
+      <li><a href="#lists">Λίστες &amp; offset</a></li>
+      <li><a href="#append">append, len, IndexError</a></li>
+      <li><a href="#nested">Nested lists</a></li>
+      <li><a href="#quiz2">Έλεγχος 2 <span class="tag">quiz</span></a></li>
+      <li><a href="#project">Πέτρα-Χαρτί-Ψαλίδι <span class="tag">project</span></a></li>
+      <li><a href="#askiseis">Ασκήσεις <span class="tag">6</span></a></li>
+      <li><a href="#turtle">Turtle: τυχαία τέχνη <span class="tag">art</span></a></li>
+      <li><a href="#ai">AI Corner</a></li>
+      <li><a href="#lathi">Συχνά λάθη</a></li>
+      <li><a href="#recap">Ανακεφαλαίωση</a></li>
+    </ul>
+  </details>
+
+  <details class="day"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">05</span><span class="day__t">Python Loops</span></summary>
+    <ul><li><a href="day-05.html">Άνοιξε το μάθημα</a></li></ul></details>
+
+  <details class="day"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">06</span><span class="day__t">Functions &amp; Karel</span></summary>
+    <ul><li><a href="day-06.html">Άνοιξε το μάθημα</a></li></ul></details>
+
+  <details class="day"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">07</span><span class="day__t">Hangman</span></summary>
+    <ul><li><a href="day-07.html">Άνοιξε το μάθημα</a></li></ul></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">08</span><span class="day__t">Parameters &amp; Caesar Cipher</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">09</span><span class="day__t">Dictionaries &amp; Secret Auction</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">10</span><span class="day__t">Functions with Outputs</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">11</span><span class="day__t">Blackjack Capstone</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">12</span><span class="day__t">Scope &amp; Number Guessing</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">13</span><span class="day__t">Debugging</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">14</span><span class="day__t">Higher Lower Game</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+</nav>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main class="main">
+
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero__meta"><b>ΗΜΕΡΑ 04</b> <span>Beginner</span> <span>·</span> <span>2 ώρες 30′</span></div>
+      <h1>Randomisation &amp; Python Lists</h1>
+      <p class="hero__sub">Μέχρι τώρα τα προγράμματά σου έκαναν ακριβώς ό,τι τους έλεγες, κάθε φορά το ίδιο. Σήμερα μαθαίνουν να <strong>εκπλήσσουν</strong> — και να κρατάνε πολλά πράγματα μαζί. Στο τέλος της ημέρας θα παίζεις Πέτρα-Χαρτί-Ψαλίδι με τον υπολογιστή:</p>
+
+      <div class="term">
+        <div class="term__bar"><i></i><i></i><i></i><span>rock_paper_scissors.py</span></div>
+        <pre id="termOut"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- ─── ΣΤΟΧΟΙ ─── -->
+    <section id="stoxoi">
+      <h2><span class="h2n">§1</span> Στόχοι της ημέρας</h2>
+      <p class="lead">Στο τέλος του μαθήματος θα μπορείς να κάνεις όλα τα παρακάτω χωρίς βοήθεια.</p>
+      <ul>
+        <li>Να εξηγείς τι είναι ένα <em>module</em> και να το φέρνεις στο πρόγραμμά σου με <code>import</code></li>
+        <li>Να παράγεις τυχαίους αριθμούς με <code>random.randint()</code> και <code>random.random()</code></li>
+        <li>Να φτιάχνεις μια <em>λίστα</em>, να παίρνεις στοιχεία με <code>[index]</code> και να προσθέτεις με <code>.append()</code></li>
+        <li>Να εξηγείς γιατί το τελευταίο στοιχείο είναι στη θέση <code>len - 1</code> και τι είναι το <code>IndexError</code></li>
+        <li>Να διαλέγεις τυχαία από μια λίστα με <code>random.choice()</code></li>
+        <li>Να δουλεύεις με λίστα μέσα σε λίστα — έναν χάρτη</li>
+        <li>Να φτιάξεις το Πέτρα-Χαρτί-Ψαλίδι, με δικό σου ASCII art</li>
+      </ul>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── RANDOM ─── -->
+    <section id="random">
+      <h2><span class="h2n">§2</span> Το random module — δανείζομαι κώδικα</h2>
+      <p>Η Python από μόνη της δεν ξέρει να ρίχνει ζάρια. Ξέρει όμως να <em>δανείζεται</em>. Ένα <strong>module</strong> είναι ένα αρχείο με έτοιμο κώδικα που έγραψε κάποιος άλλος — και με μία γραμμή γίνεται δικός σου:</p>
+
+      <div class="codewrap"><pre><code>import random
+
+dice = random.randint(1, 6)
+print(dice)</code></pre></div>
+
+      <p>Τρέξ' το πέντε φορές. Κάθε φορά άλλος αριθμός. Αυτό είναι το πρώτο σου πρόγραμμα που δεν κάνει το ίδιο πράγμα δύο φορές.</p>
+
+      <h3>Τα τρία εργαλεία που θα χρησιμοποιείς</h3>
+      <table class="tbl">
+        <thead><tr><th>Εντολή</th><th>Τι δίνει</th><th>Παράδειγμα</th></tr></thead>
+        <tbody>
+          <tr><td><code>random.randint(a, b)</code></td><td>ακέραιο από <code>a</code> μέχρι <strong>και</strong> <code>b</code></td><td><code>randint(1, 6)</code> → ζάρι</td></tr>
+          <tr><td><code>random.random()</code></td><td>δεκαδικό από <code>0.0</code> μέχρι (αλλά όχι) <code>1.0</code></td><td><code>random() * 100</code> → 0 έως 99.99</td></tr>
+          <tr><td><code>random.choice(list)</code></td><td>ένα τυχαίο στοιχείο από λίστα</td><td>θα το δούμε στην §5</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note note--key">
+        <p><b>Γιατί <code>random.randint</code> και όχι σκέτο <code>randint</code>;</b> Το <code>randint</code> ζει <em>μέσα</em> στο module <code>random</code>. Η τελεία διαβάζεται «από το random, πάρε το randint». Χωρίς το <code>random.</code> μπροστά, η Python δεν ξέρει για τι μιλάς → <code>NameError</code>.</p>
+      </div>
+
+      <h3>Κορώνα ή γράμματα</h3>
+      <p>Δύο αποτελέσματα, ένας τυχαίος αριθμός, ένα <code>if</code> από την Ημέρα 3:</p>
+
+      <div class="codewrap"><pre><code>import random
+
+coin = random.randint(0, 1)
+
+if coin == 1:
+    print("Heads")
+else:
+    print("Tails")</code></pre></div>
+
+      <div class="note note--warn">
+        <p><b>Μην ονομάσεις ΠΟΤΕ το αρχείο σου <code>random.py</code>.</b> Η Python θα κάνει import το δικό σου αρχείο αντί για το πραγματικό module, και τίποτα δεν θα δουλεύει — χωρίς να καταλαβαίνεις γιατί. Είναι ένα από τα πιο μπερδευτικά σφάλματα που υπάρχουν, και τώρα το ξέρεις πριν το πάθεις.</p>
+      </div>
+
+      <div class="note">
+        <p><b>Pseudo-random.</b> Ο υπολογιστής δεν μπορεί να κάνει κάτι <em>πραγματικά</em> τυχαίο — είναι μηχανή που ακολουθεί κανόνες. Υπολογίζει αριθμούς που <em>μοιάζουν</em> τυχαίοι, ξεκινώντας συνήθως από το ρολόι της στιγμής. Γι' αυτό λέγονται ψευδο-τυχαίοι. Για ζάρια και παιχνίδια, αρκούν και περισσεύουν.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── QUIZ 1 ─── -->
+    <section id="quiz1">
+      <h2><span class="h2n">§3</span> Έλεγχος 1 — import &amp; random</h2>
+      <p class="lead">Χωρίς σημειώσεις. Θέλεις 3 στα 4 πριν προχωρήσεις.</p>
+      <div class="quiz" data-quiz="q1"></div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΛΙΣΤΕΣ ─── -->
+    <section id="lists">
+      <h2><span class="h2n">§4</span> Λίστες — πολλές τιμές, ένα όνομα</h2>
+      <p>Μια μεταβλητή κρατάει <em>μία</em> τιμή. Μια <strong>λίστα</strong> κρατάει πολλές, με τη σειρά, κάτω από ένα όνομα. Οι αγκύλες <code>[ ]</code> είναι το σήμα της:</p>
+
+      <div class="codewrap"><pre><code>fruits = ["apple", "banana", "cherry"]
+numbers = [3, 7, 11, 42]
+mixed = ["Athens", 13, 1.62, True]
+
+print(fruits)
+print(fruits[0])      # apple
+print(fruits[1])      # banana
+print(fruits[-1])     # cherry  — το τελευταίο
+print(len(fruits))    # 3</code></pre></div>
+
+      <p>Σου θυμίζει κάτι; Την Ημέρα 2 έκανες <code>name[0]</code> για το πρώτο γράμμα. Ίδιος ακριβώς κανόνας: <strong>η αρίθμηση ξεκινάει από το 0</strong>. Οι προγραμματιστές το λένε <strong>offset</strong> — πόσα βήματα από την αρχή. Το πρώτο στοιχείο είναι μηδέν βήματα μακριά.</p>
+
+      <table class="tbl">
+        <thead><tr><th>Στοιχείο</th><th><code>"apple"</code></th><th><code>"banana"</code></th><th><code>"cherry"</code></th></tr></thead>
+        <tbody>
+          <tr><td>Index από την αρχή</td><td><code>0</code></td><td><code>1</code></td><td><code>2</code></td></tr>
+          <tr><td>Index από το τέλος</td><td><code>-3</code></td><td><code>-2</code></td><td><code>-1</code></td></tr>
+        </tbody>
+      </table>
+
+      <h3>Αλλαγή στοιχείου</h3>
+      <div class="codewrap"><pre><code>fruits = ["apple", "banana", "cherry"]
+fruits[1] = "mango"
+print(fruits)         # ['apple', 'mango', 'cherry']</code></pre></div>
+      <p>Η λίστα δεν είναι παγωμένη. Δείχνεις μια θέση, της δίνεις νέα τιμή. Αυτό δεν γίνεται με τα strings — δοκίμασε <code>name[0] = "X"</code> και δες τι λέει η Python.</p>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── APPEND ─── -->
+    <section id="append">
+      <h2><span class="h2n">§5</span> append, len και το IndexError</h2>
+
+      <div class="codewrap"><pre><code>fruits = ["apple", "banana", "cherry"]
+
+fruits.append("kiwi")                # ένα στοιχείο στο τέλος
+print(fruits)                        # ['apple', 'banana', 'cherry', 'kiwi']
+
+fruits.extend(["mango", "fig"])      # πολλά στοιχεία στο τέλος
+print(len(fruits))                   # 6</code></pre></div>
+
+      <p>Το <code>.append()</code> είναι σαν το <code>.lower()</code> της Ημέρας 3: μια ενέργεια που <em>ανήκει</em> στο αντικείμενο. Η λίστα ξέρει να προσθέτει στον εαυτό της.</p>
+
+      <h3>Το λάθος με το δικό του όνομα</h3>
+      <div class="codewrap"><pre><code>fruits = ["apple", "banana", "cherry"]
+print(fruits[3])      # IndexError: list index out of range</code></pre></div>
+
+      <p>Τρία στοιχεία → θέσεις <code>0</code>, <code>1</code>, <code>2</code>. Η θέση 3 δεν υπάρχει. Το τελευταίο έγκυρο index είναι <strong>πάντα</strong> <code>len(list) - 1</code>. Αυτό το bug είναι τόσο συχνό που έχει δικό του όνομα: <em>off-by-one error</em>. Θα το κάνεις. Όλοι το κάνουν. Το θέμα είναι να το αναγνωρίζεις σε τρία δευτερόλεπτα.</p>
+
+      <h3>Ποιος πληρώνει;</h3>
+      <p>Μια παρέα, ένας λογαριασμός, και ο υπολογιστής διαλέγει:</p>
+
+      <div class="codewrap"><pre><code>import random
+
+names_string = input("Give me everybody's names, separated by a comma. ")
+names = names_string.split(", ")
+
+person = random.choice(names)
+print(f"{person} is going to buy the meal today!")</code></pre></div>
+
+      <p>Δύο νέα πράγματα. Το <code>.split(", ")</code> κόβει ένα string σε λίστα, εκεί που βρίσκει κόμμα-και-κενό: το <code>"Maria, Nikos, Eleni"</code> γίνεται <code>["Maria", "Nikos", "Eleni"]</code>. Και το <code>random.choice()</code> διαλέγει ένα τυχαίο στοιχείο. Αυτές οι δύο γραμμές είναι ο σκελετός κάθε «ποιος θα…» προγράμματος που θα φτιάξεις ποτέ.</p>
+
+      <div class="note note--key">
+        <p><b>Ο ίδιος στόχος, χωρίς το <code>choice</code>:</b></p>
+        <div class="codewrap"><pre><code>how_many = len(names)
+random_index = random.randint(0, how_many - 1)
+print(names[random_index])</code></pre></div>
+        <p>Γιατί <code>- 1</code>; Γιατί αν η παρέα έχει 3 άτομα, τα index είναι 0, 1, 2 — και το <code>randint(0, 3)</code> θα έβγαζε κάποια στιγμή 3, δηλαδή <code>IndexError</code>. Το <code>random.choice()</code> το κάνει αυτό για σένα. Αλλά τώρα ξέρεις <em>τι</em> κάνει.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── NESTED ─── -->
+    <section id="nested">
+      <h2><span class="h2n">§6</span> Nested lists — λίστα μέσα σε λίστα</h2>
+      <p>Μια λίστα μπορεί να περιέχει ό,τι θέλεις — και <em>άλλες λίστες</em>. Έτσι φτιάχνονται πίνακες, χάρτες, σκακιέρες:</p>
+
+      <div class="codewrap"><pre><code>fruits = ["apple", "banana", "cherry"]
+vegetables = ["carrot", "spinach", "onion"]
+
+food = [fruits, vegetables]
+
+print(food)
+print(food[1])          # ['carrot', 'spinach', 'onion']
+print(food[1][0])       # carrot</code></pre></div>
+
+      <p>Διαβάζεται από αριστερά προς τα δεξιά: <code>food[1]</code> είναι τα λαχανικά, και από αυτά, <code>[0]</code> είναι το πρώτο. Δύο ζευγάρια αγκύλες = δύο επίπεδα βάθους. Σαν να ανοίγεις ένα κουτί που έχει μέσα κουτιά.</p>
+
+      <h3>Ο χάρτης του θησαυρού</h3>
+      <p>Τρεις γραμμές, τρεις στήλες, ένας θησαυρός. Ο χρήστης λέει πού — π.χ. <code>B2</code> — και εμείς βάζουμε το <code>X</code>:</p>
+
+      <div class="codewrap"><pre><code>row1 = [".", ".", "."]
+row2 = [".", ".", "."]
+row3 = [".", ".", "."]
+grid = [row1, row2, row3]
+
+print(f"{row1}\n{row2}\n{row3}")
+position = input("Where do you want to put the treasure? (e.g. B2) ")
+
+column = "ABC".index(position[0].upper())    # A→0, B→1, C→2
+row = int(position[1]) - 1                    # 1→0, 2→1, 3→2
+
+grid[row][column] = "X"
+
+print(f"{row1}\n{row2}\n{row3}")</code></pre></div>
+
+      <p>Το <code>"ABC".index("B")</code> ρωτάει «σε ποια θέση είναι το B μέσα στο ABC;» και απαντάει <code>1</code>. Ένα string ξέρει να ψάχνει τον εαυτό του — ακριβώς όπως η λίστα ξέρει να προσθέτει στον εαυτό της.</p>
+
+      <div class="note">
+        <p><b>Πρόσεξε το <code>- 1</code> ξανά.</b> Ο άνθρωπος μετράει γραμμές 1, 2, 3. Η Python μετράει 0, 1, 2. Κάθε φορά που ο χρήστης δίνει αριθμό θέσης, κάπου θα χρειαστεί ένα <code>- 1</code>. Αν το <code>X</code> βγαίνει μία γραμμή πιο κάτω απ' ό,τι ζήτησες, αυτό ξέχασες.</p>
+      </div>
+
+      <div class="note">
+        <p><b>Θέλεις να φαίνεται καλύτερα;</b> Αντικατέστησε το <code>"."</code> με <code>"⬜"</code> και το <code>"X"</code> με <code>"💎"</code>. Αν το Thonny σου δείχνει περίεργα σύμβολα αντί για εικονίδια, γύρνα στις τελείες — δεν φταίει ο κώδικάς σου.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── QUIZ 2 ─── -->
+    <section id="quiz2">
+      <h2><span class="h2n">§7</span> Έλεγχος 2 — λίστες</h2>
+      <p class="lead">Πρόβλεψε πρώτα, μετά επιβεβαίωσε στον υπολογιστή.</p>
+      <div class="quiz" data-quiz="q2"></div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── PROJECT ─── -->
+    <section id="project">
+      <h2><span class="h2n">§8</span> Project — Πέτρα-Χαρτί-Ψαλίδι</h2>
+      <p class="lead">Ο χρήστης διαλέγει, ο υπολογιστής διαλέγει τυχαία, και το πρόγραμμα κρίνει. Όλα όσα έμαθες μέχρι σήμερα, σε ένα παιχνίδι.</p>
+
+      <h3>Βήμα 0 — ο πίνακας πριν τον κώδικα</h3>
+      <p>Πάρε χαρτί. Ζωγράφισε έναν πίνακα 3×3: εσύ στις γραμμές (πέτρα, χαρτί, ψαλίδι), ο υπολογιστής στις στήλες. Σε κάθε κελί γράψε <em>Win</em>, <em>Lose</em> ή <em>Draw</em>. Εννιά κελιά. Αυτός ο πίνακας <strong>είναι</strong> το πρόγραμμα — ό,τι γράψεις μετά, απλώς τον αντιγράφει.</p>
+
+      <h3>Βήμα 1 — τα τρία σύμβολα, σε μια λίστα</h3>
+      <p>Θυμήσου το <code>r'''</code> από την Ημέρα 3 — για ASCII art με ανάποδες καθέτους. Σχεδίασε δικά σου· αυτά είναι μόνο για να ξεκινήσεις:</p>
+
+      <div class="codewrap"><pre><code>import random
+
+rock = r'''
+    _______
+   /       \
+  |  (   )  |
+   \_______/
+'''
+
+paper = r'''
+   _________
+  |         |
+  |         |
+  |_________|
+'''
+
+scissors = r'''
+   O   O
+    \ /
+     X
+    / \
+'''
+
+choices = [rock, paper, scissors]</code></pre></div>
+
+      <p>Η λίστα <code>choices</code> είναι το κόλπο της ημέρας. Η πέτρα είναι στη θέση 0, το χαρτί στην 1, το ψαλίδι στη 2. Κράτα το στο μυαλό σου.</p>
+
+      <h3>Βήμα 2 — ο χρήστης διαλέγει</h3>
+      <div class="codewrap"><pre><code>user_choice = int(input("What do you choose? Type 0 for Rock, 1 for Paper or 2 for Scissors.\n"))
+print(choices[user_choice])</code></pre></div>
+      <p>Τρέξ' το. Γράψε <code>0</code> — βλέπεις την πέτρα. Ο αριθμός που πληκτρολογεί ο χρήστης γίνεται <strong>απευθείας index</strong> στη λίστα. Καμία <code>if</code>. Αυτό είναι που κάνει τις λίστες τόσο χρήσιμες: ένας αριθμός διαλέγει.</p>
+
+      <h3>Βήμα 3 — ο υπολογιστής διαλέγει</h3>
+      <div class="codewrap"><pre><code>computer_choice = random.randint(0, 2)
+print("Computer chose:")
+print(choices[computer_choice])</code></pre></div>
+      <p>Γιατί <code>randint(0, 2)</code> και όχι <code>(0, 3)</code>; Αν δεν ξέρεις, ξαναδιάβασε την §5.</p>
+
+      <h3>Βήμα 4 — ποιος κέρδισε;</h3>
+      <p>Εδώ ανοίγεις τον πίνακα του Βήματος 0 και τον αντιγράφεις γραμμή-γραμμή:</p>
+      <div class="codewrap"><pre><code>if user_choice == computer_choice:
+    print("It's a draw!")
+elif user_choice == 0 and computer_choice == 2:
+    print("You win! Rock crushes scissors.")
+elif user_choice == 1 and computer_choice == 0:
+    print("You win! Paper covers rock.")
+elif user_choice == 2 and computer_choice == 1:
+    print("You win! Scissors cut paper.")
+else:
+    print("You lose!")</code></pre></div>
+      <p>Τρεις τρόποι να κερδίσεις, ένας να ισοφαρίσεις, και όλα τα υπόλοιπα είναι ήττα. Το <code>else</code> στο τέλος πιάνει τα τρία κελιά «Lose» με μία γραμμή.</p>
+
+      <h3>Βήμα 5 — τι γίνεται αν ο χρήστης γράψει 7;</h3>
+      <p>Θα σκάσει με <code>IndexError</code> στο Βήμα 2. Ένα καλό πρόγραμμα δεν σκάει. Τύλιξε όλα τα βήματα 2–4 σε ένα <code>if</code>:</p>
+      <div class="codewrap"><pre><code>user_choice = int(input("What do you choose? Type 0 for Rock, 1 for Paper or 2 for Scissors.\n"))
+
+if user_choice &lt; 0 or user_choice &gt; 2:
+    print("Invalid number, you lose!")
+else:
+    print(choices[user_choice])
+    computer_choice = random.randint(0, 2)
+    print("Computer chose:")
+    print(choices[computer_choice])
+
+    if user_choice == computer_choice:
+        print("It's a draw!")
+    elif user_choice == 0 and computer_choice == 2:
+        print("You win! Rock crushes scissors.")
+    elif user_choice == 1 and computer_choice == 0:
+        print("You win! Paper covers rock.")
+    elif user_choice == 2 and computer_choice == 1:
+        print("You win! Scissors cut paper.")
+    else:
+        print("You lose!")</code></pre></div>
+
+      <div class="note note--key">
+        <p><b>Το κόλπο των μαθηματικών — για αργότερα.</b> Όλα τα «You win» της Βήματος 4 έχουν κάτι κοινό: <code>(user_choice - computer_choice) % 3</code> βγαίνει πάντα <code>1</code>. Δοκίμασέ το με τα τρία ζευγάρια. Κάποιος που το βλέπει αυτό, γράφει τη νίκη σε <em>μία</em> γραμμή αντί για τρεις. Δεν χρειάζεται να το χρησιμοποιήσεις σήμερα — αλλά αξίζει να το δεις.</p>
+      </div>
+
+      <div class="note">
+        <p><b>Δικό σου τώρα.</b> Δικό σου ASCII art, δικά σου μηνύματα νίκης — στα ελληνικά αν θέλεις. Κι ένα βήμα παραπάνω: πρόσθεσε τέταρτη επιλογή, <em>λάβα</em>, που νικάει πέτρα και ψαλίδι αλλά χάνει από χαρτί. Πόσα κελιά έχει ο νέος πίνακας; Ζωγράφισέ τον πρώτα.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΑΣΚΗΣΕΙΣ ─── -->
+    <section id="askiseis">
+      <h2><span class="h2n">§9</span> Ασκήσεις</h2>
+      <p class="lead">Κάνε την Α0 και την Α1 οπωσδήποτε, μετά διάλεξε μία ακόμα. Αν κολλήσεις: <strong>διάβασε το error δυνατά</strong> πριν ζητήσεις βοήθεια.</p>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α0</span>
+          <div class="ex__b">
+            <h4>Heads or Tails</h4>
+            <p>Ρίξε ένα νόμισμα. Τύπωσε <code>Heads</code> ή <code>Tails</code>, τυχαία, με ίσες πιθανότητες.</p>
+            <p class="ex__out">Heads</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Δύο αποτελέσματα → <code>randint(0, 1)</code>. Μετά ένα <code>if</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <p>Είναι ο κώδικας της §2. Γράψ' τον από μνήμης πρώτα, μετά σύγκρινε. Αν θέλεις πρόκληση: κάν' το με <code>random.choice(["Heads", "Tails"])</code> — μία γραμμή, χωρίς <code>if</code>.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α1</span>
+          <div class="ex__b">
+            <h4>Banker Roulette</h4>
+            <p>Ζήτα ονόματα χωρισμένα με κόμμα και κενό. Διάλεξε τυχαία ποιος πληρώνει το τραπέζι. Μετά, άλλαξέ το ώστε να μη χρησιμοποιεί <code>random.choice()</code> αλλά <code>randint</code> + <code>len</code>.</p>
+            <p class="ex__out">Nikos is going to buy the meal today!</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p><code>.split(", ")</code> για να γίνει λίστα. Για τη δεύτερη εκδοχή: το μεγαλύτερο έγκυρο index είναι <code>len(names) - 1</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <p>Και οι δύο εκδοχές είναι στην §5. Η δεύτερη είναι αυτή που μετράει — αν τη γράψεις χωρίς <code>IndexError</code>, κατάλαβες το offset.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α2</span>
+          <div class="ex__b">
+            <h4>Treasure Map</h4>
+            <p>Πλέγμα 3×3. Ο χρήστης δίνει θέση όπως <code>B2</code> (γράμμα = στήλη, αριθμός = γραμμή). Βάλε <code>X</code> εκεί και τύπωσε τον χάρτη πριν και μετά.</p>
+            <p class="ex__out">['.', 'X', '.']</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Το γράμμα γίνεται αριθμός με <code>"ABC".index(...)</code>. Ο αριθμός γραμμής θέλει <code>- 1</code>. Μετά δύο ζευγάρια αγκύλες: <code>grid[row][column]</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <p>Είναι ο κώδικας της §6. Επέκταση: κάν' το 5×5 — τι αλλάζει; Πόσες γραμμές πρέπει να προσθέσεις; (Την Ημέρα 5 αυτό θα γίνεται με δύο γραμμές.)</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α3</span>
+          <div class="ex__b">
+            <h4>Magic 8-Ball</h4>
+            <p>Μια λίστα με τουλάχιστον οκτώ απαντήσεις — μερικές «ναι», μερικές «όχι», μερικές «ρώτα αργότερα». Ο χρήστης κάνει μια ερώτηση ναι/όχι, και η μπάλα απαντάει τυχαία.</p>
+            <p class="ex__out">The Magic 8-Ball says: Ask again later.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Μία λίστα, ένα <code>input()</code> (που δεν χρειάζεται καν να το χρησιμοποιήσεις), ένα <code>random.choice()</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>import random
+
+answers = [
+    "Yes, definitely.",
+    "It is certain.",
+    "Signs point to yes.",
+    "Ask again later.",
+    "Cannot predict now.",
+    "Don't count on it.",
+    "My reply is no.",
+    "Very doubtful.",
+]
+
+question = input("Ask the Magic 8-Ball a yes/no question: ")
+print(f"The Magic 8-Ball says: {random.choice(answers)}")</code></pre></div>
+          <p>Πρόσεξε πώς γράφεται μια μεγάλη λίστα: ένα στοιχείο ανά γραμμή, με κόμμα μετά από κάθε ένα. Η Python δεν νοιάζεται για τις αλλαγές γραμμής μέσα στις αγκύλες.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α4</span>
+          <div class="ex__b">
+            <h4>Δύο ζάρια</h4>
+            <p>Ρίξε δύο ζάρια. Τύπωσε και τα δύο και το άθροισμά τους. Αν είναι ίδια, γράψε ότι έφερες διπλές.</p>
+            <p class="ex__out">You rolled 4 and 4 — a double! Total: 8</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Δύο <code>randint(1, 6)</code> σε δύο μεταβλητές. Μετά ένα <code>if dice1 == dice2</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>import random
+
+dice1 = random.randint(1, 6)
+dice2 = random.randint(1, 6)
+total = dice1 + dice2
+
+if dice1 == dice2:
+    print(f"You rolled {dice1} and {dice2} — a double! Total: {total}")
+else:
+    print(f"You rolled {dice1} and {dice2}. Total: {total}")</code></pre></div>
+          <p>Επέκταση: πόσο συχνά έρχονται διπλές; Τρέξ' το 20 φορές και μέτρα. Μετά σκέψου: από τα 36 δυνατά ζευγάρια, πόσα είναι διπλές;</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α5</span>
+          <div class="ex__b">
+            <h4>Γεννήτρια ονομάτων ομάδας</h4>
+            <p>Δύο λίστες: επίθετα και ζώα. Διάλεξε ένα από κάθε λίστα και φτιάξε όνομα ομάδας. Τρέξ' το μέχρι να βρεις ένα που σου αρέσει.</p>
+            <p class="ex__out">Your team name: Flying Octopus</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Δύο <code>random.choice()</code> μέσα σε ένα f-string.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>import random
+
+adjectives = ["Flying", "Silent", "Golden", "Electric", "Hungry", "Invisible"]
+animals = ["Octopus", "Falcon", "Panda", "Shark", "Dragon", "Hedgehog"]
+
+name = f"{random.choice(adjectives)} {random.choice(animals)}"
+print(f"Your team name: {name}")</code></pre></div>
+          <p>Κράτα το — στο AI Corner θα δεις ότι μόλις έφτιαξες το πιο χαζό language model του κόσμου.</p>
+        </div></details>
+      </div>
+
+      <div class="note">
+        <p><b>Θέλεις κι άλλες;</b> <a href="https://codingbat.com/python/List-1" target="_blank" rel="noopener">CodingBat → List-1</a> είναι ακριβώς σημερινή ύλη, με αυτόματο έλεγχο. Οι ασκήσεις εκεί γράφονται μέσα σε <code>def</code> — απλά γράψε την απάντησή σου μετά το <code>return</code>. Θα το μάθουμε κανονικά την Ημέρα 6. Ξεκίνα από <code>first_last6</code> και <code>same_first_last</code>.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── TURTLE ─── -->
+    <section id="turtle">
+      <h2><span class="h2n">§10</span> Turtle — τυχαία τέχνη</h2>
+      <p class="lead">Ένας πίνακας που ζωγραφίζει τον εαυτό του διαφορετικά κάθε φορά. Κανείς — ούτε εσύ — δεν ξέρει πώς θα βγει.</p>
+
+      <svg class="turtle" viewBox="0 0 260 200" role="img" aria-label="Τυχαίες χρωματιστές κουκκίδες σε μαύρο φόντο, σχεδιασμένες με turtle">
+        <rect width="260" height="200" rx="6" fill="#111827"/>
+        <circle cx="60" cy="70" r="28" fill="#FF5A5F" opacity="0"><animate attributeName="opacity" from="0" to="1" dur=".25s" begin="0.3s" fill="freeze"/></circle>
+        <circle cx="150" cy="112" r="40" fill="#FFB400" opacity="0"><animate attributeName="opacity" from="0" to="1" dur=".25s" begin="0.7s" fill="freeze"/></circle>
+        <circle cx="212" cy="50" r="18" fill="#7CFF6B" opacity="0"><animate attributeName="opacity" from="0" to="1" dur=".25s" begin="1.1s" fill="freeze"/></circle>
+        <circle cx="95" cy="152" r="22" fill="#38BDF8" opacity="0"><animate attributeName="opacity" from="0" to="1" dur=".25s" begin="1.5s" fill="freeze"/></circle>
+        <circle cx="192" cy="162" r="14" fill="#A78BFA" opacity="0"><animate attributeName="opacity" from="0" to="1" dur=".25s" begin="1.9s" fill="freeze"/></circle>
+        <circle cx="30" cy="160" r="12" fill="#FF7AB6" opacity="0"><animate attributeName="opacity" from="0" to="1" dur=".25s" begin="2.3s" fill="freeze"/></circle>
+        <circle cx="122" cy="40" r="10" fill="#FFFFFF" opacity="0"><animate attributeName="opacity" from="0" to="1" dur=".25s" begin="2.7s" fill="freeze"/></circle>
+        <circle cx="236" cy="118" r="24" fill="#FFD166" opacity="0"><animate attributeName="opacity" from="0" to="1" dur=".25s" begin="3.1s" fill="freeze"/></circle>
+        <text x="130" y="188" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#CBD5E1" opacity="0">
+          <animate attributeName="opacity" from="0" to="1" dur=".5s" begin="3.6s" fill="freeze"/>pen.dot(random, random) × 8</text>
+      </svg>
+
+      <div class="codewrap"><pre><code>import turtle
+import random
+
+colours = ["red", "orange", "gold", "lime", "deepskyblue", "blueviolet", "hotpink", "white"]
+
+screen = turtle.Screen()
+screen.bgcolor("black")
+
+pen = turtle.Turtle()
+pen.speed(0)
+pen.hideturtle()
+pen.penup()
+
+# ── μία τυχαία κουκκίδα: τυχαία θέση, τυχαίο μέγεθος, τυχαίο χρώμα ──
+pen.goto(random.randint(-250, 250), random.randint(-180, 180))
+pen.dot(random.randint(10, 80), random.choice(colours))
+
+# αντίγραψε τις δύο γραμμές από πάνω και κόλλησέ τες άλλες 9 φορές εδώ ↓
+
+turtle.done()</code></pre></div>
+
+      <p>Τρέξ' το. Ξανά. Ξανά. Κάθε φορά βγαίνει άλλος πίνακας, και κανένας δεν θα ξαναβγεί ποτέ ακριβώς ίδιος. Όταν βγει ένας που σου αρέσει, κράτα screenshot — πάει στο portfolio.</p>
+
+      <div class="note note--key">
+        <p><b>Το copy-paste πονάει, το ξέρω.</b> Δέκα φορές οι ίδιες δύο γραμμές. Κράτα αυτόν τον πόνο στο μυαλό σου: <strong>την Ημέρα 5 αυτές οι 20 γραμμές γίνονται 3</strong> — και αντί για 10 κουκκίδες θα βάζεις 1.000. Σήμερα μαθαίνεις γιατί χρειάζονται τα loops. Την επόμενη φορά τα μαθαίνεις.</p>
+      </div>
+
+      <h3>Για τους τολμηρούς: ο τυχαίος περίπατος</h3>
+      <p>Αντί για κουκκίδες, βήματα. Η πένα κατεβαίνει, διαλέγει τυχαία κατεύθυνση, χρώμα και πάχος, και περπατάει:</p>
+      <div class="codewrap"><pre><code>pen.pendown()
+
+# ── ένα τυχαίο βήμα ──
+pen.color(random.choice(colours))
+pen.pensize(random.randint(2, 12))
+pen.setheading(random.choice([0, 90, 180, 270]))
+pen.forward(random.randint(20, 80))
+
+# αντίγραψε τις τέσσερις γραμμές ×20 ↓</code></pre></div>
+      <p>Το <code>setheading(90)</code> γυρίζει την πένα να κοιτάει πάνω, το <code>0</code> δεξιά, το <code>180</code> αριστερά, το <code>270</code> κάτω. Βγαίνει ένας λαβύρινθος που κανείς δεν σχεδίασε. Άλλαξε τη λίστα των κατευθύνσεων σε <code>[0, 60, 120, 180, 240, 300]</code> και δες τι γίνεται.</p>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── AI ─── -->
+    <section id="ai">
+      <h2><span class="h2n">§11</span> AI Corner — το πιο χαζό language model του κόσμου</h2>
+      <p>Θυμάσαι την άσκηση Α5; Τρεις λίστες αντί για δύο, και φτιάχνεις προτάσεις:</p>
+
+      <div class="codewrap"><pre><code>import random
+
+subjects = ["Ο δράκος", "Η γάτα", "Ένα ρομπότ", "Η δασκάλα"]
+verbs = ["έφαγε", "ζωγράφισε", "έχασε", "βρήκε"]
+objects = ["ένα κάστρο", "τον ήλιο", "ένα παλιό κλειδί", "μια πίτσα"]
+
+sentence = f"{random.choice(subjects)} {random.choice(verbs)} {random.choice(objects)}."
+print(sentence)</code></pre></div>
+
+      <p>Μόλις έφτιαξες ένα πρόγραμμα που <em>παράγει κείμενο</em>. Είναι χαζό — δεν ξέρει τι λέει — αλλά η βασική ιδέα είναι <strong>ακριβώς ίδια</strong> με αυτό που κάνει το ChatGPT ή το Gemini: διαλέγει την επόμενη λέξη από μια λίστα. Οι διαφορές είναι τρεις:</p>
+      <ul>
+        <li>Η λίστα του δεν έχει 4 λέξεις. Έχει γύρω στα 100.000 κομμάτια λέξεων — τα <em>tokens</em> που είδες την Ημέρα 2.</li>
+        <li>Δεν διαλέγει με ίσες πιθανότητες. Κάθε λέξη έχει ένα <strong>βάρος</strong>, ανάλογα με όλα όσα προηγήθηκαν. Μετά το «Η γάτα», το «νιαούρισε» έχει μεγάλο βάρος, το «απογειώθηκε» μικρό.</li>
+        <li>Τα βάρη δεν τα έγραψε άνθρωπος. Τα <em>έμαθε</em> διαβάζοντας εκατομμύρια βιβλία και σελίδες. Αυτό λέγεται training.</li>
+      </ul>
+
+      <p>Το δεύτερο σημείο μπορείς να το δεις με τα μάτια σου. Η Python έχει μια αδερφή του <code>choice</code> που δέχεται βάρη:</p>
+
+      <div class="codewrap"><pre><code>next_word = random.choices(["νιαούρισε", "κοιμήθηκε", "απογειώθηκε"], weights=[60, 35, 5])
+print(next_word[0])
+
+# Τρέξ' το 20 φορές. Σχεδόν πάντα "νιαούρισε" ή "κοιμήθηκε".
+# Σπάνια, μία στις είκοσι, η γάτα απογειώνεται.</code></pre></div>
+
+      <p>Πρόσεξε: <code>choices</code> με <code>s</code> στο τέλος, και επιστρέφει <em>λίστα</em> — γι' αυτό το <code>[0]</code>. Αυτό το <code>weights</code> είναι το μισό μυστικό των σύγχρονων AI. Το άλλο μισό — πώς βρίσκονται οι αριθμοί 60, 35, 5 — είναι το training, και θα το δούμε από κοντά αργότερα μέσα στη χρονιά.</p>
+
+      <div class="note">
+        <p><b>Η ερώτηση που μετράει:</b> Ρώτα το ίδιο πράγμα σε ένα AI δύο φορές — π.χ. «γράψε μου μία πρόταση για μια γάτα». Πήρες την ίδια απάντηση; Σχεδόν ποτέ. Τώρα ξέρεις γιατί: κάπου μέσα του υπάρχει ένα <code>random.choices()</code>. Οι μηχανικοί το ρυθμίζουν με μια τιμή που λέγεται <strong>temperature</strong> — πόσο «τολμηρό» να είναι στις επιλογές του. Χαμηλή temperature → πάντα η πιο πιθανή λέξη, σχεδόν ίδια απάντηση κάθε φορά. Ψηλή → τρελές επιλογές, σαν τη γάτα που απογειώθηκε.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΛΑΘΗ ─── -->
+    <section id="lathi">
+      <h2><span class="h2n">§12</span> Συχνά λάθη</h2>
+      <p class="lead">Όταν σκάσει κάτι, ψάξ' το εδώ πρώτα.</p>
+      <table class="tbl">
+        <thead><tr><th>Error</th><th>Τι φταίει</th></tr></thead>
+        <tbody>
+          <tr><td><code>NameError: name 'random' is not defined</code></td><td>Ξέχασες το <code>import random</code> στην πρώτη γραμμή.</td></tr>
+          <tr><td><code>NameError: name 'randint' is not defined</code></td><td>Έγραψες σκέτο <code>randint</code>. Θέλει <code>random.randint</code> — από το module, πάρε τη συνάρτηση.</td></tr>
+          <tr><td><code>AttributeError: module 'random' has no attribute 'randInt'</code></td><td>Κεφαλαίο I. Είναι <code>randint</code>, όλα πεζά.</td></tr>
+          <tr><td><code>AttributeError</code> σε <em>κάθε</em> εντολή του random</td><td>Το αρχείο σου λέγεται <code>random.py</code>. Μετονόμασέ το σε οτιδήποτε άλλο.</td></tr>
+          <tr><td><code>IndexError: list index out of range</code></td><td>Ζήτησες θέση που δεν υπάρχει. Λίστα με 3 στοιχεία → μόνο 0, 1, 2. Το τελευταίο είναι <code>len - 1</code>.</td></tr>
+          <tr><td><code>TypeError: list indices must be integers or slices, not str</code></td><td>Έγραψες <code>fruits["1"]</code> ή ξέχασες το <code>int()</code> στο <code>input()</code>. Το index είναι αριθμός.</td></tr>
+          <tr><td>Η λίστα μου έγινε <code>None</code></td><td>Έγραψες <code>fruits = fruits.append("x")</code>. Το <code>append</code> αλλάζει τη λίστα επί τόπου και δεν επιστρέφει τίποτα. Σκέτο <code>fruits.append("x")</code>.</td></tr>
+          <tr><td><code>ValueError: substring not found</code></td><td>Το <code>"ABC".index("D")</code> — ο χρήστης έγραψε γράμμα που δεν υπάρχει στον χάρτη. Θυμήσου το <code>else</code> της Ημέρας 3.</td></tr>
+          <tr><td>Το <code>randint(1, 10)</code> έβγαλε 10</td><td>Δεν είναι λάθος. Το <code>randint</code> περιλαμβάνει <strong>και τα δύο</strong> άκρα. Αν ήθελες 1–9, γράψε <code>randint(1, 9)</code>.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── RECAP ─── -->
+    <section id="recap">
+      <h2><span class="h2n">§13</span> Ανακεφαλαίωση</h2>
+      <p class="lead">Κράτησέ το. Οι λίστες είναι η δομή που θα χρησιμοποιείς περισσότερο από οτιδήποτε άλλο από εδώ και πέρα.</p>
+
+      <h3>Οι τρεις μεγάλες ιδέες</h3>
+      <div class="ideas">
+        <div class="idea"><span class="idea__n">1</span><p>Το <code>import</code> φέρνει έτοιμο κώδικα. Το <code>module.function()</code> διαβάζεται «από εκεί, πάρε αυτό».</p></div>
+        <div class="idea"><span class="idea__n">2</span><p>Λίστα = πολλές τιμές, ένα όνομα, θέσεις <strong>από το 0</strong>. Το τελευταίο στοιχείο είναι στη θέση <code>len - 1</code>.</p></div>
+        <div class="idea"><span class="idea__n">3</span><p><code>random.choice(list)</code> — ο σκελετός κάθε παιχνιδιού που θα φτιάξεις φέτος. Ένας αριθμός διαλέγει.</p></div>
+      </div>
+
+      <h3>Κάρτα αναφοράς</h3>
+      <div class="codewrap"><pre><code># MODULES
+import random
+random.randint(1, 6)          # ακέραιος 1..6 (και τα δύο άκρα)
+random.random()               # δεκαδικός 0.0 ≤ x &lt; 1.0
+random.choice(my_list)        # τυχαίο στοιχείο
+
+# ΛΙΣΤΕΣ
+fruits = ["apple", "banana", "cherry"]
+fruits[0]                     # apple   — πρώτο
+fruits[-1]                    # cherry  — τελευταίο
+fruits[1] = "mango"           # αλλαγή
+len(fruits)                   # 3
+fruits.append("kiwi")         # +1 στο τέλος
+fruits.extend(["a", "b"])     # +πολλά στο τέλος
+"a, b, c".split(", ")         # string → λίστα
+"ABC".index("B")              # 1 — σε ποια θέση;
+
+# NESTED
+grid = [[1, 2], [3, 4]]
+grid[1][0]                    # 3 — δεύτερη λίστα, πρώτο στοιχείο
+
+# Ο ΚΑΝΟΝΑΣ
+# τελευταίο έγκυρο index = len(list) - 1</code></pre></div>
+
+      <h3>Μπορώ να…</h3>
+      <p>Τσέκαρε μόνο ό,τι μπορείς να κάνεις <strong>χωρίς</strong> να κοιτάξεις σημειώσεις. Η πρόοδος αποθηκεύεται σε αυτόν τον υπολογιστή.</p>
+      <div class="check" id="checklist">
+        <label><input type="checkbox" data-ck="c1"><span>…εξηγήσω τι είναι ένα module και γιατί γράφω <code>import</code></span></label>
+        <label><input type="checkbox" data-ck="c2"><span>…ρίξω ένα ζάρι με <code>randint</code> και πω αν το 6 μπορεί να βγει</span></label>
+        <label><input type="checkbox" data-ck="c3"><span>…φτιάξω λίστα και πάρω το πρώτο και το τελευταίο στοιχείο</span></label>
+        <label><input type="checkbox" data-ck="c4"><span>…εξηγήσω γιατί το <code>fruits[3]</code> σκάει σε λίστα με 3 στοιχεία</span></label>
+        <label><input type="checkbox" data-ck="c5"><span>…προσθέσω στοιχείο με <code>.append()</code> χωρίς να χαλάσω τη λίστα</span></label>
+        <label><input type="checkbox" data-ck="c6"><span>…διαλέξω τυχαίο στοιχείο με <code>random.choice()</code></span></label>
+        <label><input type="checkbox" data-ck="c7"><span>…πάρω ένα στοιχείο από λίστα μέσα σε λίστα</span></label>
+        <label><input type="checkbox" data-ck="c8"><span>…φτιάξω το Πέτρα-Χαρτί-Ψαλίδι από την αρχή, μόνος μου</span></label>
+      </div>
+
+      <h3>Λέξεις που έμαθα σήμερα</h3>
+      <p><code>module</code> <code>import</code> <code>random</code> <code>randint()</code> <code>random()</code> <code>choice()</code> <code>choices()</code> <code>weights</code> <code>pseudo-random</code> <code>list</code> <code>index</code> <code>offset</code> <code>len()</code> <code>append()</code> <code>extend()</code> <code>split()</code> <code>.index()</code> <code>nested list</code> <code>IndexError</code> <code>off-by-one</code></p>
+    </section>
+
+    <footer class="foot">
+      <span>Ημέρα 04 · Randomisation &amp; Python Lists</span>
+      <a href="#stoxoi">Πίσω στην αρχή</a>
+    </footer>
+
+  </div>
+</main>
+
+<script>
+'use strict';
+
+/* ── ασφαλής αποθήκευση: δουλεύει στο GitHub Pages, δεν σκάει πουθενά ── */
+var store = {
+  get: function(k){ try { return window.localStorage.getItem(k); } catch(e){ return null; } },
+  set: function(k,v){ try { window.localStorage.setItem(k,v); } catch(e){} }
+};
+
+/* ══════════════════ ΔΕΔΟΜΕΝΑ QUIZ ══════════════════ */
+var QUIZZES = {
+  q1: { title:'import & random', questions:[
+    { p:'Τι μπορεί να επιστρέψει το <code>random.randint(1, 6)</code>;',
+      o:['1 έως 5','1 έως 6, και τα δύο μέσα','0 έως 6','Μόνο 1 ή 6'], a:1,
+      h:'Αν ήταν ζάρι, θα έβγαζε ποτέ εξάρι;',
+      e:'Το <code>randint</code> περιλαμβάνει <strong>και τα δύο</strong> άκρα. Το <code>randint(1, 6)</code> είναι ένα κανονικό ζάρι.' },
+    { p:'Έγραψες <code>import random</code> και μετά <code>dice = randint(1, 6)</code> — χωρίς το <code>random.</code> μπροστά. Τι γίνεται;',
+      o:['Δουλεύει κανονικά','NameError','TypeError','Τυπώνει πάντα 0'], a:1,
+      h:'Πού «ζει» το randint;',
+      e:'Το <code>randint</code> ζει μέσα στο module <code>random</code>. Χωρίς το <code>random.</code> η Python δεν ξέρει τι είναι → <code>NameError: name \'randint\' is not defined</code>.' },
+    { p:'Τι τύπο επιστρέφει το <code>random.random()</code>;',
+      o:['int','float','str','list'], a:1,
+      h:'Δίνει κάτι ανάμεσα στο 0 και στο 1. Τι τύπος χωράει ανάμεσα;',
+      e:'Δεκαδικός από <code>0.0</code> μέχρι — αλλά όχι — <code>1.0</code>. Για ακέραιους θέλεις <code>randint</code>.' },
+    { p:'Τι κάνει η γραμμή <code>import random</code>;',
+      o:['Τρέχει ένα τυχαίο πρόγραμμα','Φέρνει έτοιμο κώδικα για να τον χρησιμοποιήσεις','Κάνει τις μεταβλητές σου τυχαίες','Τίποτα — είναι σχόλιο'], a:1,
+      h:'Ποιος έγραψε τον κώδικα του randint;',
+      e:'Ένα module είναι αρχείο με έτοιμο κώδικα. Το <code>import</code> το φέρνει στο πρόγραμμά σου. Από εκεί και πέρα, ό,τι έχει μέσα είναι δικό σου.' }
+  ]},
+  q2: { title:'Λίστες', questions:[
+    { p:'<code>fruits = ["apple", "banana", "cherry"]</code>. Τι είναι το <code>fruits[1]</code>;',
+      o:['"apple"','"banana"','"cherry"','IndexError'], a:1,
+      h:'Από πού ξεκινάει η αρίθμηση;',
+      e:'apple=0, <strong>banana=1</strong>, cherry=2. Το offset μετράει βήματα από την αρχή.' },
+    { p:'Ίδια λίστα. Τι είναι το <code>fruits[-1]</code>;',
+      o:['"apple"','"cherry"','IndexError','-1'], a:1,
+      h:'Οι αρνητικοί αριθμοί μετράνε από το τέλος.',
+      e:'Το <code>-1</code> είναι πάντα το τελευταίο στοιχείο, όσο μεγάλη κι αν είναι η λίστα. Το <code>-2</code> το προτελευταίο.' },
+    { p:'Ίδια λίστα. Τι δίνει το <code>fruits[3]</code>;',
+      o:['"cherry"','Τίποτα, κενό','IndexError','None'], a:2,
+      h:'Πόσα στοιχεία έχει; Ποιες θέσεις υπάρχουν;',
+      e:'Τρία στοιχεία → θέσεις 0, 1, 2. Η θέση 3 δεν υπάρχει → <code>IndexError: list index out of range</code>. Το κλασικό off-by-one.' },
+    { p:'Ίδια λίστα, και μετά <code>fruits.append("kiwi")</code>. Τι δίνει τώρα το <code>len(fruits)</code>;',
+      o:['3','4','"kiwi"','None'], a:1,
+      h:'Το append προσθέτει. Πόσα έγιναν;',
+      e:'Τρία συν ένα. Και προσοχή: το <code>append</code> αλλάζει τη λίστα επί τόπου — δεν γράφεις <code>fruits = fruits.append(...)</code>.' },
+    { p:'<code>grid = [[1, 2], [3, 4]]</code>. Τι είναι το <code>grid[1][0]</code>;',
+      o:['1','2','3','[3, 4]'], a:2,
+      h:'Πρώτα η πρώτη αγκύλη, μετά η δεύτερη.',
+      e:'<code>grid[1]</code> είναι η δεύτερη λίστα, <code>[3, 4]</code>. Από αυτήν, <code>[0]</code> είναι το πρώτο στοιχείο: <strong>3</strong>.' }
+  ]}
+};
+
+/* ══════════════════ RENDER QUIZ ══════════════════ */
+var KEYS = ['Α','Β','Γ','Δ'];
+
+function buildQuiz(host, id){
+  var data = QUIZZES[id];
+  var total = data.questions.length;
+  var answered = 0, right = 0;
+
+  var head = document.createElement('div');
+  head.className = 'quiz__head';
+  head.innerHTML = '<h4>' + data.title + '</h4><span class="quiz__score">— / ' + total + '</span>';
+  host.appendChild(head);
+  var scoreEl = head.querySelector('.quiz__score');
+
+  data.questions.forEach(function(q, qi){
+    var wrap = document.createElement('div');
+    wrap.className = 'q';
+
+    var prompt = document.createElement('p');
+    prompt.className = 'q__p';
+    prompt.innerHTML = '<span class="qn">' + (qi+1) + '.</span>' + q.p;
+    wrap.appendChild(prompt);
+
+    var opts = document.createElement('div');
+    opts.className = 'opts';
+    wrap.appendChild(opts);
+
+    var fb = document.createElement('div');
+    fb.className = 'q__fb';
+
+    var hintBtn = document.createElement('button');
+    hintBtn.type = 'button';
+    hintBtn.className = 'q__hintbtn';
+    hintBtn.textContent = 'Θέλω μια βοήθεια';
+    var hint = document.createElement('p');
+    hint.className = 'q__hint';
+    hint.innerHTML = q.h;
+    hintBtn.addEventListener('click', function(){
+      hint.classList.add('show');
+      hintBtn.style.display = 'none';
+    });
+
+    q.o.forEach(function(text, oi){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.innerHTML = '<span class="opt__k">' + KEYS[oi] + '</span><span class="opt__t">' + text + '</span>';
+      b.addEventListener('click', function(){
+        if (wrap.dataset.done) return;
+        wrap.dataset.done = '1';
+        answered++;
+        var ok = (oi === q.a);
+        if (ok) right++;
+
+        Array.prototype.forEach.call(opts.children, function(el, i){
+          el.disabled = true;
+          if (i === q.a) el.classList.add('is-right');
+          else if (i === oi) el.classList.add('is-wrong');
+        });
+
+        fb.className = 'q__fb show ' + (ok ? 'good' : 'bad');
+        fb.innerHTML = '<b>' + (ok ? 'Σωστά. ' : 'Όχι ακόμα. ') + '</b>' + q.e;
+        hintBtn.style.display = 'none';
+        hint.classList.remove('show');
+        scoreEl.textContent = right + ' / ' + total;
+        if (answered === total) {
+          scoreEl.style.color = (right === total) ? 'var(--pen-green)' : 'var(--ink)';
+        }
+      });
+      opts.appendChild(b);
+    });
+
+    wrap.appendChild(hintBtn);
+    wrap.appendChild(hint);
+    wrap.appendChild(fb);
+    host.appendChild(wrap);
+  });
+}
+
+document.querySelectorAll('[data-quiz]').forEach(function(el){
+  buildQuiz(el, el.dataset.quiz);
+});
+
+/* ══════════════════ ΧΡΩΜΑΤΙΣΜΟΣ ΚΩΔΙΚΑ ══════════════════ */
+var KW = /^(False|None|True|and|as|assert|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield)$/;
+var BI = /^(print|input|int|float|str|bool|type|len|round|range|abs|sum|min|max|list|dict|set|tuple|turtle|forward|left|right|color|write|goto|pensize|lower|upper|count|random|randint|choice|choices|append|extend|split|index|dot|speed|hideturtle|penup|pendown|bgcolor|setheading|Screen|Turtle|done)$/;
+
+function esc(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlight(src){
+  var re = /(#[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|(\b\d+\.?\d*\b)|([A-Za-z_][A-Za-z0-9_]*)/g;
+  var out = '', last = 0, m;
+  while ((m = re.exec(src)) !== null) {
+    out += esc(src.slice(last, m.index));
+    if (m[1])      out += '<span class="tok-c">' + esc(m[1]) + '</span>';
+    else if (m[2]) out += '<span class="tok-s">' + esc(m[2]) + '</span>';
+    else if (m[3]) out += '<span class="tok-n">' + esc(m[3]) + '</span>';
+    else if (m[4]) {
+      if (KW.test(m[4]))      out += '<span class="tok-k">' + m[4] + '</span>';
+      else if (BI.test(m[4])) out += '<span class="tok-b">' + m[4] + '</span>';
+      else                    out += esc(m[4]);
+    }
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+
+document.querySelectorAll('.codewrap pre code').forEach(function(code){
+  var raw = code.textContent;
+  code.innerHTML = highlight(raw);
+
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'copy';
+  btn.textContent = 'Αντιγραφή';
+  btn.addEventListener('click', function(){
+    var done = function(){
+      btn.textContent = 'Έγινε';
+      btn.classList.add('ok');
+      setTimeout(function(){ btn.textContent = 'Αντιγραφή'; btn.classList.remove('ok'); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(raw).then(done, function(){});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = raw; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(e){}
+      document.body.removeChild(ta);
+    }
+  });
+  code.parentNode.parentNode.appendChild(btn);
+});
+
+/* ══════════════════ CHECKLIST + ΠΡΟΟΔΟΣ ══════════════════ */
+var boxes = document.querySelectorAll('#checklist input[type=checkbox]');
+var progBar = document.getElementById('progBar');
+var progText = document.getElementById('progText');
+
+function paintProgress(){
+  var done = 0;
+  boxes.forEach(function(b){ if (b.checked) done++; });
+  progText.textContent = done + ' / ' + boxes.length;
+  progBar.style.width = (done / boxes.length * 100) + '%';
+}
+
+boxes.forEach(function(b){
+  var key = 'day04.' + b.dataset.ck;
+  if (store.get(key) === '1') b.checked = true;
+  b.addEventListener('change', function(){
+    store.set(key, b.checked ? '1' : '0');
+    paintProgress();
+  });
+});
+paintProgress();
+
+/* ══════════════════ SCROLLSPY ══════════════════ */
+var links = Array.prototype.slice.call(document.querySelectorAll('.day--now li a'));
+var targets = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+
+if ('IntersectionObserver' in window) {
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      var i = targets.indexOf(en.target);
+      if (i < 0) return;
+      links.forEach(function(a){ a.classList.remove('is-active'); });
+      links[i].classList.add('is-active');
+    });
+  }, { rootMargin: '-70px 0px -72% 0px', threshold: 0 });
+  targets.forEach(function(t){ if (t) io.observe(t); });
+}
+
+/* ══════════════════ ΜΕΝΟΥ ΓΙΑ ΚΙΝΗΤΟ ══════════════════ */
+var side = document.getElementById('side');
+var scrim = document.getElementById('scrim');
+var burger = document.getElementById('burger');
+
+function toggleSide(open){
+  side.classList.toggle('open', open);
+  scrim.classList.toggle('show', open);
+  burger.setAttribute('aria-expanded', String(open));
+}
+burger.addEventListener('click', function(){ toggleSide(!side.classList.contains('open')); });
+scrim.addEventListener('click', function(){ toggleSide(false); });
+side.addEventListener('click', function(e){
+  if (e.target.closest('a') && window.innerWidth <= 960) toggleSide(false);
+});
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && side.classList.contains('open')) toggleSide(false);
+});
+
+/* ══════════════════ HERO: ΤΟ ΠΡΟΓΡΑΜΜΑ ΤΡΕΧΕΙ ══════════════════ */
+(function(){
+  var out = document.getElementById('termOut');
+  if (!out) return;
+
+  var script = [
+    { t:'What do you choose? Type 0 for Rock, 1 for Paper or 2 for Scissors.\n', d:14 },
+    { t:'1\n', d:110, c:'u' },
+    { t:'   _________\n  |         |\n  |         |\n  |_________|\n\n', d:5 },
+    { t:'Computer chose:\n', d:22 },
+    { t:'    _______\n   /       \\\n  |  (   )  |\n   \\_______/\n\n', d:5 },
+    { t:'You win! Paper covers rock.\n', d:26, c:'r' }
+  ];
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduce) {
+    out.innerHTML = script.map(function(s){
+      var t = s.t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      return s.c ? '<span class="' + s.c + '">' + t + '</span>' : t;
+    }).join('');
+    return;
+  }
+
+  var si = 0, ci = 0, buf = '';
+  var caret = '<span class="caret"></span>';
+
+  function step(){
+    if (si >= script.length) { out.innerHTML = buf; return; }
+    var seg = script[si];
+    if (ci === 0 && seg.c) buf += '<span class="' + seg.c + '">';
+    var ch = seg.t.charAt(ci);
+    buf += (ch === '<' ? '&lt;' : ch === '&' ? '&amp;' : ch);
+    ci++;
+    if (ci >= seg.t.length) {
+      if (seg.c) buf += '</span>';
+      si++; ci = 0;
+    }
+    out.innerHTML = buf + caret;
+    setTimeout(step, seg.d);
+  }
+  setTimeout(step, 380);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1519 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ημέρα 5 — Python Loops · Programming Lessons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700;800&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — a school notebook: ballpoint ink on graph paper.
+   Every pen colour has a job. Nothing here is decoration.
+   ============================================================ */
+:root{
+  --paper:      #FCFCFA;
+  --paper-2:    #F4F6F8;
+  --grid:       #E4EAF0;
+  --grid-major: #D6DFE8;
+
+  --ink:        #17263B;   /* blue-black ballpoint  */
+  --ink-soft:   #5A6B80;
+  --ink-faint:  #94A3B4;
+
+  --pen-blue:   #2A4FC4;   /* links, active state   */
+  --pen-red:    #C63B32;   /* errors, warnings      */
+  --pen-green:  #1B7A4C;   /* correct               */
+  --marker:     #FFE9A8;   /* highlighter           */
+  --marker-2:   #FFF6DC;
+
+  --rule:       #DDE4EC;
+  --shadow:     0 1px 0 var(--rule);
+
+  --nav-h:      60px;
+  --side-w:     288px;
+
+  --f-ui:   'Commissioner', 'Helvetica Neue', Arial, sans-serif;
+  --f-body: 'Alegreya', Georgia, 'Times New Roman', serif;
+  --f-code: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
+body{
+  margin:0;
+  font-family:var(--f-body);
+  font-size:18px;
+  line-height:1.72;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:26px 26px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.nav{
+  position:fixed;inset:0 0 auto 0;height:var(--nav-h);z-index:60;
+  display:flex;align-items:center;gap:16px;padding:0 20px;
+  background:rgba(252,252,250,.94);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.nav__burger{
+  display:none;width:38px;height:38px;flex:0 0 auto;
+  border:1px solid var(--rule);border-radius:8px;background:var(--paper);
+  color:var(--ink);cursor:pointer;align-items:center;justify-content:center;
+}
+.nav__mark{
+  width:30px;height:30px;flex:0 0 auto;border-radius:7px;
+  background:var(--ink);color:var(--paper);
+  display:grid;place-items:center;
+  font-family:var(--f-code);font-size:15px;font-weight:700;
+}
+.nav__title{
+  font-family:var(--f-ui);font-weight:700;font-size:17px;
+  letter-spacing:-.01em;margin:0;white-space:nowrap;
+}
+.nav__spacer{flex:1}
+.nav__progress{display:flex;align-items:center;gap:10px}
+.nav__progress span{
+  font-family:var(--f-ui);font-size:13px;font-weight:500;color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+}
+.bar{width:110px;height:7px;border-radius:4px;background:var(--paper-2);
+  border:1px solid var(--rule);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--pen-green);
+  transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.side{
+  position:fixed;top:var(--nav-h);bottom:0;left:0;width:var(--side-w);z-index:50;
+  overflow-y:auto;padding:20px 14px 60px;
+  background:var(--paper);border-right:1px solid var(--rule);
+  font-family:var(--f-ui);
+}
+.side__label{
+  font-family:var(--f-ui);font-size:12px;font-weight:600;color:var(--ink-faint);
+  margin:0 0 12px 10px;
+}
+.day{border-bottom:1px solid var(--rule)}
+.day:last-child{border-bottom:0}
+.day > summary{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:center;gap:10px;
+  padding:11px 10px;border-radius:8px;
+  font-size:14.5px;font-weight:500;color:var(--ink);
+}
+.day > summary::-webkit-details-marker{display:none}
+.day > summary:hover{background:var(--paper-2)}
+.day > summary:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.day__n{
+  flex:0 0 auto;width:26px;height:26px;border-radius:6px;
+  display:grid;place-items:center;
+  font-family:var(--f-code);font-size:12px;font-weight:600;
+  background:var(--paper-2);color:var(--ink-soft);border:1px solid var(--rule);
+}
+.day__t{flex:1;line-height:1.35}
+.day__chev{flex:0 0 auto;color:var(--ink-faint);transition:transform .2s}
+.day[open] > summary > .day__chev{transform:rotate(90deg)}
+
+.day--now > summary{background:var(--marker-2)}
+.day--now .day__n{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.day--done .day__n{background:var(--pen-green);color:#fff;border-color:var(--pen-green)}
+.day--soon > summary{color:var(--ink-faint);cursor:default}
+.day--soon .day__n{color:var(--ink-faint)}
+
+.day ul{list-style:none;margin:0 0 10px;padding:2px 0 2px 22px}
+.day li a{
+  display:block;padding:6px 10px;border-radius:6px;
+  font-size:14px;color:var(--ink-soft);text-decoration:none;
+  border-left:2px solid var(--rule);
+}
+.day li a:hover{color:var(--ink);background:var(--paper-2)}
+.day li a:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.day li a.is-active{
+  color:var(--pen-blue);font-weight:600;
+  border-left-color:var(--pen-blue);background:var(--paper-2);
+}
+.day li a .tag{
+  font-family:var(--f-code);font-size:10.5px;font-weight:600;
+  color:var(--pen-blue);margin-left:6px;
+}
+.day__soon{
+  padding:4px 10px 12px 32px;font-size:13px;color:var(--ink-faint);font-style:italic;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.main{margin:var(--nav-h) 0 0 var(--side-w);padding:0 0 100px}
+.wrap{max-width:760px;margin:0 auto;padding:0 28px}
+
+/* ============================================================
+   HERO — the day's goal, running.
+   ============================================================ */
+.hero{
+  border-bottom:1px solid var(--rule);
+  background:linear-gradient(180deg,var(--marker-2) 0%,rgba(255,246,220,0) 100%);
+  padding:44px 0 40px;margin-bottom:44px;
+}
+.hero__meta{
+  font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--ink-soft);
+  display:flex;gap:14px;align-items:center;margin-bottom:10px;
+}
+.hero__meta b{
+  font-family:var(--f-code);font-size:12px;font-weight:700;
+  color:var(--paper);background:var(--ink);padding:3px 7px;border-radius:5px;
+}
+.hero h1{
+  font-family:var(--f-ui);font-weight:800;font-size:clamp(30px,5.2vw,44px);
+  line-height:1.1;letter-spacing:-.025em;margin:0 0 14px;
+}
+.hero__sub{font-size:19px;color:var(--ink-soft);margin:0 0 28px;max-width:56ch}
+
+.term{
+  border:1px solid var(--ink);border-radius:10px;overflow:hidden;
+  background:var(--ink);box-shadow:0 6px 22px rgba(23,38,59,.16);
+}
+.term__bar{
+  display:flex;align-items:center;gap:7px;padding:9px 13px;
+  border-bottom:1px solid rgba(255,255,255,.13);
+}
+.term__bar i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.26)}
+.term__bar span{
+  margin-left:8px;font-family:var(--f-code);font-size:11.5px;
+  color:rgba(255,255,255,.55);
+}
+.term pre{
+  margin:0;padding:18px 16px;min-height:186px;
+  font-family:var(--f-code);font-size:13.5px;line-height:1.75;
+  color:#DCE6F2;white-space:pre-wrap;word-break:break-word;
+}
+.term .u{color:#8FE3B4}
+.term .r{color:#FFD98A;font-weight:600}
+.term .caret{
+  display:inline-block;width:8px;height:15px;vertical-align:-2px;
+  background:#8FE3B4;animation:blink 1.05s step-end infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+section{margin:0 0 52px;scroll-margin-top:calc(var(--nav-h) + 16px)}
+h2{
+  font-family:var(--f-ui);font-weight:700;font-size:26px;letter-spacing:-.02em;
+  line-height:1.25;margin:0 0 6px;padding-top:6px;
+  display:flex;align-items:baseline;gap:12px;
+}
+h2 .h2n{
+  font-family:var(--f-code);font-size:13px;font-weight:600;color:var(--ink-faint);
+  flex:0 0 auto;
+}
+h3{font-family:var(--f-ui);font-weight:600;font-size:18.5px;margin:30px 0 8px}
+.lead{color:var(--ink-soft);margin:0 0 20px;font-size:17px}
+p{margin:0 0 16px}
+a{color:var(--pen-blue)}
+strong{font-weight:700}
+
+.rule{height:1px;background:var(--rule);border:0;margin:0 0 34px}
+
+/* inline + block code */
+code{
+  font-family:var(--f-code);font-size:.855em;
+  background:var(--paper-2);border:1px solid var(--rule);
+  padding:1px 5px;border-radius:4px;white-space:nowrap;
+}
+.codewrap{position:relative;margin:0 0 20px}
+.codewrap pre{
+  margin:0;padding:16px 18px;overflow-x:auto;
+  background:var(--ink);border-radius:9px;
+  font-family:var(--f-code);font-size:13.5px;line-height:1.68;
+  color:#DCE6F2;
+}
+.codewrap pre code{
+  background:none;border:0;padding:0;font-size:inherit;white-space:pre;
+}
+.copy{
+  position:absolute;top:9px;right:9px;
+  font-family:var(--f-ui);font-size:11.5px;font-weight:600;
+  color:rgba(255,255,255,.62);background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;
+  padding:4px 9px;cursor:pointer;opacity:0;transition:opacity .15s;
+}
+.codewrap:hover .copy,.copy:focus-visible{opacity:1}
+.copy:hover{color:#fff;background:rgba(255,255,255,.17)}
+.copy.ok{color:#8FE3B4;border-color:rgba(143,227,180,.4)}
+.tok-k{color:#9DB8FF;font-weight:500}
+.tok-s{color:#8FE3B4}
+.tok-c{color:#8394AB;font-style:italic}
+.tok-n{color:#FFC98A}
+.tok-b{color:#E7B4FF}
+
+/* callouts */
+.note{
+  border-left:3px solid var(--pen-blue);background:var(--paper-2);
+  padding:14px 18px;border-radius:0 8px 8px 0;margin:0 0 20px;font-size:16.5px;
+}
+.note--warn{border-left-color:var(--pen-red)}
+.note--key{border-left-color:#E8B92E;background:var(--marker-2)}
+.note p:last-child{margin-bottom:0}
+.note b{font-family:var(--f-ui);font-size:15px}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;margin:0 0 22px;font-size:16px}
+.tbl th{
+  font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--ink-soft);
+  text-align:left;padding:8px 12px;border-bottom:2px solid var(--rule);
+}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl code{white-space:nowrap}
+
+/* big ideas */
+.ideas{display:grid;gap:12px;margin:0 0 24px}
+.idea{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--marker-2);border:1px solid #F0DFA8;border-radius:9px;padding:15px 17px;
+}
+.idea__n{
+  flex:0 0 auto;width:27px;height:27px;border-radius:50%;
+  background:var(--ink);color:var(--paper);display:grid;place-items:center;
+  font-family:var(--f-code);font-size:13px;font-weight:700;margin-top:2px;
+}
+.idea p{margin:0;font-size:16.5px}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz{border:1px solid var(--rule);border-radius:11px;background:var(--paper);overflow:hidden}
+.quiz__head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 18px;border-bottom:1px solid var(--rule);background:var(--paper-2);
+}
+.quiz__head h4{font-family:var(--f-ui);font-size:15px;font-weight:600;margin:0}
+.quiz__score{
+  font-family:var(--f-code);font-size:13px;font-weight:600;color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+}
+.q{padding:20px 18px;border-bottom:1px solid var(--rule)}
+.q:last-child{border-bottom:0}
+.q__p{font-family:var(--f-ui);font-size:16px;font-weight:600;margin:0 0 13px;line-height:1.5}
+.q__p .qn{font-family:var(--f-code);font-size:13px;color:var(--ink-faint);margin-right:7px}
+.opts{display:grid;gap:7px}
+.opt{
+  display:flex;align-items:center;gap:11px;width:100%;text-align:right;
+  font-family:var(--f-body);font-size:16.5px;color:var(--ink);
+  background:var(--paper);border:1px solid var(--rule);border-radius:8px;
+  padding:10px 13px;cursor:pointer;transition:background .13s,border-color .13s;
+}
+.opt:hover:not(:disabled){background:var(--paper-2);border-color:var(--ink-faint)}
+.opt:focus-visible{outline:2px solid var(--pen-blue);outline-offset:1px}
+.opt:disabled{cursor:default}
+.opt__k{
+  flex:0 0 auto;width:23px;height:23px;border-radius:50%;
+  border:1px solid var(--rule);display:grid;place-items:center;
+  font-family:var(--f-code);font-size:11.5px;font-weight:600;color:var(--ink-soft);
+}
+.opt__t{flex:1;text-align:left}
+.opt.is-right{border-color:var(--pen-green);background:#EFF8F2}
+.opt.is-right .opt__k{background:var(--pen-green);color:#fff;border-color:var(--pen-green)}
+.opt.is-wrong{border-color:var(--pen-red);background:#FDF0EF}
+.opt.is-wrong .opt__k{background:var(--pen-red);color:#fff;border-color:var(--pen-red)}
+.q__fb{
+  display:none;margin-top:12px;padding:12px 14px;border-radius:8px;
+  font-size:16px;background:var(--paper-2);border-left:3px solid var(--ink-faint);
+}
+.q__fb.show{display:block}
+.q__fb.good{border-left-color:var(--pen-green)}
+.q__fb.bad{border-left-color:var(--pen-red)}
+.q__fb b{font-family:var(--f-ui);font-size:15px}
+.q__hintbtn{
+  margin-top:11px;font-family:var(--f-ui);font-size:13px;font-weight:600;
+  color:var(--pen-blue);background:none;border:0;padding:0;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.q__hint{display:none;margin-top:9px;font-size:16px;color:var(--ink-soft);font-style:italic}
+.q__hint.show{display:block}
+
+/* ============================================================
+   EXERCISES
+   ============================================================ */
+.ex{border:1px solid var(--rule);border-radius:11px;margin:0 0 14px;background:var(--paper);overflow:hidden}
+.ex__head{display:flex;align-items:flex-start;gap:13px;padding:16px 18px}
+.ex__n{
+  flex:0 0 auto;font-family:var(--f-code);font-size:12px;font-weight:700;
+  color:var(--paper);background:var(--ink);border-radius:5px;padding:3px 7px;margin-top:3px;
+}
+.ex__b{flex:1}
+.ex__b h4{font-family:var(--f-ui);font-size:16.5px;font-weight:600;margin:0 0 6px}
+.ex__b p{margin:0 0 8px;font-size:16.5px}
+.ex__out{
+  font-family:var(--f-code);font-size:13px;color:var(--ink-soft);
+  background:var(--paper-2);border:1px dashed var(--rule);border-radius:6px;
+  padding:8px 11px;margin:8px 0 0;
+}
+.ex details{border-top:1px solid var(--rule)}
+.ex details summary{
+  list-style:none;cursor:pointer;padding:11px 18px;
+  font-family:var(--f-ui);font-size:13.5px;font-weight:600;color:var(--pen-blue);
+}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary:hover{background:var(--paper-2)}
+.ex details summary:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.ex details[open] summary{border-bottom:1px solid var(--rule)}
+.ex details .body{padding:15px 18px}
+.ex details .body p:last-child,.ex details .body .codewrap:last-child{margin-bottom:0}
+
+/* ============================================================
+   CHECKLIST
+   ============================================================ */
+.check{border:1px solid var(--rule);border-radius:11px;padding:8px 6px;background:var(--paper)}
+.check label{
+  display:flex;align-items:flex-start;gap:12px;padding:9px 13px;border-radius:8px;
+  cursor:pointer;font-size:16.5px;
+}
+.check label:hover{background:var(--paper-2)}
+.check input{
+  flex:0 0 auto;width:19px;height:19px;margin-top:4px;
+  accent-color:var(--pen-green);cursor:pointer;
+}
+.check input:checked + span{color:var(--ink-faint);text-decoration:line-through}
+
+/* turtle figure */
+.turtle{
+  display:block;margin:0 auto 20px;max-width:280px;width:100%;
+  background:var(--paper);border:1px solid var(--rule);border-radius:9px;padding:10px;
+}
+
+/* footer */
+.foot{
+  border-top:1px solid var(--rule);margin-top:56px;padding-top:24px;
+  font-family:var(--f-ui);font-size:13.5px;color:var(--ink-faint);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.foot a{color:var(--ink-soft);text-decoration:none}
+.foot a:hover{color:var(--pen-blue);text-decoration:underline}
+
+/* scrim for mobile drawer */
+.scrim{
+  display:none;position:fixed;inset:var(--nav-h) 0 0 0;z-index:45;
+  background:rgba(23,38,59,.35);
+}
+.scrim.show{display:block}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:960px){
+  :root{--side-w:280px}
+  .nav__burger{display:flex}
+  .side{transform:translateX(-100%);transition:transform .24s cubic-bezier(.4,0,.2,1);
+    box-shadow:2px 0 18px rgba(23,38,59,.12)}
+  .side.open{transform:none}
+  .main{margin-left:0}
+  .nav__progress span{display:none}
+}
+@media (max-width:600px){
+  body{font-size:17px}
+  .wrap{padding:0 18px}
+  .hero{padding:30px 0 28px;margin-bottom:32px}
+  h2{font-size:22px}
+  .bar{width:70px}
+  .opt{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ NAVBAR ══════════════════ -->
+<header class="nav">
+  <button class="nav__burger" id="burger" aria-label="Άνοιγμα μενού" aria-expanded="false">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M2 4.5h14M2 9h14M2 13.5h14"/>
+    </svg>
+  </button>
+  <div class="nav__mark">Py</div>
+  <p class="nav__title"><a href="../index.html" style="color:inherit;text-decoration:none" title="Όλα τα μαθήματα">Programming Lessons</a></p>
+  <div class="nav__spacer"></div>
+  <div class="nav__progress">
+    <span id="progText">0 / 8</span>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<nav class="side" id="side" aria-label="Περιεχόμενα μαθημάτων">
+  <p class="side__label">Beginner · Ημέρες 1–14</p>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">01</span>
+      <span class="day__t">Μεταβλητές &amp; Variables</span>
+    </summary>
+    <div class="day__soon">Ολοκληρώθηκε. Σύντομα και εδώ.</div>
+  </details>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">02</span>
+      <span class="day__t">Τύποι Δεδομένων &amp; Strings</span>
+    </summary>
+    <ul><li><a href="index.html">Άνοιξε το μάθημα</a></li></ul>
+  </details>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">03</span>
+      <span class="day__t">Control Flow &amp; Logical Operators</span>
+    </summary>
+    <ul><li><a href="day-03.html">Άνοιξε το μάθημα</a></li></ul>
+  </details>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">04</span>
+      <span class="day__t">Randomisation &amp; Lists</span>
+    </summary>
+    <ul><li><a href="day-04.html">Άνοιξε το μάθημα</a></li></ul>
+  </details>
+
+  <details class="day day--now" open>
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">05</span>
+      <span class="day__t">Python Loops</span>
+    </summary>
+    <ul>
+      <li><a href="#stoxoi">Στόχοι της ημέρας</a></li>
+      <li><a href="#for">Το for loop</a></li>
+      <li><a href="#accumulator">Μαζεύω αποτέλεσμα</a></li>
+      <li><a href="#quiz1">Έλεγχος 1 <span class="tag">quiz</span></a></li>
+      <li><a href="#range">range()</a></li>
+      <li><a href="#fizzbuzz">FizzBuzz</a></li>
+      <li><a href="#quiz2">Έλεγχος 2 <span class="tag">quiz</span></a></li>
+      <li><a href="#askiseis">Ασκήσεις <span class="tag">6</span></a></li>
+      <li><a href="#nested">Loop μέσα σε loop</a></li>
+      <li><a href="#project">Password Generator <span class="tag">project</span></a></li>
+      <li><a href="#turtle">Turtle: η τέχνη των loops <span class="tag">art</span></a></li>
+      <li><a href="#ai">AI Corner</a></li>
+      <li><a href="#lathi">Συχνά λάθη</a></li>
+      <li><a href="#recap">Ανακεφαλαίωση</a></li>
+    </ul>
+  </details>
+
+  <details class="day"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">06</span><span class="day__t">Functions &amp; Karel</span></summary>
+    <ul><li><a href="day-06.html">Άνοιξε το μάθημα</a></li></ul></details>
+
+  <details class="day"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">07</span><span class="day__t">Hangman</span></summary>
+    <ul><li><a href="day-07.html">Άνοιξε το μάθημα</a></li></ul></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">08</span><span class="day__t">Parameters &amp; Caesar Cipher</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">09</span><span class="day__t">Dictionaries &amp; Secret Auction</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">10</span><span class="day__t">Functions with Outputs</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">11</span><span class="day__t">Blackjack Capstone</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">12</span><span class="day__t">Scope &amp; Number Guessing</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">13</span><span class="day__t">Debugging</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">14</span><span class="day__t">Higher Lower Game</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+</nav>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main class="main">
+
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero__meta"><b>ΗΜΕΡΑ 05</b> <span>Beginner</span> <span>·</span> <span>2 συνεδρίες × 2 ώρες 30′</span></div>
+      <h1>Python Loops</h1>
+      <p class="hero__sub">Την προηγούμενη φορά αντέγραψες δέκα φορές τις ίδιες δύο γραμμές για να βάλεις δέκα κουκκίδες. Σήμερα μαθαίνεις να λες στην Python <strong>«κάν' το ξανά»</strong> — εκατό, χίλιες, ένα εκατομμύριο φορές — με τρεις γραμμές. Και στο τέλος, φτιάχνεις κάτι που θα χρησιμοποιείς πραγματικά:</p>
+
+      <div class="term">
+        <div class="term__bar"><i></i><i></i><i></i><span>password_generator.py</span></div>
+        <pre id="termOut"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- ─── ΣΤΟΧΟΙ ─── -->
+    <section id="stoxoi">
+      <h2><span class="h2n">§1</span> Στόχοι της ημέρας</h2>
+      <p class="lead">Δύο συνεδρίες αυτή τη φορά — τα loops είναι η πρώτη πραγματικά μεγάλη ιδέα. Στο τέλος θα μπορείς να κάνεις όλα τα παρακάτω χωρίς βοήθεια.</p>
+      <ul>
+        <li>Να γράφεις <code>for</code> loop πάνω σε λίστα και να εξηγείς τι κάνει η <em>μεταβλητή του loop</em> σε κάθε γύρο</li>
+        <li>Να χρησιμοποιείς το <code>range()</code> — και να θυμάσαι ότι το τέλος <strong>δεν</strong> περιλαμβάνεται</li>
+        <li>Να «μαζεύεις» ένα αποτέλεσμα μέσα σε loop (άθροισμα, μέγιστο) με μια μεταβλητή <em>έξω</em> από αυτό</li>
+        <li>Να λύνεις το FizzBuzz — την πιο διάσημη ερώτηση συνέντευξης προγραμματιστών</li>
+        <li>Να γράφεις loop μέσα σε loop και να προβλέπεις πόσες φορές θα τρέξει</li>
+        <li>Να μετατρέψεις τις 20 γραμμές copy-paste της Ημέρας 4 σε 3</li>
+        <li>Να φτιάξεις έναν Password Generator που παράγει πραγματικά ασφαλείς κωδικούς</li>
+      </ul>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── FOR ─── -->
+    <section id="for">
+      <h2><span class="h2n">§2</span> Το for loop — «για κάθε ένα από αυτά…»</h2>
+      <p>Την Ημέρα 4 έγραψες αυτό:</p>
+      <div class="codewrap"><pre><code>fruits = ["apple", "banana", "cherry"]
+print(fruits[0])
+print(fruits[1])
+print(fruits[2])</code></pre></div>
+      <p>Δουλεύει. Αλλά αν η λίστα έχει 300 στοιχεία; Η Python έχει έναν τρόπο να πεις «κάνε αυτό για <em>κάθε</em> στοιχείο, όσα κι αν είναι»:</p>
+
+      <div class="codewrap"><pre><code>fruits = ["apple", "banana", "cherry"]
+
+for fruit in fruits:
+    print(fruit)</code></pre></div>
+
+      <p>Διαβάζεται ακριβώς όπως είναι γραμμένο: <em>«για κάθε fruit μέσα στα fruits, κάνε αυτό»</em>. Το <code>fruit</code> είναι μια μεταβλητή που <strong>αλλάζει τιμή σε κάθε γύρο</strong>. Το code block με εσοχή — τον ξέρεις από την Ημέρα 3 — τρέχει μία φορά για κάθε στοιχείο.</p>
+
+      <table class="tbl">
+        <thead><tr><th>Γύρος</th><th>Τι έχει μέσα το <code>fruit</code></th><th>Τι τυπώνεται</th></tr></thead>
+        <tbody>
+          <tr><td>1</td><td><code>"apple"</code></td><td>apple</td></tr>
+          <tr><td>2</td><td><code>"banana"</code></td><td>banana</td></tr>
+          <tr><td>3</td><td><code>"cherry"</code></td><td>cherry</td></tr>
+          <tr><td>—</td><td colspan="2">Τελείωσαν τα στοιχεία. Το loop σταματάει.</td></tr>
+        </tbody>
+      </table>
+
+      <div class="note note--key">
+        <p><b>Δες το να συμβαίνει.</b> Στο Thonny: <em>View → Variables</em>, και μετά τρέξε το πρόγραμμα με το κουμπί <em>Debug</em> (το ζουζούνι) αντί για Run. Πάτα <em>Step into</em> ξανά και ξανά. Θα δεις το <code>fruit</code> να αλλάζει τιμή μπροστά στα μάτια σου, γύρο με γύρο. Αυτό είναι το πιο χρήσιμο πράγμα που έχει το Thonny — και σήμερα είναι η μέρα του.</p>
+      </div>
+
+      <h3>Μέσα ή έξω από το loop;</h3>
+      <p>Η εσοχή αποφασίζει — ακριβώς όπως με το <code>if</code>. Πρόβλεψε τι τυπώνει αυτό, και πόσες φορές:</p>
+      <div class="codewrap"><pre><code>for fruit in fruits:
+    print(fruit)
+    print(fruit + " pie")
+
+print("Done!")</code></pre></div>
+      <p>Έξι γραμμές από το loop (δύο ανά φρούτο), και μετά <strong>μία</strong> φορά <code>Done!</code>. Το <code>print("Done!")</code> δεν έχει εσοχή, άρα δεν ανήκει στο loop — τρέχει αφού τελειώσει.</p>
+
+      <div class="note">
+        <p><b>Το όνομα είναι δικό σου.</b> Το <code>fruit</code> δεν είναι ειδική λέξη — θα μπορούσες να γράψεις <code>for x in fruits</code> και θα δούλευε. Αλλά <code>for fruit in fruits</code>, <code>for name in names</code>, <code>for score in scores</code> διαβάζονται σαν πρόταση. Ενικός μέσα, πληθυντικός έξω. Είναι συνήθεια που ξεχωρίζει αυτούς που ξέρουν να γράφουν κώδικα από αυτούς που απλώς τον κάνουν να τρέχει.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ACCUMULATOR ─── -->
+    <section id="accumulator">
+      <h2><span class="h2n">§3</span> Μαζεύω αποτέλεσμα — άθροισμα και μέγιστο</h2>
+      <p>Το πιο συχνό πράγμα που κάνεις με ένα loop δεν είναι να τυπώνεις. Είναι να <em>μαζεύεις</em> κάτι: ένα σύνολο, ένα πλήθος, το μεγαλύτερο. Ο τρόπος είναι πάντα ίδιος — μια μεταβλητή <strong>έξω</strong> από το loop που ξεκινάει άδεια, και σε κάθε γύρο της προσθέτεις.</p>
+
+      <h3>Μέσος όρος ύψους</h3>
+      <div class="codewrap"><pre><code>student_heights = input("Input student heights, separated by spaces: ").split()
+# π.χ. ["156", "178", "165", "171", "187"]  — είναι strings!
+
+total_height = 0
+for height in student_heights:
+    total_height += int(height)
+
+number_of_students = 0
+for height in student_heights:
+    number_of_students += 1
+
+average = round(total_height / number_of_students)
+print(f"total height = {total_height}")
+print(f"number of students = {number_of_students}")
+print(f"average height = {average}")</code></pre></div>
+
+      <p>Δες το μοτίβο στο πρώτο loop: <code>total_height = 0</code> <em>πριν</em>, <code>total_height += ...</code> <em>μέσα</em>. Το <code>+=</code> το ξέρεις από την πίτσα της Ημέρας 3. Και το <code>int(height)</code> είναι η Ημέρα 2 — το <code>split()</code> δίνει strings, και strings δεν αθροίζονται.</p>
+
+      <div class="note note--warn">
+        <p><b>Το λάθος που θα κάνεις:</b> να βάλεις το <code>total_height = 0</code> <em>μέσα</em> στο loop. Τότε σε κάθε γύρο μηδενίζεται, και στο τέλος έχεις μόνο το τελευταίο ύψος. Η μεταβλητή που μαζεύει ζει <strong>έξω</strong>. Πάντα.</p>
+      </div>
+
+      <h3>Το μεγαλύτερο σκορ</h3>
+      <p>Ίδιο μοτίβο, αλλά αντί να προσθέτεις, συγκρίνεις — Ημέρα 3 μέσα σε Ημέρα 5:</p>
+      <div class="codewrap"><pre><code>scores = []
+for s in input("Input student scores, separated by spaces: ").split():
+    scores.append(int(s))
+
+highest = 0
+for score in scores:
+    if score &gt; highest:
+        highest = score
+
+print(f"The highest score in the class is: {highest}")</code></pre></div>
+
+      <p>Το πρώτο loop χτίζει μια <em>νέα</em> λίστα με αριθμούς αντί για strings — ένα <code>append</code> ανά γύρο. Το δεύτερο κρατάει το μεγαλύτερο που έχει δει μέχρι τώρα: κάθε φορά που βλέπει κάτι μεγαλύτερο, το αντικαθιστά.</p>
+
+      <div class="note">
+        <p><b>Ναι, υπάρχουν τα <code>sum()</code>, <code>len()</code> και <code>max()</code>.</b> Κάνουν ακριβώς αυτά τα τρία loops σε μία λέξη το καθένα. Σήμερα τα γράφεις με το χέρι για να ξέρεις <em>τι</em> κάνουν. Από την επόμενη εβδομάδα, χρησιμοποίησέ τα.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── QUIZ 1 ─── -->
+    <section id="quiz1">
+      <h2><span class="h2n">§4</span> Έλεγχος 1 — for &amp; μαζεύω</h2>
+      <p class="lead">Χωρίς σημειώσεις. Θέλεις 3 στα 4 πριν προχωρήσεις.</p>
+      <div class="quiz" data-quiz="q1"></div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── RANGE ─── -->
+    <section id="range">
+      <h2><span class="h2n">§5</span> range() — loop χωρίς λίστα</h2>
+      <p>Μερικές φορές δεν έχεις λίστα, απλώς θέλεις να γίνει κάτι <em>N φορές</em> ή για τους αριθμούς από το 1 μέχρι το 100. Το <code>range()</code> φτιάχνει τη σειρά των αριθμών για σένα:</p>
+
+      <div class="codewrap"><pre><code>for number in range(1, 11):
+    print(number)       # 1, 2, 3, ... 10</code></pre></div>
+
+      <div class="note note--warn">
+        <p><b>Το 11 ΔΕΝ περιλαμβάνεται.</b> Το <code>range(1, 11)</code> δίνει 1 έως 10. Αντίθετα από το <code>randint(1, 11)</code> της Ημέρας 4, που δίνει 1 έως 11. Η Python δεν είναι συνεπής εδώ, και <em>όλοι</em> το μπερδεύουν — κάθε προγραμματιστής στον κόσμο έχει γράψει κάποια στιγμή <code>range(1, 10)</code> και αναρωτήθηκε πού πήγε το 10.</p>
+      </div>
+
+      <table class="tbl">
+        <thead><tr><th>Γράφεις</th><th>Παίρνεις</th><th>Τι σημαίνει</th></tr></thead>
+        <tbody>
+          <tr><td><code>range(5)</code></td><td>0, 1, 2, 3, 4</td><td>πέντε αριθμοί, από το 0</td></tr>
+          <tr><td><code>range(1, 6)</code></td><td>1, 2, 3, 4, 5</td><td>από το 1 μέχρι <em>πριν</em> το 6</td></tr>
+          <tr><td><code>range(0, 10, 2)</code></td><td>0, 2, 4, 6, 8</td><td>ανά 2 — το τρίτο νούμερο είναι το βήμα</td></tr>
+          <tr><td><code>range(10, 0, -1)</code></td><td>10, 9, 8, … 1</td><td>αντίστροφα</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Ο μικρός Gauss</h3>
+      <p>Λένε ότι ο δάσκαλος έβαλε στην τάξη να προσθέσει όλους τους αριθμούς από το 1 μέχρι το 100 για να ησυχάσει. Ο επτάχρονος Gauss απάντησε σε δευτερόλεπτα: 5050. Εσύ δεν χρειάζεται να είσαι ιδιοφυΐα — έχεις loop:</p>
+      <div class="codewrap"><pre><code>total = 0
+for number in range(1, 101):
+    total += number
+
+print(total)        # 5050</code></pre></div>
+      <p>Ίδιο μοτίβο με το ύψος: μεταβλητή έξω, <code>+=</code> μέσα. Μόνο που τώρα το loop τρέχει πάνω σε <code>range</code> αντί για λίστα.</p>
+
+      <div class="note note--key">
+        <p><b>Το «N φορές» χωρίς να σε νοιάζει ο αριθμός.</b> Αν θέλεις απλώς να γίνει κάτι 50 φορές, γράφεις <code>for i in range(50):</code> και <em>δεν χρησιμοποιείς</em> το <code>i</code> καθόλου. Είναι απόλυτα φυσιολογικό. Έτσι θα βάλεις 200 κουκκίδες στην §11.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── FIZZBUZZ ─── -->
+    <section id="fizzbuzz">
+      <h2><span class="h2n">§6</span> FizzBuzz — η ερώτηση της συνέντευξης</h2>
+      <p>Υπάρχει ένα μικρό πρόβλημα που δίνουν σε συνεντεύξεις εργασίας για προγραμματιστές — και ένας εκπληκτικός αριθμός υποψηφίων το χαλάει. Οι κανόνες: τύπωσε τους αριθμούς από το 1 μέχρι το 100. Αλλά για τα πολλαπλάσια του 3 γράψε <code>Fizz</code>, για τα πολλαπλάσια του 5 γράψε <code>Buzz</code>, και για όσα είναι και τα δύο, <code>FizzBuzz</code>.</p>
+
+      <p>Έχεις όλα τα εργαλεία: <code>range</code> από σήμερα, <code>%</code> και <code>elif</code> από την Ημέρα 3. Δοκίμασέ το μόνος σου πριν δεις τη λύση. Σοβαρά.</p>
+
+      <details class="ex" style="border-radius:11px">
+        <summary style="list-style:none;cursor:pointer;padding:12px 18px;font-family:var(--f-ui);font-size:14px;font-weight:600;color:var(--pen-blue)">Δείξε τη λύση</summary>
+        <div class="body" style="padding:0 18px 16px">
+          <div class="codewrap"><pre><code>for number in range(1, 101):
+    if number % 3 == 0 and number % 5 == 0:
+        print("FizzBuzz")
+    elif number % 3 == 0:
+        print("Fizz")
+    elif number % 5 == 0:
+        print("Buzz")
+    else:
+        print(number)</code></pre></div>
+          <p style="margin:0"><strong>Γιατί αποτυγχάνουν οι υποψήφιοι;</strong> Βάζουν τον έλεγχο του 3 πρώτο. Τότε το 15 τυπώνει <code>Fizz</code> και δεν φτάνει ποτέ στο <code>FizzBuzz</code> — γιατί, όπως έμαθες την Ημέρα 3, το <code>elif</code> σταματάει στην πρώτη αληθή συνθήκη. Ο πιο ειδικός έλεγχος πάει <em>πρώτος</em>.</p>
+        </div>
+      </details>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── QUIZ 2 ─── -->
+    <section id="quiz2">
+      <h2><span class="h2n">§7</span> Έλεγχος 2 — range &amp; loop μέσα σε loop</h2>
+      <p class="lead">Πρόβλεψε πρώτα, μετά επιβεβαίωσε στον υπολογιστή. Η τελευταία ερώτηση είναι από την §9 — αν δεν την έχεις διαβάσει ακόμα, άφησέ την για μετά.</p>
+      <div class="quiz" data-quiz="q2"></div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΑΣΚΗΣΕΙΣ ─── -->
+    <section id="askiseis">
+      <h2><span class="h2n">§8</span> Ασκήσεις</h2>
+      <p class="lead">Α0 έως Α3 είναι η πρώτη συνεδρία, Α4 και Α5 η δεύτερη. Πριν γράψεις ένα loop: <strong>πες δυνατά τι αλλάζει σε κάθε γύρο</strong>.</p>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α0</span>
+          <div class="ex__b">
+            <h4>Average Height</h4>
+            <p>Ζήτα ύψη χωρισμένα με κενό. Υπολόγισε τον μέσο όρο <em>χωρίς</em> <code>sum()</code> και <code>len()</code> — με δύο loops. Στρογγυλοποίησε σε ακέραιο.</p>
+            <p class="ex__out">average height = 171</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Δύο μεταβλητές έξω από τα loops: μία για το σύνολο (<code>+= int(height)</code>) και μία για το πλήθος (<code>+= 1</code>). Δοκίμασε με <code>156 178 165 171 187</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <p>Είναι ο κώδικας της §3. Γράψ' τον από μνήμης πρώτα. Μετά, ως δεύτερο βήμα, ξαναγράψ' τον με <code>sum()</code> και <code>len()</code> — τρεις γραμμές.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α1</span>
+          <div class="ex__b">
+            <h4>High Score</h4>
+            <p>Ζήτα βαθμούς χωρισμένους με κενό. Βρες τον μεγαλύτερο <em>χωρίς</em> <code>max()</code>.</p>
+            <p class="ex__out">The highest score in the class is: 91</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Μια μεταβλητή <code>highest</code> που ξεκινάει από 0. Σε κάθε γύρο: αν το σκορ είναι μεγαλύτερο από το <code>highest</code>, γίνε εσύ το <code>highest</code>. Δοκίμασε με <code>78 65 89 86 55 91 64 89</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <p>Είναι ο κώδικας της §3. Ερώτηση για σκέψη: αν όλοι οι βαθμοί ήταν αρνητικοί, τι θα τύπωνε; Πώς το διορθώνεις; (Ξεκίνα το <code>highest</code> από το πρώτο στοιχείο της λίστας αντί για 0.)</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α2</span>
+          <div class="ex__b">
+            <h4>Adding Even Numbers</h4>
+            <p>Πρόσθεσε όλους τους ζυγούς αριθμούς από το 2 μέχρι και το 100. Κάν' το με δύο διαφορετικούς τρόπους.</p>
+            <p class="ex__out">2550</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Τρόπος 1: <code>range(1, 101)</code> και ένα <code>if number % 2 == 0</code> μέσα. Τρόπος 2: <code>range(2, 101, 2)</code> — το βήμα κάνει τη δουλειά, χωρίς <code>if</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code># Τρόπος 1 — ελέγχω κάθε αριθμό
+total = 0
+for number in range(1, 101):
+    if number % 2 == 0:
+        total += number
+print(total)
+
+# Τρόπος 2 — πηδάω κατευθείαν στους ζυγούς
+total = 0
+for number in range(2, 101, 2):
+    total += number
+print(total)</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α3</span>
+          <div class="ex__b">
+            <h4>FizzBuzz</h4>
+            <p>Οι κανόνες της §6. Γράψ' το χωρίς να κοιτάξεις τη λύση. Μετά τρέξ' το και κοίτα ειδικά τους αριθμούς 15, 30 και 45.</p>
+            <p class="ex__out">13<br>14<br>FizzBuzz<br>16</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Ποιος έλεγχος πρέπει να πάει πρώτος; Αυτός που «πιάνει» τους λιγότερους αριθμούς.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <p>Στην §6. Αν το 15 σου βγάζει <code>Fizz</code>, η σειρά των <code>elif</code> είναι λάθος.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α4</span>
+          <div class="ex__b">
+            <h4>Αντίστροφη μέτρηση</h4>
+            <p>Τύπωσε από το 10 μέχρι το 1, μία γραμμή το καθένα, και στο τέλος <code>Liftoff!</code>.</p>
+            <p class="ex__out">10<br>9<br>…<br>1<br>Liftoff!</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Το τρίτο όρισμα του <code>range</code> μπορεί να είναι αρνητικό. Και θυμήσου: το τέλος δεν περιλαμβάνεται — αν θέλεις να φτάσει στο 1, πού σταματάς;</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>for number in range(10, 0, -1):
+    print(number)
+
+print("Liftoff!")</code></pre></div>
+          <p>Το <code>Liftoff!</code> είναι έξω από το loop — χωρίς εσοχή. Αλλιώς θα τυπωθεί δέκα φορές.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α5</span>
+          <div class="ex__b">
+            <h4>Μετρητής φωνηέντων</h4>
+            <p>Ζήτα μια πρόταση στα αγγλικά. Μέτρησε πόσα φωνήεντα (a, e, i, o, u) έχει. Ένα loop πάνω σε <em>string</em> — δουλεύει ακριβώς όπως πάνω σε λίστα, γράμμα-γράμμα.</p>
+            <p class="ex__out">"Python is fun" has 3 vowels.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p><code>for letter in sentence:</code> — το <code>letter</code> είναι κάθε χαρακτήρας με τη σειρά. Μέσα: <code>if letter in "aeiou":</code> — το <code>in</code> από την Ημέρα 3. Μην ξεχάσεις το <code>.lower()</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>sentence = input("Type a sentence: ")
+
+count = 0
+for letter in sentence.lower():
+    if letter in "aeiou":
+        count += 1
+
+print(f'"{sentence}" has {count} vowels.')</code></pre></div>
+          <p>Επέκταση: μέτρα και τα ελληνικά φωνήεντα. Τι γίνεται με τους τόνους — το <code>ά</code> είναι ίδιο με το <code>α</code> για την Python;</p>
+        </div></details>
+      </div>
+
+      <div class="note">
+        <p><b>Θέλεις κι άλλες;</b> <a href="https://www.practicepython.org" target="_blank" rel="noopener">PracticePython</a>, ασκήσεις 7 (List Comprehensions — κάνε την με κανονικό loop), 10 και 14. Και <a href="https://codingbat.com/python/List-2" target="_blank" rel="noopener">CodingBat → List-2</a>: ό,τι έχει «count» ή «sum» στο όνομα είναι σημερινό μοτίβο.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── NESTED ─── -->
+    <section id="nested">
+      <h2><span class="h2n">§9</span> Loop μέσα σε loop</h2>
+      <p class="lead">Από εδώ ξεκινάει η δεύτερη συνεδρία. Ξεκίνα με τρεις ερωτήσεις από την ανακεφαλαίωση και ξαναγράψε το loop του Gauss από μνήμης.</p>
+
+      <p>Ένα loop μπορεί να έχει μέσα του ένα άλλο loop — όπως ένα <code>if</code> μέσα σε <code>if</code>. Ο κανόνας: <strong>ο εσωτερικός τρέχει ολόκληρος για κάθε γύρο του εξωτερικού</strong>.</p>
+
+      <div class="codewrap"><pre><code>for a in range(1, 4):
+    for b in range(1, 4):
+        print(f"{a} x {b} = {a * b}")
+    print("---")</code></pre></div>
+
+      <p>Πρόβλεψε: πόσες γραμμές με πολλαπλασιασμό; Πόσες με <code>---</code>; Μετά τρέξ' το. Τρία επί τρία ίσον εννιά πολλαπλασιασμοί, και τρεις διαχωριστικές γραμμές — μία στο τέλος κάθε εξωτερικού γύρου, γιατί το <code>print("---")</code> έχει εσοχή του <em>εξωτερικού</em> loop, όχι του εσωτερικού.</p>
+
+      <h3>Ο χάρτης της Ημέρας 4 — ξανά, σωστά</h3>
+      <p>Θυμάσαι τις τρεις γραμμές <code>row1</code>, <code>row2</code>, <code>row3</code>; Και την ερώτηση «τι αλλάζει αν θέλω 5×5»; Αυτό:</p>
+
+      <div class="codewrap"><pre><code>grid = []
+for row in range(5):
+    grid.append([".", ".", ".", ".", "."])
+
+grid[2][3] = "X"
+
+for row in grid:
+    for cell in row:
+        print(cell, end=" ")
+    print()</code></pre></div>
+
+      <p>Δύο νέα μικρά πράγματα. Το <code>end=" "</code> λέει στο <code>print</code> «μην αλλάξεις γραμμή, βάλε ένα κενό» — έτσι τα κελιά μπαίνουν δίπλα-δίπλα. Και το σκέτο <code>print()</code> αλλάζει γραμμή. Το αποτέλεσμα είναι ένας χάρτης που φαίνεται σαν χάρτης — και για 20×20 αλλάζεις δύο νούμερα.</p>
+
+      <div class="note note--key">
+        <p><b>Η ερώτηση που αξίζει:</b> αν το εξωτερικό τρέχει 20 φορές και το εσωτερικό 20, πόσες φορές τρέχει το <code>print(cell, end=" ")</code>; Αν απάντησες 400, κατάλαβες τα nested loops. Αν απάντησες 40, ξανασκέψου το: το εσωτερικό τρέχει <em>ολόκληρο</em> σε κάθε γύρο.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── PROJECT ─── -->
+    <section id="project">
+      <h2><span class="h2n">§10</span> Project — Password Generator</h2>
+      <p class="lead">Ένα πρόγραμμα που θα χρησιμοποιείς πραγματικά. Ο χρήστης λέει πόσα γράμματα, σύμβολα και αριθμούς θέλει, και παίρνει έναν κωδικό που κανείς δεν μπορεί να μαντέψει.</p>
+
+      <h3>Βήμα 1 — τα «αλφάβητα» και οι ερωτήσεις</h3>
+      <div class="codewrap"><pre><code>import random
+
+letters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ"
+numbers = "0123456789"
+symbols = "!#$%&amp;()*+"
+
+print("Welcome to the PyPassword Generator!")
+nr_letters = int(input("How many letters would you like in your password?\n"))
+nr_symbols = int(input("How many symbols would you like?\n"))
+nr_numbers = int(input("How many numbers would you like?\n"))</code></pre></div>
+      <p>Τα αλφάβητα είναι strings, όχι λίστες. Το <code>random.choice()</code> δουλεύει και στα δύο — ένα string είναι μια σειρά από χαρακτήρες, όπως μια λίστα είναι μια σειρά από στοιχεία. Το ίδιο ισχύει και για το <code>for</code>, όπως είδες στην Α5.</p>
+
+      <h3>Βήμα 2 — εύκολο επίπεδο: με τη σειρά</h3>
+      <div class="codewrap"><pre><code>password = ""
+
+for i in range(nr_letters):
+    password += random.choice(letters)
+
+for i in range(nr_symbols):
+    password += random.choice(symbols)
+
+for i in range(nr_numbers):
+    password += random.choice(numbers)
+
+print(f"Your password is: {password}")</code></pre></div>
+      <p>Τρέξ' το με 4, 2, 2. Παίρνεις κάτι σαν <code>pWgQ#$73</code>. Δες το μοτίβο: <code>password = ""</code> έξω, <code>+=</code> μέσα — ο ίδιος accumulator με το ύψος, μόνο που μαζεύει γράμματα αντί για αριθμούς. Και το <code>i</code> δεν χρησιμοποιείται πουθενά: απλώς θέλουμε «κάν' το N φορές».</p>
+
+      <p>Υπάρχει όμως πρόβλημα. Ο κωδικός έχει <em>πάντα</em> πρώτα τα γράμματα, μετά τα σύμβολα, μετά τους αριθμούς. Κάποιος που το ξέρει αυτό, έχει πολύ λιγότερα να μαντέψει.</p>
+
+      <h3>Βήμα 3 — δύσκολο επίπεδο: ανακάτεμα</h3>
+      <p>Η λύση: μάζεψε τους χαρακτήρες σε <em>λίστα</em> αντί για string, ανακάτεψέ τη, και μετά κόλλησέ τους:</p>
+      <div class="codewrap"><pre><code>password_list = []
+
+for i in range(nr_letters):
+    password_list.append(random.choice(letters))
+
+for i in range(nr_symbols):
+    password_list.append(random.choice(symbols))
+
+for i in range(nr_numbers):
+    password_list.append(random.choice(numbers))
+
+random.shuffle(password_list)
+
+password = ""
+for char in password_list:
+    password += char
+
+print(f"Your password is: {password}")</code></pre></div>
+
+      <p>Το <code>random.shuffle()</code> ανακατεύει τη λίστα επί τόπου — όπως το <code>append</code>, <em>αλλάζει</em> τη λίστα και δεν επιστρέφει τίποτα. Μην γράψεις <code>password_list = random.shuffle(...)</code>. Το τελευταίο loop είναι ο accumulator για τρίτη φορά σήμερα: μαζεύει τα γράμματα της λίστας πίσω σε ένα string.</p>
+
+      <div class="note note--key">
+        <p><b>Για αργότερα:</b> το τελευταίο loop γράφεται σε μία γραμμή: <code>password = "".join(password_list)</code>. Το <code>join</code> κολλάει μια λίστα από strings με ό,τι βάλεις μπροστά — εδώ, τίποτα. Μην το χρησιμοποιήσεις σήμερα· γράψε το loop. Αλλά όταν το δεις σε ξένο κώδικα, τώρα ξέρεις τι κάνει.</p>
+      </div>
+
+      <div class="note">
+        <p><b>Δικό σου τώρα.</b> Πρόσθεσε ελληνικά γράμματα στα αλφάβητα — τι γίνεται; Φτιάξε το πρόγραμμα να παράγει <em>πέντε</em> κωδικούς με τη μία (loop γύρω από όλο το Βήμα 3 — nested!). Και ένα πραγματικό ερώτημα ασφάλειας: γιατί ένας κωδικός 12 χαρακτήρων είναι <em>πολύ</em> πιο ασφαλής από έναν 8; Πόσοι συνδυασμοί υπάρχουν για καθέναν; Το <code>**</code> της Ημέρας 2 απαντάει.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── TURTLE ─── -->
+    <section id="turtle">
+      <h2><span class="h2n">§11</span> Turtle — η τέχνη των loops</h2>
+      <p class="lead">Αυτή είναι η στιγμή που περίμενες από την Ημέρα 4.</p>
+
+      <h3>Οι 20 γραμμές που γίνονται 3</h3>
+      <p>Άνοιξε το <code>random_art.py</code> της Ημέρας 4. Σβήσε τα εννιά αντίγραφα. Κράτα ένα και τύλιξέ το:</p>
+      <div class="codewrap"><pre><code>for i in range(200):
+    pen.goto(random.randint(-250, 250), random.randint(-180, 180))
+    pen.dot(random.randint(5, 40), random.choice(colours))</code></pre></div>
+      <p>Διακόσιες κουκκίδες. Άλλαξε το 200 σε 2000. Αυτό ήταν — το copy-paste της προηγούμενης εβδομάδας δεν θα το ξαναχρειαστείς ποτέ.</p>
+
+      <h3>Spirograph</h3>
+      <p>Ένας κύκλος, μια μικρή στροφή, ξανά. Τριάντα έξι φορές:</p>
+
+      <svg class="turtle" viewBox="0 0 260 200" role="img" aria-label="Spirograph από 18 χρωματιστούς κύκλους σε μαύρο φόντο, σχεδιασμένο με turtle">
+        <rect width="260" height="200" rx="6" fill="#111827"/>
+        <circle cx="172.0" cy="100.0" r="42" fill="none" stroke="#FF5A5F" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="0.30s" fill="freeze"/></circle>
+        <circle cx="169.5" cy="114.4" r="42" fill="none" stroke="#FFB400" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="0.52s" fill="freeze"/></circle>
+        <circle cx="162.2" cy="127.0" r="42" fill="none" stroke="#7CFF6B" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="0.74s" fill="freeze"/></circle>
+        <circle cx="151.0" cy="136.4" r="42" fill="none" stroke="#38BDF8" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="0.96s" fill="freeze"/></circle>
+        <circle cx="137.3" cy="141.4" r="42" fill="none" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="1.18s" fill="freeze"/></circle>
+        <circle cx="122.7" cy="141.4" r="42" fill="none" stroke="#FF7AB6" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="1.40s" fill="freeze"/></circle>
+        <circle cx="109.0" cy="136.4" r="42" fill="none" stroke="#FFD166" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="1.62s" fill="freeze"/></circle>
+        <circle cx="97.8" cy="127.0" r="42" fill="none" stroke="#F8FAFC" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="1.84s" fill="freeze"/></circle>
+        <circle cx="90.5" cy="114.4" r="42" fill="none" stroke="#FF5A5F" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="2.06s" fill="freeze"/></circle>
+        <circle cx="88.0" cy="100.0" r="42" fill="none" stroke="#FFB400" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="2.28s" fill="freeze"/></circle>
+        <circle cx="90.5" cy="85.6" r="42" fill="none" stroke="#7CFF6B" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="2.50s" fill="freeze"/></circle>
+        <circle cx="97.8" cy="73.0" r="42" fill="none" stroke="#38BDF8" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="2.72s" fill="freeze"/></circle>
+        <circle cx="109.0" cy="63.6" r="42" fill="none" stroke="#A78BFA" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="2.94s" fill="freeze"/></circle>
+        <circle cx="122.7" cy="58.6" r="42" fill="none" stroke="#FF7AB6" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="3.16s" fill="freeze"/></circle>
+        <circle cx="137.3" cy="58.6" r="42" fill="none" stroke="#FFD166" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="3.38s" fill="freeze"/></circle>
+        <circle cx="151.0" cy="63.6" r="42" fill="none" stroke="#F8FAFC" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="3.60s" fill="freeze"/></circle>
+        <circle cx="162.2" cy="73.0" r="42" fill="none" stroke="#FF5A5F" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="3.82s" fill="freeze"/></circle>
+        <circle cx="169.5" cy="85.6" r="42" fill="none" stroke="#FFB400" stroke-width="1.6" stroke-dasharray="264" stroke-dashoffset="264"><animate attributeName="stroke-dashoffset" from="264" to="0" dur=".55s" begin="4.04s" fill="freeze"/></circle>
+        <text x="130" y="190" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#CBD5E1" opacity="0">
+          <animate attributeName="opacity" from="0" to="1" dur=".5s" begin="4.6s" fill="freeze"/>for i in range(18): circle, left(20)</text>
+      </svg>
+
+      <div class="codewrap"><pre><code>import turtle
+import random
+
+colours = ["red", "orange", "gold", "lime", "deepskyblue", "blueviolet", "hotpink", "white"]
+
+screen = turtle.Screen()
+screen.bgcolor("black")
+
+pen = turtle.Turtle()
+pen.speed(0)
+pen.pensize(2)
+
+for i in range(36):
+    pen.color(random.choice(colours))
+    pen.circle(100)
+    pen.left(10)
+
+pen.hideturtle()
+turtle.done()</code></pre></div>
+
+      <p>Τα κουμπιά σου: το <code>36</code> και το <code>10</code> πρέπει να πολλαπλασιάζονται σε 360 για να κλείσει το σχήμα — δοκίμασε 18 και 20, ή 72 και 5. Το <code>100</code> είναι η ακτίνα. Το <code>pensize</code>. Τα χρώματα. Κάθε αλλαγή είναι άλλος πίνακας.</p>
+
+      <h3>Mandala — nested loops στη ζωγραφική</h3>
+      <p>Το αστέρι της Ημέρας 3 ήταν δέκα γραμμές. Τώρα είναι τρεις. Και αν το βάλεις μέσα σε άλλο loop που το γυρίζει λίγο κάθε φορά, γίνεται mandala:</p>
+      <div class="codewrap"><pre><code>for i in range(12):
+    pen.color(random.choice(colours))
+
+    for side in range(5):        # ένα πεντάγωνο
+        pen.forward(90)
+        pen.left(72)
+
+    pen.left(30)                 # γύρνα λίγο, ξανά</code></pre></div>
+      <p>Δώδεκα πεντάγωνα, το καθένα γυρισμένο 30° από το προηγούμενο. Το εσωτερικό loop ζωγραφίζει <em>ένα</em> σχήμα, το εξωτερικό το επαναλαμβάνει γυρισμένο. Άλλαξε το 5 και το 72 σε 6 και 60 — εξάγωνα. Σε 3 και 120 — τρίγωνα. Σε 5 και 144 — αστέρια.</p>
+
+      <div class="note note--key">
+        <p><b>Το κόλπο για να κλείνει το σχήμα:</b> <code>πλευρές × γωνία = 360</code>. Τρίγωνο: 3 × 120. Τετράγωνο: 4 × 90. Πεντάγωνο: 5 × 72. Αστέρι: 5 × 144 = 720 — δύο γύροι, γι' αυτό διασταυρώνεται. Αυτό είναι γεωμετρία που κάνεις στο σχολείο, μόνο που εδώ τη <em>βλέπεις</em>.</p>
+      </div>
+
+      <div class="note">
+        <p><b>Δικό σου τώρα.</b> Συνδύασε και τα τρία: spirograph από πίσω, mandala από πάνω, κουκκίδες στα κενά. Κράτα το καλύτερο και βάλ' το στο README. Αυτό είναι το πρώτο έργο που είναι καθαρά δικό σου — κανένα μάθημα δεν σου είπε πώς να φαίνεται.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── AI ─── -->
+    <section id="ai">
+      <h2><span class="h2n">§12</span> AI Corner — Quick, Draw!</h2>
+      <p>Άνοιξε το <a href="https://quickdraw.withgoogle.com" target="_blank" rel="noopener">quickdraw.withgoogle.com</a>. Σου ζητάει να ζωγραφίσεις έξι πράγματα, είκοσι δευτερόλεπτα το καθένα, και ένα νευρωνικό δίκτυο προσπαθεί να μαντέψει τι σχεδιάζεις — <em>ενώ</em> το σχεδιάζεις. Παίξε δύο γύρους.</p>
+
+      <p>Μετά, η ερώτηση: <strong>πώς μαντεύει;</strong> Κανείς δεν του έγραψε κανόνες «αν έχει τέσσερα πόδια και ουρά, είναι γάτα». Αντί γι' αυτό, του έδειξαν <em>πενήντα εκατομμύρια</em> ζωγραφιές που έκαναν άνθρωποι σαν εσένα, με την ετικέτα τους. Και έτρεξαν ένα loop:</p>
+
+      <div class="codewrap"><pre><code># Αυτό ΔΕΝ είναι πραγματικός κώδικας — είναι η ιδέα.
+
+for drawing in millions_of_drawings:
+    guess = network.guess(drawing)
+    if guess != correct_label:
+        network.adjust_a_little()</code></pre></div>
+
+      <p>Ένα <code>for</code> loop που τρέχει πενήντα εκατομμύρια φορές. Σε κάθε γύρο, το δίκτυο μαντεύει, μαθαίνει αν έκανε λάθος, και διορθώνεται <em>λίγο</em>. Μετά από εκατομμύρια μικρές διορθώσεις, μαντεύει σωστά. Αυτό λέγεται <strong>training</strong>, και στην καρδιά του είναι ακριβώς αυτό που έμαθες σήμερα: μια μεταβλητή έξω από το loop που βελτιώνεται σε κάθε γύρο.</p>
+
+      <div class="note">
+        <p><b>Δες τα δεδομένα.</b> Στο <a href="https://quickdraw.withgoogle.com/data" target="_blank" rel="noopener">quickdraw.withgoogle.com/data</a> βλέπεις πώς ζωγράφισαν «γάτα» εκατό χιλιάδες άνθρωποι. Κοίταξέ τα σαν σχεδιαστής: τι έχουν κοινό; Τι διαφέρει; Αυτό ακριβώς «βλέπει» και το δίκτυο.</p>
+        <p><b>Η ερώτηση που μετράει:</b> ζωγράφισε ένα κουλούρι Θεσσαλονίκης. Το μαντεύει; Γιατί όχι; Γιατί <em>κανείς</em> στα πενήντα εκατομμύρια δεν του το έδειξε. Ένα δίκτυο ξέρει μόνο ό,τι υπήρχε στο loop του. Αυτό έχει ένα όνομα — <strong>bias στα δεδομένα</strong> — και είναι από τα πιο σημαντικά πράγματα που πρέπει να καταλαβαίνει κανείς για την AI.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΛΑΘΗ ─── -->
+    <section id="lathi">
+      <h2><span class="h2n">§13</span> Συχνά λάθη</h2>
+      <p class="lead">Όταν σκάσει κάτι, ψάξ' το εδώ πρώτα.</p>
+      <table class="tbl">
+        <thead><tr><th>Error</th><th>Τι φταίει</th></tr></thead>
+        <tbody>
+          <tr><td><code>TypeError: 'int' object is not iterable</code></td><td>Έγραψες <code>for i in 10:</code>. Το loop θέλει κάτι με στοιχεία — λίστα, string ή <code>range(10)</code>.</td></tr>
+          <tr><td><code>IndentationError: expected an indented block</code></td><td>Η γραμμή κάτω από το <code>for</code> δεν έχει εσοχή. Ίδιος κανόνας με το <code>if</code>.</td></tr>
+          <tr><td>Το loop σταμάτησε ένα νωρίτερα</td><td><code>range(1, 10)</code> δίνει 1–9. Το τέλος δεν περιλαμβάνεται. Αν θέλεις μέχρι το 10, γράψε <code>range(1, 11)</code>.</td></tr>
+          <tr><td><code>TypeError: can only concatenate str (not "int") to str</code></td><td>Τα ύψη από το <code>split()</code> είναι strings. Θέλει <code>int(height)</code> πριν το <code>+=</code>.</td></tr>
+          <tr><td>Το σύνολο βγαίνει ίσο με το τελευταίο στοιχείο</td><td>Έβαλες το <code>total = 0</code> <em>μέσα</em> στο loop. Μηδενίζεται σε κάθε γύρο. Βγάλ' το έξω.</td></tr>
+          <tr><td>Το <code>Done!</code> τυπώνεται πολλές φορές</td><td>Έχει εσοχή, άρα είναι μέσα στο loop. Αν το θες μία φορά, πάει στην αρχή της γραμμής.</td></tr>
+          <tr><td>Η λίστα μου έγινε <code>None</code></td><td><code>x = random.shuffle(x)</code>. Όπως το <code>append</code>: αλλάζει επί τόπου, δεν επιστρέφει. Σκέτο <code>random.shuffle(x)</code>.</td></tr>
+          <tr><td>Το 15 τυπώνει <code>Fizz</code></td><td>Ο έλεγχος του 3 είναι πριν τον έλεγχο «και τα δύο». Το <code>elif</code> σταματάει στην πρώτη αληθή. Ο πιο ειδικός έλεγχος πρώτος.</td></tr>
+          <tr><td>Το spirograph δεν κλείνει</td><td><code>φορές × γωνία</code> δεν κάνει 360. Π.χ. 36 × 10, 18 × 20, 72 × 5.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── RECAP ─── -->
+    <section id="recap">
+      <h2><span class="h2n">§14</span> Ανακεφαλαίωση</h2>
+      <p class="lead">Κράτησέ το. Από εδώ και πέρα, σχεδόν κάθε πρόγραμμα έχει τουλάχιστον ένα loop — και τα περισσότερα έχουν τον accumulator.</p>
+
+      <h3>Οι τρεις μεγάλες ιδέες</h3>
+      <div class="ideas">
+        <div class="idea"><span class="idea__n">1</span><p><code>for item in list:</code> — το <code>item</code> αλλάζει τιμή σε κάθε γύρο. Το block με εσοχή τρέχει μία φορά ανά στοιχείο.</p></div>
+        <div class="idea"><span class="idea__n">2</span><p><code>range(a, b)</code> δίνει από <code>a</code> μέχρι <code>b - 1</code>. Το τέλος <strong>δεν</strong> περιλαμβάνεται — αντίθετα από το <code>randint</code>.</p></div>
+        <div class="idea"><span class="idea__n">3</span><p>Ο <strong>accumulator</strong>: μια μεταβλητή <em>έξω</em> από το loop που μαζεύει (<code>total = 0</code> πριν, <code>total += x</code> μέσα). Άθροισμα, πλήθος, μέγιστο, κωδικός — όλα το ίδιο μοτίβο.</p></div>
+      </div>
+
+      <h3>Κάρτα αναφοράς</h3>
+      <div class="codewrap"><pre><code># FOR ΠΑΝΩ ΣΕ ΛΙΣΤΑ (ή string)
+for fruit in fruits:
+    print(fruit)              # μία φορά ανά στοιχείο
+
+# RANGE
+range(5)            # 0 1 2 3 4
+range(1, 6)         # 1 2 3 4 5       — το 6 ΟΧΙ
+range(0, 10, 2)     # 0 2 4 6 8       — βήμα 2
+range(10, 0, -1)    # 10 9 ... 1      — αντίστροφα
+
+# ACCUMULATOR
+total = 0                     # ΕΞΩ από το loop
+for number in range(1, 101):
+    total += number           # ΜΕΣΑ
+
+# ΜΕΓΙΣΤΟ
+highest = 0
+for score in scores:
+    if score &gt; highest:
+        highest = score
+
+# NESTED — ο εσωτερικός τρέχει ολόκληρος σε κάθε γύρο
+for row in range(3):
+    for col in range(3):
+        ...                   # 3 × 3 = 9 φορές
+
+# ΧΡΗΣΙΜΑ
+random.shuffle(my_list)       # ανακατεύει επί τόπου
+print(x, end=" ")             # χωρίς αλλαγή γραμμής
+"".join(list_of_strings)      # κόλλα τα — για αργότερα</code></pre></div>
+
+      <h3>Μπορώ να…</h3>
+      <p>Τσέκαρε μόνο ό,τι μπορείς να κάνεις <strong>χωρίς</strong> να κοιτάξεις σημειώσεις. Η πρόοδος αποθηκεύεται σε αυτόν τον υπολογιστή.</p>
+      <div class="check" id="checklist">
+        <label><input type="checkbox" data-ck="c1"><span>…γράψω ένα <code>for</code> πάνω σε λίστα και πω τι έχει η μεταβλητή σε κάθε γύρο</span></label>
+        <label><input type="checkbox" data-ck="c2"><span>…πω τι δίνει το <code>range(1, 11)</code> χωρίς να το τρέξω</span></label>
+        <label><input type="checkbox" data-ck="c3"><span>…προσθέσω όλους τους αριθμούς μιας λίστας με accumulator</span></label>
+        <label><input type="checkbox" data-ck="c4"><span>…βρω το μεγαλύτερο στοιχείο χωρίς <code>max()</code></span></label>
+        <label><input type="checkbox" data-ck="c5"><span>…λύσω το FizzBuzz και εξηγήσω γιατί η σειρά των <code>elif</code> μετράει</span></label>
+        <label><input type="checkbox" data-ck="c6"><span>…προβλέψω πόσες φορές τρέχει το εσωτερικό loop σε ένα nested</span></label>
+        <label><input type="checkbox" data-ck="c7"><span>…ζωγραφίσω ένα πολύγωνο με loop, ξέροντας τη γωνία</span></label>
+        <label><input type="checkbox" data-ck="c8"><span>…φτιάξω τον Password Generator (δύσκολο επίπεδο) από την αρχή, μόνος μου</span></label>
+      </div>
+
+      <h3>Λέξεις που έμαθα σήμερα</h3>
+      <p><code>loop</code> <code>for</code> <code>in</code> <code>iteration</code> <code>loop variable</code> <code>range()</code> <code>step</code> <code>accumulator</code> <code>nested loop</code> <code>FizzBuzz</code> <code>shuffle()</code> <code>join()</code> <code>end=</code> <code>training</code> <code>bias</code></p>
+    </section>
+
+    <footer class="foot">
+      <span>Ημέρα 05 · Python Loops</span>
+      <a href="#stoxoi">Πίσω στην αρχή</a>
+    </footer>
+
+  </div>
+</main>
+
+<script>
+'use strict';
+
+/* ── ασφαλής αποθήκευση: δουλεύει στο GitHub Pages, δεν σκάει πουθενά ── */
+var store = {
+  get: function(k){ try { return window.localStorage.getItem(k); } catch(e){ return null; } },
+  set: function(k,v){ try { window.localStorage.setItem(k,v); } catch(e){} }
+};
+
+/* ══════════════════ ΔΕΔΟΜΕΝΑ QUIZ ══════════════════ */
+var QUIZZES = {
+  q1: { title:'for & μαζεύω', questions:[
+    { p:'<code>for fruit in ["apple", "banana"]:</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;print(fruit)</code><br>Τι τυπώνεται;',
+      o:['apple banana (μία γραμμή)','apple και banana, σε δύο γραμμές','["apple", "banana"]','fruit, δύο φορές'], a:1,
+      h:'Το block τρέχει μία φορά για κάθε στοιχείο.',
+      e:'Δύο στοιχεία, δύο γύροι, δύο <code>print</code>. Σε κάθε γύρο το <code>fruit</code> έχει το επόμενο στοιχείο.' },
+    { p:'Στο ίδιο loop, τι έχει μέσα το <code>fruit</code> στον <strong>δεύτερο</strong> γύρο;',
+      o:['"apple"','"banana"','2','Και τα δύο'], a:1,
+      h:'Το loop προχωράει με τη σειρά της λίστας.',
+      e:'Πρώτος γύρος <code>"apple"</code>, δεύτερος <code>"banana"</code>. Μία τιμή τη φορά, πάντα.' },
+    { p:'<code>total = 0</code><br><code>for n in [1, 2, 3]:</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;total += n</code><br><code>print(total)</code> &nbsp;(χωρίς εσοχή)<br>Τι τυπώνει;',
+      o:['1 2 3','3','6','0'], a:2,
+      h:'Το print είναι έξω από το loop — τρέχει μία φορά, στο τέλος.',
+      e:'0+1=1, 1+2=3, 3+3=<strong>6</strong>. Το <code>print</code> δεν έχει εσοχή, άρα τυπώνει μόνο το τελικό σύνολο.' },
+    { p:'Πού πρέπει να μπει το <code>total = 0</code>;',
+      o:['Μέσα στο loop, στην αρχή','Πριν το loop, έξω','Μετά το loop','Δεν έχει σημασία'], a:1,
+      h:'Τι θα γινόταν αν μηδενιζόταν σε κάθε γύρο;',
+      e:'Έξω, πριν. Αν μπει μέσα, μηδενίζεται κάθε γύρο και στο τέλος το σύνολο είναι απλώς το τελευταίο στοιχείο.' }
+  ]},
+  q2: { title:'range & nested', questions:[
+    { p:'Τι δίνει το <code>range(1, 5)</code>;',
+      o:['1, 2, 3, 4, 5','1, 2, 3, 4','0, 1, 2, 3, 4','5 αριθμούς από το 1'], a:1,
+      h:'Το τέλος περιλαμβάνεται ή όχι;',
+      e:'Από το 1 μέχρι <em>πριν</em> το 5. Το τέλος δεν περιλαμβάνεται — αντίθετα από το <code>randint</code>.' },
+    { p:'Τι δίνει το <code>range(3)</code>;',
+      o:['1, 2, 3','0, 1, 2','3','0, 1, 2, 3'], a:1,
+      h:'Με ένα μόνο όρισμα, από πού ξεκινάει;',
+      e:'Με ένα όρισμα ξεκινάει από το 0: <strong>0, 1, 2</strong>. Τρεις αριθμοί — τόσοι όσος ο αριθμός που έδωσες.' },
+    { p:'Τι δίνει το <code>range(0, 10, 2)</code>;',
+      o:['0, 2, 4, 6, 8, 10','0, 2, 4, 6, 8','2, 4, 6, 8, 10','0, 10, 2'], a:1,
+      h:'Το τρίτο νούμερο είναι το βήμα. Και το τέλος…',
+      e:'Βήμα 2, από το 0, μέχρι πριν το 10: <strong>0, 2, 4, 6, 8</strong>.' },
+    { p:'Στο FizzBuzz, γιατί ο έλεγχος «διαιρείται και με 3 και με 5» πρέπει να πάει <strong>πρώτος</strong>;',
+      o:['Γιατί είναι πιο δύσκολος','Γιατί το elif σταματάει στην πρώτη αληθή συνθήκη','Γιατί το 15 είναι μεγαλύτερος αριθμός','Δεν χρειάζεται να πάει πρώτος'], a:1,
+      h:'Ημέρα 3. Τι κάνει το elif όταν βρει μία αληθή;',
+      e:'Αν ο έλεγχος του 3 πάει πρώτος, το 15 τυπώνει <code>Fizz</code> και το <code>elif</code> δεν συνεχίζει. Ο πιο ειδικός έλεγχος μπαίνει πρώτος.' },
+    { p:'<code>for a in range(2):</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;for b in range(3):</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;print("x")</code><br>Πόσα <code>x</code> τυπώνονται;',
+      o:['2','3','5','6'], a:3,
+      h:'Το εσωτερικό τρέχει ολόκληρο σε κάθε γύρο του εξωτερικού.',
+      e:'Δύο εξωτερικοί γύροι, και σε καθέναν τρεις εσωτερικοί: 2 × 3 = <strong>6</strong>. Όχι 2 + 3.' }
+  ]}
+};
+
+/* ══════════════════ RENDER QUIZ ══════════════════ */
+var KEYS = ['Α','Β','Γ','Δ'];
+
+function buildQuiz(host, id){
+  var data = QUIZZES[id];
+  var total = data.questions.length;
+  var answered = 0, right = 0;
+
+  var head = document.createElement('div');
+  head.className = 'quiz__head';
+  head.innerHTML = '<h4>' + data.title + '</h4><span class="quiz__score">— / ' + total + '</span>';
+  host.appendChild(head);
+  var scoreEl = head.querySelector('.quiz__score');
+
+  data.questions.forEach(function(q, qi){
+    var wrap = document.createElement('div');
+    wrap.className = 'q';
+
+    var prompt = document.createElement('p');
+    prompt.className = 'q__p';
+    prompt.innerHTML = '<span class="qn">' + (qi+1) + '.</span>' + q.p;
+    wrap.appendChild(prompt);
+
+    var opts = document.createElement('div');
+    opts.className = 'opts';
+    wrap.appendChild(opts);
+
+    var fb = document.createElement('div');
+    fb.className = 'q__fb';
+
+    var hintBtn = document.createElement('button');
+    hintBtn.type = 'button';
+    hintBtn.className = 'q__hintbtn';
+    hintBtn.textContent = 'Θέλω μια βοήθεια';
+    var hint = document.createElement('p');
+    hint.className = 'q__hint';
+    hint.innerHTML = q.h;
+    hintBtn.addEventListener('click', function(){
+      hint.classList.add('show');
+      hintBtn.style.display = 'none';
+    });
+
+    q.o.forEach(function(text, oi){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.innerHTML = '<span class="opt__k">' + KEYS[oi] + '</span><span class="opt__t">' + text + '</span>';
+      b.addEventListener('click', function(){
+        if (wrap.dataset.done) return;
+        wrap.dataset.done = '1';
+        answered++;
+        var ok = (oi === q.a);
+        if (ok) right++;
+
+        Array.prototype.forEach.call(opts.children, function(el, i){
+          el.disabled = true;
+          if (i === q.a) el.classList.add('is-right');
+          else if (i === oi) el.classList.add('is-wrong');
+        });
+
+        fb.className = 'q__fb show ' + (ok ? 'good' : 'bad');
+        fb.innerHTML = '<b>' + (ok ? 'Σωστά. ' : 'Όχι ακόμα. ') + '</b>' + q.e;
+        hintBtn.style.display = 'none';
+        hint.classList.remove('show');
+        scoreEl.textContent = right + ' / ' + total;
+        if (answered === total) {
+          scoreEl.style.color = (right === total) ? 'var(--pen-green)' : 'var(--ink)';
+        }
+      });
+      opts.appendChild(b);
+    });
+
+    wrap.appendChild(hintBtn);
+    wrap.appendChild(hint);
+    wrap.appendChild(fb);
+    host.appendChild(wrap);
+  });
+}
+
+document.querySelectorAll('[data-quiz]').forEach(function(el){
+  buildQuiz(el, el.dataset.quiz);
+});
+
+/* ══════════════════ ΧΡΩΜΑΤΙΣΜΟΣ ΚΩΔΙΚΑ ══════════════════ */
+var KW = /^(False|None|True|and|as|assert|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield)$/;
+var BI = /^(print|input|int|float|str|bool|type|len|round|range|abs|sum|min|max|list|dict|set|tuple|turtle|forward|left|right|color|write|goto|pensize|lower|upper|count|random|randint|choice|choices|shuffle|append|extend|split|join|index|dot|circle|speed|hideturtle|penup|pendown|bgcolor|setheading|Screen|Turtle|done)$/;
+
+function esc(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlight(src){
+  var re = /(#[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|(\b\d+\.?\d*\b)|([A-Za-z_][A-Za-z0-9_]*)/g;
+  var out = '', last = 0, m;
+  while ((m = re.exec(src)) !== null) {
+    out += esc(src.slice(last, m.index));
+    if (m[1])      out += '<span class="tok-c">' + esc(m[1]) + '</span>';
+    else if (m[2]) out += '<span class="tok-s">' + esc(m[2]) + '</span>';
+    else if (m[3]) out += '<span class="tok-n">' + esc(m[3]) + '</span>';
+    else if (m[4]) {
+      if (KW.test(m[4]))      out += '<span class="tok-k">' + m[4] + '</span>';
+      else if (BI.test(m[4])) out += '<span class="tok-b">' + m[4] + '</span>';
+      else                    out += esc(m[4]);
+    }
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+
+document.querySelectorAll('.codewrap pre code').forEach(function(code){
+  var raw = code.textContent;
+  code.innerHTML = highlight(raw);
+
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'copy';
+  btn.textContent = 'Αντιγραφή';
+  btn.addEventListener('click', function(){
+    var done = function(){
+      btn.textContent = 'Έγινε';
+      btn.classList.add('ok');
+      setTimeout(function(){ btn.textContent = 'Αντιγραφή'; btn.classList.remove('ok'); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(raw).then(done, function(){});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = raw; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(e){}
+      document.body.removeChild(ta);
+    }
+  });
+  code.parentNode.parentNode.appendChild(btn);
+});
+
+/* ══════════════════ CHECKLIST + ΠΡΟΟΔΟΣ ══════════════════ */
+var boxes = document.querySelectorAll('#checklist input[type=checkbox]');
+var progBar = document.getElementById('progBar');
+var progText = document.getElementById('progText');
+
+function paintProgress(){
+  var done = 0;
+  boxes.forEach(function(b){ if (b.checked) done++; });
+  progText.textContent = done + ' / ' + boxes.length;
+  progBar.style.width = (done / boxes.length * 100) + '%';
+}
+
+boxes.forEach(function(b){
+  var key = 'day05.' + b.dataset.ck;
+  if (store.get(key) === '1') b.checked = true;
+  b.addEventListener('change', function(){
+    store.set(key, b.checked ? '1' : '0');
+    paintProgress();
+  });
+});
+paintProgress();
+
+/* ══════════════════ SCROLLSPY ══════════════════ */
+var links = Array.prototype.slice.call(document.querySelectorAll('.day--now li a'));
+var targets = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+
+if ('IntersectionObserver' in window) {
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      var i = targets.indexOf(en.target);
+      if (i < 0) return;
+      links.forEach(function(a){ a.classList.remove('is-active'); });
+      links[i].classList.add('is-active');
+    });
+  }, { rootMargin: '-70px 0px -72% 0px', threshold: 0 });
+  targets.forEach(function(t){ if (t) io.observe(t); });
+}
+
+/* ══════════════════ ΜΕΝΟΥ ΓΙΑ ΚΙΝΗΤΟ ══════════════════ */
+var side = document.getElementById('side');
+var scrim = document.getElementById('scrim');
+var burger = document.getElementById('burger');
+
+function toggleSide(open){
+  side.classList.toggle('open', open);
+  scrim.classList.toggle('show', open);
+  burger.setAttribute('aria-expanded', String(open));
+}
+burger.addEventListener('click', function(){ toggleSide(!side.classList.contains('open')); });
+scrim.addEventListener('click', function(){ toggleSide(false); });
+side.addEventListener('click', function(e){
+  if (e.target.closest('a') && window.innerWidth <= 960) toggleSide(false);
+});
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && side.classList.contains('open')) toggleSide(false);
+});
+
+/* ══════════════════ HERO: ΤΟ ΠΡΟΓΡΑΜΜΑ ΤΡΕΧΕΙ ══════════════════ */
+(function(){
+  var out = document.getElementById('termOut');
+  if (!out) return;
+
+  var script = [
+    { t:'Welcome to the PyPassword Generator!\n', d:20 },
+    { t:'How many letters would you like in your password?\n', d:14 },
+    { t:'6\n', d:110, c:'u' },
+    { t:'How many symbols would you like?\n', d:14 },
+    { t:'2\n', d:110, c:'u' },
+    { t:'How many numbers would you like?\n', d:14 },
+    { t:'2\n\n', d:110, c:'u' },
+    { t:'Your password is: ', d:22 },
+    { t:'x7Rk$Qe#3W\n', d:45, c:'r' }
+  ];
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduce) {
+    out.innerHTML = script.map(function(s){
+      var t = s.t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      return s.c ? '<span class="' + s.c + '">' + t + '</span>' : t;
+    }).join('');
+    return;
+  }
+
+  var si = 0, ci = 0, buf = '';
+  var caret = '<span class="caret"></span>';
+
+  function step(){
+    if (si >= script.length) { out.innerHTML = buf; return; }
+    var seg = script[si];
+    if (ci === 0 && seg.c) buf += '<span class="' + seg.c + '">';
+    var ch = seg.t.charAt(ci);
+    buf += (ch === '<' ? '&lt;' : ch === '&' ? '&amp;' : ch);
+    ci++;
+    if (ci >= seg.t.length) {
+      if (seg.c) buf += '</span>';
+      si++; ci = 0;
+    }
+    out.innerHTML = buf + caret;
+    setTimeout(step, seg.d);
+  }
+  setTimeout(step, 380);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,1539 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ημέρα 6 — Functions &amp; Karel · Programming Lessons</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Commissioner:wght@300;400;500;600;700;800&family=Alegreya:ital,wght@0,400;0,500;0,700;1,400&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+/* ============================================================
+   TOKENS — a school notebook: ballpoint ink on graph paper.
+   Every pen colour has a job. Nothing here is decoration.
+   ============================================================ */
+:root{
+  --paper:      #FCFCFA;
+  --paper-2:    #F4F6F8;
+  --grid:       #E4EAF0;
+  --grid-major: #D6DFE8;
+
+  --ink:        #17263B;   /* blue-black ballpoint  */
+  --ink-soft:   #5A6B80;
+  --ink-faint:  #94A3B4;
+
+  --pen-blue:   #2A4FC4;   /* links, active state   */
+  --pen-red:    #C63B32;   /* errors, warnings      */
+  --pen-green:  #1B7A4C;   /* correct               */
+  --marker:     #FFE9A8;   /* highlighter           */
+  --marker-2:   #FFF6DC;
+
+  --rule:       #DDE4EC;
+  --shadow:     0 1px 0 var(--rule);
+
+  --nav-h:      60px;
+  --side-w:     288px;
+
+  --f-ui:   'Commissioner', 'Helvetica Neue', Arial, sans-serif;
+  --f-body: 'Alegreya', Georgia, 'Times New Roman', serif;
+  --f-code: 'JetBrains Mono', 'SF Mono', Consolas, monospace;
+}
+
+*,*::before,*::after{box-sizing:border-box}
+
+html{scroll-behavior:smooth;scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}
+  *,*::before,*::after{animation-duration:.001ms!important;transition-duration:.001ms!important}}
+
+body{
+  margin:0;
+  font-family:var(--f-body);
+  font-size:18px;
+  line-height:1.72;
+  color:var(--ink);
+  background-color:var(--paper);
+  background-image:
+    linear-gradient(var(--grid) 1px, transparent 1px),
+    linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size:26px 26px;
+  -webkit-font-smoothing:antialiased;
+}
+
+/* ============================================================
+   NAVBAR
+   ============================================================ */
+.nav{
+  position:fixed;inset:0 0 auto 0;height:var(--nav-h);z-index:60;
+  display:flex;align-items:center;gap:16px;padding:0 20px;
+  background:rgba(252,252,250,.94);
+  backdrop-filter:blur(8px);
+  border-bottom:1px solid var(--rule);
+}
+.nav__burger{
+  display:none;width:38px;height:38px;flex:0 0 auto;
+  border:1px solid var(--rule);border-radius:8px;background:var(--paper);
+  color:var(--ink);cursor:pointer;align-items:center;justify-content:center;
+}
+.nav__mark{
+  width:30px;height:30px;flex:0 0 auto;border-radius:7px;
+  background:var(--ink);color:var(--paper);
+  display:grid;place-items:center;
+  font-family:var(--f-code);font-size:15px;font-weight:700;
+}
+.nav__title{
+  font-family:var(--f-ui);font-weight:700;font-size:17px;
+  letter-spacing:-.01em;margin:0;white-space:nowrap;
+}
+.nav__spacer{flex:1}
+.nav__progress{display:flex;align-items:center;gap:10px}
+.nav__progress span{
+  font-family:var(--f-ui);font-size:13px;font-weight:500;color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+}
+.bar{width:110px;height:7px;border-radius:4px;background:var(--paper-2);
+  border:1px solid var(--rule);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--pen-green);
+  transition:width .45s cubic-bezier(.4,0,.2,1)}
+
+/* ============================================================
+   SIDEBAR
+   ============================================================ */
+.side{
+  position:fixed;top:var(--nav-h);bottom:0;left:0;width:var(--side-w);z-index:50;
+  overflow-y:auto;padding:20px 14px 60px;
+  background:var(--paper);border-right:1px solid var(--rule);
+  font-family:var(--f-ui);
+}
+.side__label{
+  font-family:var(--f-ui);font-size:12px;font-weight:600;color:var(--ink-faint);
+  margin:0 0 12px 10px;
+}
+.day{border-bottom:1px solid var(--rule)}
+.day:last-child{border-bottom:0}
+.day > summary{
+  list-style:none;cursor:pointer;
+  display:flex;align-items:center;gap:10px;
+  padding:11px 10px;border-radius:8px;
+  font-size:14.5px;font-weight:500;color:var(--ink);
+}
+.day > summary::-webkit-details-marker{display:none}
+.day > summary:hover{background:var(--paper-2)}
+.day > summary:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.day__n{
+  flex:0 0 auto;width:26px;height:26px;border-radius:6px;
+  display:grid;place-items:center;
+  font-family:var(--f-code);font-size:12px;font-weight:600;
+  background:var(--paper-2);color:var(--ink-soft);border:1px solid var(--rule);
+}
+.day__t{flex:1;line-height:1.35}
+.day__chev{flex:0 0 auto;color:var(--ink-faint);transition:transform .2s}
+.day[open] > summary > .day__chev{transform:rotate(90deg)}
+
+.day--now > summary{background:var(--marker-2)}
+.day--now .day__n{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.day--done .day__n{background:var(--pen-green);color:#fff;border-color:var(--pen-green)}
+.day--soon > summary{color:var(--ink-faint);cursor:default}
+.day--soon .day__n{color:var(--ink-faint)}
+
+.day ul{list-style:none;margin:0 0 10px;padding:2px 0 2px 22px}
+.day li a{
+  display:block;padding:6px 10px;border-radius:6px;
+  font-size:14px;color:var(--ink-soft);text-decoration:none;
+  border-left:2px solid var(--rule);
+}
+.day li a:hover{color:var(--ink);background:var(--paper-2)}
+.day li a:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.day li a.is-active{
+  color:var(--pen-blue);font-weight:600;
+  border-left-color:var(--pen-blue);background:var(--paper-2);
+}
+.day li a .tag{
+  font-family:var(--f-code);font-size:10.5px;font-weight:600;
+  color:var(--pen-blue);margin-left:6px;
+}
+.day__soon{
+  padding:4px 10px 12px 32px;font-size:13px;color:var(--ink-faint);font-style:italic;
+}
+
+/* ============================================================
+   LAYOUT
+   ============================================================ */
+.main{margin:var(--nav-h) 0 0 var(--side-w);padding:0 0 100px}
+.wrap{max-width:760px;margin:0 auto;padding:0 28px}
+
+/* ============================================================
+   HERO — the day's goal, running.
+   ============================================================ */
+.hero{
+  border-bottom:1px solid var(--rule);
+  background:linear-gradient(180deg,var(--marker-2) 0%,rgba(255,246,220,0) 100%);
+  padding:44px 0 40px;margin-bottom:44px;
+}
+.hero__meta{
+  font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--ink-soft);
+  display:flex;gap:14px;align-items:center;margin-bottom:10px;
+}
+.hero__meta b{
+  font-family:var(--f-code);font-size:12px;font-weight:700;
+  color:var(--paper);background:var(--ink);padding:3px 7px;border-radius:5px;
+}
+.hero h1{
+  font-family:var(--f-ui);font-weight:800;font-size:clamp(30px,5.2vw,44px);
+  line-height:1.1;letter-spacing:-.025em;margin:0 0 14px;
+}
+.hero__sub{font-size:19px;color:var(--ink-soft);margin:0 0 28px;max-width:56ch}
+
+.term{
+  border:1px solid var(--ink);border-radius:10px;overflow:hidden;
+  background:var(--ink);box-shadow:0 6px 22px rgba(23,38,59,.16);
+}
+.term__bar{
+  display:flex;align-items:center;gap:7px;padding:9px 13px;
+  border-bottom:1px solid rgba(255,255,255,.13);
+}
+.term__bar i{width:10px;height:10px;border-radius:50%;background:rgba(255,255,255,.26)}
+.term__bar span{
+  margin-left:8px;font-family:var(--f-code);font-size:11.5px;
+  color:rgba(255,255,255,.55);
+}
+.term pre{
+  margin:0;padding:18px 16px;min-height:186px;
+  font-family:var(--f-code);font-size:13.5px;line-height:1.75;
+  color:#DCE6F2;white-space:pre-wrap;word-break:break-word;
+}
+.term .u{color:#8FE3B4}
+.term .r{color:#FFD98A;font-weight:600}
+.term .caret{
+  display:inline-block;width:8px;height:15px;vertical-align:-2px;
+  background:#8FE3B4;animation:blink 1.05s step-end infinite;
+}
+@keyframes blink{50%{opacity:0}}
+
+/* ============================================================
+   SECTIONS
+   ============================================================ */
+section{margin:0 0 52px;scroll-margin-top:calc(var(--nav-h) + 16px)}
+h2{
+  font-family:var(--f-ui);font-weight:700;font-size:26px;letter-spacing:-.02em;
+  line-height:1.25;margin:0 0 6px;padding-top:6px;
+  display:flex;align-items:baseline;gap:12px;
+}
+h2 .h2n{
+  font-family:var(--f-code);font-size:13px;font-weight:600;color:var(--ink-faint);
+  flex:0 0 auto;
+}
+h3{font-family:var(--f-ui);font-weight:600;font-size:18.5px;margin:30px 0 8px}
+.lead{color:var(--ink-soft);margin:0 0 20px;font-size:17px}
+p{margin:0 0 16px}
+a{color:var(--pen-blue)}
+strong{font-weight:700}
+
+.rule{height:1px;background:var(--rule);border:0;margin:0 0 34px}
+
+/* inline + block code */
+code{
+  font-family:var(--f-code);font-size:.855em;
+  background:var(--paper-2);border:1px solid var(--rule);
+  padding:1px 5px;border-radius:4px;white-space:nowrap;
+}
+.codewrap{position:relative;margin:0 0 20px}
+.codewrap pre{
+  margin:0;padding:16px 18px;overflow-x:auto;
+  background:var(--ink);border-radius:9px;
+  font-family:var(--f-code);font-size:13.5px;line-height:1.68;
+  color:#DCE6F2;
+}
+.codewrap pre code{
+  background:none;border:0;padding:0;font-size:inherit;white-space:pre;
+}
+.copy{
+  position:absolute;top:9px;right:9px;
+  font-family:var(--f-ui);font-size:11.5px;font-weight:600;
+  color:rgba(255,255,255,.62);background:rgba(255,255,255,.09);
+  border:1px solid rgba(255,255,255,.16);border-radius:6px;
+  padding:4px 9px;cursor:pointer;opacity:0;transition:opacity .15s;
+}
+.codewrap:hover .copy,.copy:focus-visible{opacity:1}
+.copy:hover{color:#fff;background:rgba(255,255,255,.17)}
+.copy.ok{color:#8FE3B4;border-color:rgba(143,227,180,.4)}
+.tok-k{color:#9DB8FF;font-weight:500}
+.tok-s{color:#8FE3B4}
+.tok-c{color:#8394AB;font-style:italic}
+.tok-n{color:#FFC98A}
+.tok-b{color:#E7B4FF}
+
+/* callouts */
+.note{
+  border-left:3px solid var(--pen-blue);background:var(--paper-2);
+  padding:14px 18px;border-radius:0 8px 8px 0;margin:0 0 20px;font-size:16.5px;
+}
+.note--warn{border-left-color:var(--pen-red)}
+.note--key{border-left-color:#E8B92E;background:var(--marker-2)}
+.note p:last-child{margin-bottom:0}
+.note b{font-family:var(--f-ui);font-size:15px}
+
+/* tables */
+.tbl{width:100%;border-collapse:collapse;margin:0 0 22px;font-size:16px}
+.tbl th{
+  font-family:var(--f-ui);font-size:13px;font-weight:600;color:var(--ink-soft);
+  text-align:left;padding:8px 12px;border-bottom:2px solid var(--rule);
+}
+.tbl td{padding:9px 12px;border-bottom:1px solid var(--rule);vertical-align:top}
+.tbl tr:last-child td{border-bottom:0}
+.tbl code{white-space:nowrap}
+
+/* big ideas */
+.ideas{display:grid;gap:12px;margin:0 0 24px}
+.idea{
+  display:flex;gap:14px;align-items:flex-start;
+  background:var(--marker-2);border:1px solid #F0DFA8;border-radius:9px;padding:15px 17px;
+}
+.idea__n{
+  flex:0 0 auto;width:27px;height:27px;border-radius:50%;
+  background:var(--ink);color:var(--paper);display:grid;place-items:center;
+  font-family:var(--f-code);font-size:13px;font-weight:700;margin-top:2px;
+}
+.idea p{margin:0;font-size:16.5px}
+
+/* ============================================================
+   QUIZ
+   ============================================================ */
+.quiz{border:1px solid var(--rule);border-radius:11px;background:var(--paper);overflow:hidden}
+.quiz__head{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  padding:14px 18px;border-bottom:1px solid var(--rule);background:var(--paper-2);
+}
+.quiz__head h4{font-family:var(--f-ui);font-size:15px;font-weight:600;margin:0}
+.quiz__score{
+  font-family:var(--f-code);font-size:13px;font-weight:600;color:var(--ink-soft);
+  font-variant-numeric:tabular-nums;
+}
+.q{padding:20px 18px;border-bottom:1px solid var(--rule)}
+.q:last-child{border-bottom:0}
+.q__p{font-family:var(--f-ui);font-size:16px;font-weight:600;margin:0 0 13px;line-height:1.5}
+.q__p .qn{font-family:var(--f-code);font-size:13px;color:var(--ink-faint);margin-right:7px}
+.opts{display:grid;gap:7px}
+.opt{
+  display:flex;align-items:center;gap:11px;width:100%;text-align:right;
+  font-family:var(--f-body);font-size:16.5px;color:var(--ink);
+  background:var(--paper);border:1px solid var(--rule);border-radius:8px;
+  padding:10px 13px;cursor:pointer;transition:background .13s,border-color .13s;
+}
+.opt:hover:not(:disabled){background:var(--paper-2);border-color:var(--ink-faint)}
+.opt:focus-visible{outline:2px solid var(--pen-blue);outline-offset:1px}
+.opt:disabled{cursor:default}
+.opt__k{
+  flex:0 0 auto;width:23px;height:23px;border-radius:50%;
+  border:1px solid var(--rule);display:grid;place-items:center;
+  font-family:var(--f-code);font-size:11.5px;font-weight:600;color:var(--ink-soft);
+}
+.opt__t{flex:1;text-align:left}
+.opt.is-right{border-color:var(--pen-green);background:#EFF8F2}
+.opt.is-right .opt__k{background:var(--pen-green);color:#fff;border-color:var(--pen-green)}
+.opt.is-wrong{border-color:var(--pen-red);background:#FDF0EF}
+.opt.is-wrong .opt__k{background:var(--pen-red);color:#fff;border-color:var(--pen-red)}
+.q__fb{
+  display:none;margin-top:12px;padding:12px 14px;border-radius:8px;
+  font-size:16px;background:var(--paper-2);border-left:3px solid var(--ink-faint);
+}
+.q__fb.show{display:block}
+.q__fb.good{border-left-color:var(--pen-green)}
+.q__fb.bad{border-left-color:var(--pen-red)}
+.q__fb b{font-family:var(--f-ui);font-size:15px}
+.q__hintbtn{
+  margin-top:11px;font-family:var(--f-ui);font-size:13px;font-weight:600;
+  color:var(--pen-blue);background:none;border:0;padding:0;cursor:pointer;
+  text-decoration:underline;text-underline-offset:3px;
+}
+.q__hint{display:none;margin-top:9px;font-size:16px;color:var(--ink-soft);font-style:italic}
+.q__hint.show{display:block}
+
+/* ============================================================
+   EXERCISES
+   ============================================================ */
+.ex{border:1px solid var(--rule);border-radius:11px;margin:0 0 14px;background:var(--paper);overflow:hidden}
+.ex__head{display:flex;align-items:flex-start;gap:13px;padding:16px 18px}
+.ex__n{
+  flex:0 0 auto;font-family:var(--f-code);font-size:12px;font-weight:700;
+  color:var(--paper);background:var(--ink);border-radius:5px;padding:3px 7px;margin-top:3px;
+}
+.ex__b{flex:1}
+.ex__b h4{font-family:var(--f-ui);font-size:16.5px;font-weight:600;margin:0 0 6px}
+.ex__b p{margin:0 0 8px;font-size:16.5px}
+.ex__out{
+  font-family:var(--f-code);font-size:13px;color:var(--ink-soft);
+  background:var(--paper-2);border:1px dashed var(--rule);border-radius:6px;
+  padding:8px 11px;margin:8px 0 0;
+}
+.ex details{border-top:1px solid var(--rule)}
+.ex details summary{
+  list-style:none;cursor:pointer;padding:11px 18px;
+  font-family:var(--f-ui);font-size:13.5px;font-weight:600;color:var(--pen-blue);
+}
+.ex details summary::-webkit-details-marker{display:none}
+.ex details summary:hover{background:var(--paper-2)}
+.ex details summary:focus-visible{outline:2px solid var(--pen-blue);outline-offset:-2px}
+.ex details[open] summary{border-bottom:1px solid var(--rule)}
+.ex details .body{padding:15px 18px}
+.ex details .body p:last-child,.ex details .body .codewrap:last-child{margin-bottom:0}
+
+/* ============================================================
+   CHECKLIST
+   ============================================================ */
+.check{border:1px solid var(--rule);border-radius:11px;padding:8px 6px;background:var(--paper)}
+.check label{
+  display:flex;align-items:flex-start;gap:12px;padding:9px 13px;border-radius:8px;
+  cursor:pointer;font-size:16.5px;
+}
+.check label:hover{background:var(--paper-2)}
+.check input{
+  flex:0 0 auto;width:19px;height:19px;margin-top:4px;
+  accent-color:var(--pen-green);cursor:pointer;
+}
+.check input:checked + span{color:var(--ink-faint);text-decoration:line-through}
+
+/* turtle figure */
+.turtle{
+  display:block;margin:0 auto 20px;max-width:280px;width:100%;
+  background:var(--paper);border:1px solid var(--rule);border-radius:9px;padding:10px;
+}
+
+/* footer */
+.foot{
+  border-top:1px solid var(--rule);margin-top:56px;padding-top:24px;
+  font-family:var(--f-ui);font-size:13.5px;color:var(--ink-faint);
+  display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;
+}
+.foot a{color:var(--ink-soft);text-decoration:none}
+.foot a:hover{color:var(--pen-blue);text-decoration:underline}
+
+/* scrim for mobile drawer */
+.scrim{
+  display:none;position:fixed;inset:var(--nav-h) 0 0 0;z-index:45;
+  background:rgba(23,38,59,.35);
+}
+.scrim.show{display:block}
+
+/* ============================================================
+   RESPONSIVE
+   ============================================================ */
+@media (max-width:960px){
+  :root{--side-w:280px}
+  .nav__burger{display:flex}
+  .side{transform:translateX(-100%);transition:transform .24s cubic-bezier(.4,0,.2,1);
+    box-shadow:2px 0 18px rgba(23,38,59,.12)}
+  .side.open{transform:none}
+  .main{margin-left:0}
+  .nav__progress span{display:none}
+}
+@media (max-width:600px){
+  body{font-size:17px}
+  .wrap{padding:0 18px}
+  .hero{padding:30px 0 28px;margin-bottom:32px}
+  h2{font-size:22px}
+  .bar{width:70px}
+  .opt{font-size:16px}
+}
+</style>
+</head>
+<body>
+
+<!-- ══════════════════ NAVBAR ══════════════════ -->
+<header class="nav">
+  <button class="nav__burger" id="burger" aria-label="Άνοιγμα μενού" aria-expanded="false">
+    <svg width="18" height="18" viewBox="0 0 18 18" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round">
+      <path d="M2 4.5h14M2 9h14M2 13.5h14"/>
+    </svg>
+  </button>
+  <div class="nav__mark">Py</div>
+  <p class="nav__title"><a href="../index.html" style="color:inherit;text-decoration:none" title="Όλα τα μαθήματα">Programming Lessons</a></p>
+  <div class="nav__spacer"></div>
+  <div class="nav__progress">
+    <span id="progText">0 / 8</span>
+    <div class="bar"><i id="progBar"></i></div>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<!-- ══════════════════ SIDEBAR ══════════════════ -->
+<nav class="side" id="side" aria-label="Περιεχόμενα μαθημάτων">
+  <p class="side__label">Beginner · Ημέρες 1–14</p>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">01</span>
+      <span class="day__t">Μεταβλητές &amp; Variables</span>
+    </summary>
+    <div class="day__soon">Ολοκληρώθηκε. Σύντομα και εδώ.</div>
+  </details>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">02</span>
+      <span class="day__t">Τύποι Δεδομένων &amp; Strings</span>
+    </summary>
+    <ul><li><a href="index.html">Άνοιξε το μάθημα</a></li></ul>
+  </details>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">03</span>
+      <span class="day__t">Control Flow &amp; Logical Operators</span>
+    </summary>
+    <ul><li><a href="day-03.html">Άνοιξε το μάθημα</a></li></ul>
+  </details>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">04</span>
+      <span class="day__t">Randomisation &amp; Lists</span>
+    </summary>
+    <ul><li><a href="day-04.html">Άνοιξε το μάθημα</a></li></ul>
+  </details>
+
+  <details class="day day--done">
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">05</span>
+      <span class="day__t">Python Loops</span>
+    </summary>
+    <ul><li><a href="day-05.html">Άνοιξε το μάθημα</a></li></ul>
+  </details>
+
+  <details class="day day--now" open>
+    <summary>
+      <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+      <span class="day__n">06</span>
+      <span class="day__t">Functions &amp; Karel</span>
+    </summary>
+    <ul>
+      <li><a href="#stoxoi">Στόχοι της ημέρας</a></li>
+      <li><a href="#def">def — η δική σου εντολή</a></li>
+      <li><a href="#reeborg">Reeborg's World</a></li>
+      <li><a href="#quiz1">Έλεγχος 1 <span class="tag">quiz</span></a></li>
+      <li><a href="#indent">Η εσοχή, μία για πάντα</a></li>
+      <li><a href="#while">Το while loop</a></li>
+      <li><a href="#hurdle4">Εμπόδια με άγνωστο ύψος</a></li>
+      <li><a href="#quiz2">Έλεγχος 2 <span class="tag">quiz</span></a></li>
+      <li><a href="#project">Ο λαβύρινθος <span class="tag">project</span></a></li>
+      <li><a href="#askiseis">Ασκήσεις <span class="tag">6</span></a></li>
+      <li><a href="#turtle">Turtle: πινέλα <span class="tag">art</span></a></li>
+      <li><a href="#ai">AI Corner</a></li>
+      <li><a href="#lathi">Συχνά λάθη</a></li>
+      <li><a href="#recap">Ανακεφαλαίωση</a></li>
+    </ul>
+  </details>
+
+  <details class="day"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">07</span><span class="day__t">Hangman</span></summary>
+    <ul><li><a href="day-07.html">Άνοιξε το μάθημα</a></li></ul></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">08</span><span class="day__t">Parameters &amp; Caesar Cipher</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">09</span><span class="day__t">Dictionaries &amp; Secret Auction</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">10</span><span class="day__t">Functions with Outputs</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">11</span><span class="day__t">Blackjack Capstone</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">12</span><span class="day__t">Scope &amp; Number Guessing</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">13</span><span class="day__t">Debugging</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+
+  <details class="day day--soon"><summary>
+    <svg class="day__chev" width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 2.5L8 6l-4 3.5"/></svg>
+    <span class="day__n">14</span><span class="day__t">Higher Lower Game</span></summary>
+    <div class="day__soon">Σύντομα</div></details>
+</nav>
+
+<!-- ══════════════════ MAIN ══════════════════ -->
+<main class="main">
+
+  <div class="hero">
+    <div class="wrap">
+      <div class="hero__meta"><b>ΗΜΕΡΑ 06</b> <span>Beginner</span> <span>·</span> <span>2 ώρες 30′</span></div>
+      <h1>Functions &amp; Karel</h1>
+      <p class="hero__sub">Την προηγούμενη φορά έγραψες ένα πεντάγωνο σε τρεις γραμμές. Σήμερα μαθαίνεις να του δίνεις <strong>όνομα</strong> — και από εκεί και πέρα να το καλείς με μία λέξη. Μετά, ένα ρομπότ: θα του μάθεις να βγαίνει από <em>οποιονδήποτε</em> λαβύρινθο, χωρίς να ξέρεις πώς μοιάζει.</p>
+
+      <div class="term">
+        <div class="term__bar"><i></i><i></i><i></i><span>maze.py · Reeborg's World</span></div>
+        <pre id="termOut"></pre>
+      </div>
+    </div>
+  </div>
+
+  <div class="wrap">
+
+    <!-- ─── ΣΤΟΧΟΙ ─── -->
+    <section id="stoxoi">
+      <h2><span class="h2n">§1</span> Στόχοι της ημέρας</h2>
+      <p class="lead">Στο τέλος του μαθήματος θα μπορείς να κάνεις όλα τα παρακάτω χωρίς βοήθεια.</p>
+      <ul>
+        <li>Να ορίζεις μια συνάρτηση με <code>def</code> και να εξηγείς τη διαφορά <em>ορισμού</em> και <em>κλήσης</em></li>
+        <li>Να πεις γιατί το <code>greet</code> και το <code>greet()</code> είναι δύο διαφορετικά πράγματα</li>
+        <li>Να χτίζεις μεγάλες συναρτήσεις από μικρότερες — <code>jump()</code> από <code>turn_right()</code> από <code>turn_left()</code></li>
+        <li>Να γράφεις <code>while</code> loop και να διαλέγεις πότε θέλεις <code>while</code> και πότε <code>for</code></li>
+        <li>Να αναγνωρίζεις ένα <em>infinite loop</em> και να το σταματάς</li>
+        <li>Να βγάζεις τον Reeborg από οποιονδήποτε λαβύρινθο με τον κανόνα του δεξιού χεριού</li>
+        <li>Να φτιάξεις «πινέλα» για το turtle — συναρτήσεις που ζωγραφίζουν — και να τα συνδυάζεις</li>
+      </ul>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── DEF ─── -->
+    <section id="def">
+      <h2><span class="h2n">§2</span> def — η δική σου εντολή</h2>
+      <p>Μέχρι τώρα χρησιμοποιείς έτοιμες εντολές: <code>print()</code>, <code>len()</code>, <code>random.choice()</code>. Κάποιος τις έγραψε, τους έδωσε όνομα, και εσύ τις <em>καλείς</em>. Σήμερα γράφεις τις δικές σου.</p>
+
+      <div class="codewrap"><pre><code>def greet():
+    print("Hello!")
+    print("How are you?")
+    print("Isn't the weather nice today?")
+
+greet()</code></pre></div>
+
+      <p>Δύο μέρη, και πρέπει να τα ξεχωρίζεις καθαρά:</p>
+      <table class="tbl">
+        <thead><tr><th>Μέρος</th><th>Πώς μοιάζει</th><th>Τι κάνει</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Ορισμός</strong> (definition)</td><td><code>def greet():</code> + το block με εσοχή</td><td>Μαθαίνει στην Python τι σημαίνει <code>greet</code>. <em>Δεν τρέχει τίποτα.</em></td></tr>
+          <tr><td><strong>Κλήση</strong> (call)</td><td><code>greet()</code></td><td>Τώρα τρέχει το block. Κάθε φορά που το γράφεις, ξανατρέχει.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Πρόβλεψε πριν τρέξεις</h3>
+      <div class="codewrap"><pre><code>def greet():
+    print("Hello!")
+
+print("Start")
+greet()
+greet()
+print("End")</code></pre></div>
+      <p>Πόσες φορές τυπώνεται το <code>Hello!</code>; Και — πιο σημαντικό — γιατί το <code>Start</code> τυπώνεται <em>πριν</em> από το πρώτο <code>Hello!</code>, ενώ ο ορισμός είναι πιο πάνω στο αρχείο; Επειδή ο ορισμός δεν τρέχει. Είναι μια συνταγή στο συρτάρι. Τρέχει μόνο όταν τη ζητήσεις.</p>
+
+      <div class="note note--warn">
+        <p><b>Το λάθος που θα κάνεις σίγουρα:</b> θα γράψεις <code>greet</code> χωρίς παρενθέσεις και θα απορείς γιατί δεν συμβαίνει τίποτα. Το <code>greet</code> είναι το <em>όνομα</em> της συνάρτησης. Το <code>greet()</code> είναι η <em>εντολή</em> «τρέξε την». Οι παρενθέσεις είναι το κουμπί.</p>
+      </div>
+
+      <div class="note note--key">
+        <p><b>Γιατί μπαίνουμε στον κόπο;</b> Τρεις λόγοι, και θα τους δεις και τους τρεις σήμερα. <strong>Πρώτον</strong>, δεν ξαναγράφεις το ίδιο πράγμα — το γράφεις μία φορά και το καλείς δέκα. <strong>Δεύτερον</strong>, το πρόγραμμα διαβάζεται: <code>draw_house()</code> λέει περισσότερα από είκοσι γραμμές turtle. <strong>Τρίτον</strong>, χτίζεις σκαλοπάτια: μικρές συναρτήσεις φτιάχνουν μεγαλύτερες, κι αυτές ακόμα μεγαλύτερες. Έτσι γράφονται τα παιχνίδια.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── REEBORG ─── -->
+    <section id="reeborg">
+      <h2><span class="h2n">§3</span> Reeborg's World — ένα ρομπότ που ξέρει δύο πράγματα</h2>
+      <p>Ο Reeborg είναι ένα ρομπότ σε έναν κόσμο από τετράγωνα. Ξέρει να κάνει ακριβώς δύο πράγματα: <code>move()</code> — ένα τετράγωνο μπροστά — και <code>turn_left()</code> — στροφή 90° αριστερά. <strong>Δεν ξέρει να στρίβει δεξιά.</strong> Αυτό είναι το σημείο.</p>
+
+      <div class="note">
+        <p><b>Άνοιξε το:</b> <a href="https://reeborg.ca/reeborg.html?lang=en&amp;mode=python&amp;menu=worlds%2Fmenus%2Freeborg_intro_en.json&amp;name=Hurdle%201&amp;url=worlds%2Ftutorial_en%2Fhurdle1.json" target="_blank" rel="noopener">Reeborg's World — Hurdle 1</a>. Δωρεάν, χωρίς λογαριασμό, τρέχει στον browser. Αν το link δεν ανοίξει τον σωστό κόσμο, πήγαινε στο <a href="https://reeborg.ca/world.html" target="_blank" rel="noopener">reeborg.ca/world.html</a> και από το μενού <em>World</em> διάλεξε <strong>Hurdle 1</strong>. Γράφεις κώδικα στο αριστερό μέρος και πατάς το βελάκι Play.</p>
+      </div>
+
+      <h3>Hurdle 1 — έξι εμπόδια, μία συνάρτηση</h3>
+      <p>Ο Reeborg πρέπει να περάσει έξι εμπόδια για να φτάσει στη σημαία. Κάθε εμπόδιο θέλει: αριστερά, μπροστά, δεξιά, μπροστά, δεξιά, μπροστά, αριστερά. Αλλά δεν υπάρχει δεξιά. Πρώτα λοιπόν <strong>τη φτιάχνεις</strong>:</p>
+
+      <div class="codewrap"><pre><code>def turn_right():
+    turn_left()
+    turn_left()
+    turn_left()</code></pre></div>
+
+      <p>Τρεις αριστερές κάνουν μία δεξιά. Αυτή είναι η πρώτη δική σου εντολή που ο Reeborg δεν είχε — και από εδώ και πέρα την έχει. Τώρα το άλμα:</p>
+
+      <div class="codewrap"><pre><code>def jump():
+    move()
+    turn_left()
+    move()
+    turn_right()
+    move()
+    turn_right()
+    move()
+    turn_left()
+
+for step in range(6):
+    jump()</code></pre></div>
+
+      <p>Δες τι έγινε: η <code>jump()</code> χρησιμοποιεί την <code>turn_right()</code>, που χρησιμοποιεί την <code>turn_left()</code>. Σκαλοπάτι πάνω σε σκαλοπάτι. Και το <code>for</code> της Ημέρας 5 την καλεί έξι φορές — μία λέξη, όχι οκτώ γραμμές.</p>
+
+      <div class="note note--key">
+        <p><b>Η σειρά μετράει.</b> Ο ορισμός της <code>turn_right()</code> πρέπει να είναι <em>πάνω</em> από τον ορισμό της <code>jump()</code>, κι αυτός πάνω από το <code>for</code>. Η Python διαβάζει από πάνω προς τα κάτω — δεν μπορείς να καλέσεις κάτι που δεν έχει μάθει ακόμα. Αν σου βγάλει <code>NameError</code> σε συνάρτηση που σίγουρα έγραψες, κοίτα πού τη γράψες.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── QUIZ 1 ─── -->
+    <section id="quiz1">
+      <h2><span class="h2n">§4</span> Έλεγχος 1 — def &amp; κλήση</h2>
+      <p class="lead">Χωρίς σημειώσεις. Θέλεις 3 στα 4 πριν προχωρήσεις.</p>
+      <div class="quiz" data-quiz="q1"></div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── INDENT ─── -->
+    <section id="indent">
+      <h2><span class="h2n">§5</span> Η εσοχή, μία για πάντα</h2>
+      <p>Την είδες στο <code>if</code> (Ημέρα 3), στο <code>for</code> (Ημέρα 5), και τώρα στο <code>def</code>. Ώρα για τον γενικό κανόνα, γιατί από εδώ και πέρα θα τα βάζεις το ένα μέσα στο άλλο:</p>
+
+      <div class="note note--key">
+        <p><b>Κάθε γραμμή που τελειώνει σε <code>:</code> ανοίγει ένα block.</b> Ό,τι ακολουθεί με εσοχή ανήκει σε αυτό. Η πρώτη γραμμή που ξαναγυρίζει στο προηγούμενο επίπεδο το κλείνει. Τέσσερα κενά ανά επίπεδο — το Thonny και το Replit τα βάζουν μόνα τους όταν πατάς Enter μετά από <code>:</code>.</p>
+      </div>
+
+      <div class="codewrap"><pre><code>def jump():                  # επίπεδο 0 — ανοίγει block
+    turn_left()              # επίπεδο 1 — μέσα στη jump
+    while wall_on_right():   # επίπεδο 1 — ανοίγει νέο block
+        move()               # επίπεδο 2 — μέσα στο while, μέσα στη jump
+    turn_right()             # επίπεδο 1 — το while έκλεισε, η jump όχι
+    move()                   # επίπεδο 1
+
+jump()                       # επίπεδο 0 — η jump έκλεισε</code></pre></div>
+
+      <p>Διάβασέ το με το δάχτυλο στην αριστερή άκρη. Κάθε φορά που το δάχτυλο μπαίνει δεξιά, μπήκες σε block. Κάθε φορά που γυρίζει αριστερά, βγήκες. Αν μπορείς να πεις σε ποιο επίπεδο είναι κάθε γραμμή, δεν θα ξαναδείς <code>IndentationError</code> που να μην καταλαβαίνεις.</p>
+
+      <div class="note note--warn">
+        <p><b>Tab ή κενά;</b> Στο Thonny και στο Replit, το Tab βάζει τέσσερα κενά — μια χαρά. Αλλά αν αντιγράψεις κώδικα από αλλού και ανακατευτούν πραγματικά Tab με κενά, η Python σκάει με <code>TabError</code> ή με <code>unindent does not match</code>, και με το μάτι δεν φαίνεται τίποτα. Λύση: σβήσε όλη την εσοχή της γραμμής και ξαναβάλ' την με το Tab.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── WHILE ─── -->
+    <section id="while">
+      <h2><span class="h2n">§6</span> Το while loop — «όσο ισχύει αυτό, συνέχισε»</h2>
+      <p>Το <code>for</code> της Ημέρας 5 ξέρει από πριν πόσες φορές θα τρέξει: έξι εμπόδια, εκατό αριθμοί, κάθε στοιχείο μιας λίστας. Αλλά στο <strong>Hurdle 2</strong> η σημαία είναι σε τυχαία θέση. Πόσα άλματα; Δεν ξέρεις. Χρειάζεσαι ένα loop που δεν μετράει — που <em>ρωτάει</em>:</p>
+
+      <div class="codewrap"><pre><code>while not at_goal():
+    jump()</code></pre></div>
+
+      <p>Διαβάζεται: <em>«όσο ΔΕΝ είσαι στον στόχο, πήδα»</em>. Το <code>at_goal()</code> είναι μια έτοιμη συνάρτηση του Reeborg που απαντάει <code>True</code> ή <code>False</code>. Το <code>not</code> το ξέρεις από την Ημέρα 3. Σε κάθε γύρο, πριν τρέξει το block, το <code>while</code> ξαναρωτάει. Μόλις η απάντηση γίνει <code>False</code>, σταματάει.</p>
+
+      <table class="tbl">
+        <thead><tr><th>Θέλω…</th><th>Χρησιμοποιώ</th><th>Παράδειγμα</th></tr></thead>
+        <tbody>
+          <tr><td>κάτι να γίνει <strong>N φορές</strong>, ή για <strong>κάθε στοιχείο</strong></td><td><code>for</code></td><td>έξι άλματα, κάθε φρούτο στη λίστα</td></tr>
+          <tr><td>κάτι να γίνεται <strong>μέχρι να αλλάξει μια συνθήκη</strong></td><td><code>while</code></td><td>μέχρι τη σημαία, μέχρι να μαντέψει σωστά, μέχρι να τελειώσουν οι ζωές</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Το ίδιο loop με αριθμούς</h3>
+      <p>Χωρίς τον Reeborg, για να δεις τον μηχανισμό γυμνό:</p>
+      <div class="codewrap"><pre><code>number = 0
+while number &lt; 3:
+    print(number)
+    number += 1
+
+print("Done!")        # 0  1  2  Done!</code></pre></div>
+      <p>Πρόσεξε το <code>number += 1</code>. Χωρίς αυτό, το <code>number</code> μένει 0 για πάντα, η συνθήκη <code>0 &lt; 3</code> μένει αληθής για πάντα, και το loop <strong>δεν σταματάει ποτέ</strong>.</p>
+
+      <div class="note note--warn">
+        <p><b>Το infinite loop.</b> Θα σου συμβεί — σε όλους συμβαίνει. Το πρόγραμμα «κολλάει», ο υπολογιστής ζεσταίνεται, το Thonny δεν απαντάει. <strong>Δεν χάλασε τίποτα.</strong> Πάτα το κόκκινο Stop στο Thonny (ή <code>Ctrl+C</code> στο shell), και μετά ρώτα: «τι έπρεπε να αλλάξει μέσα στο loop, και δεν άλλαξε;» Στον Reeborg, το αντίστοιχο είναι το ρομπότ να γυρίζει γύρω-γύρω — πάτα Stop και σκέψου το ίδιο.</p>
+      </div>
+
+      <h3>Hurdle 3 — εμπόδια σε τυχαίες θέσεις</h3>
+      <p>Τώρα ούτε η σημαία ούτε τα εμπόδια είναι σε σταθερό μέρος. Το loop πρέπει να <em>κοιτάει</em> πριν αποφασίσει — <code>while</code> απ' έξω, <code>if</code> από μέσα:</p>
+      <div class="codewrap"><pre><code>while not at_goal():
+    if wall_in_front():
+        jump()
+    else:
+        move()</code></pre></div>
+      <p>Ημέρα 3 μέσα σε Ημέρα 6. Το <code>wall_in_front()</code> είναι ακόμα μία έτοιμη ερώτηση του Reeborg. Ο κατάλογός του: <code>at_goal()</code>, <code>wall_in_front()</code>, <code>front_is_clear()</code>, <code>wall_on_right()</code>, <code>right_is_clear()</code>. Όλες απαντάνε <code>True</code> ή <code>False</code>, και όλες μπαίνουν σε <code>if</code> ή <code>while</code>.</p>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── HURDLE 4 ─── -->
+    <section id="hurdle4">
+      <h2><span class="h2n">§7</span> Hurdle 4 — εμπόδια με άγνωστο ύψος</h2>
+      <p>Το τελευταίο εμπόδιο πριν τον λαβύρινθο. Τα εμπόδια έχουν διαφορετικό ύψος, κι έτσι η <code>jump()</code> που ανεβαίνει <em>ένα</em> τετράγωνο δεν φτάνει. Πρέπει να ανεβαίνει <strong>όσο υπάρχει τοίχος</strong> — και να κατεβαίνει <strong>όσο έχει δρόμο</strong>. Δηλαδή <code>while</code> μέσα σε συνάρτηση, που καλείται μέσα σε <code>while</code>:</p>
+
+      <div class="codewrap"><pre><code>def turn_right():
+    turn_left()
+    turn_left()
+    turn_left()
+
+def jump():
+    turn_left()
+    while wall_on_right():      # ανέβα όσο έχει τοίχο δεξιά σου
+        move()
+    turn_right()
+    move()                      # πέρνα πάνω από το εμπόδιο
+    turn_right()
+    while front_is_clear():     # κατέβα όσο έχει δρόμο
+        move()
+    turn_left()
+
+while not at_goal():
+    if wall_in_front():
+        jump()
+    else:
+        move()</code></pre></div>
+
+      <p>Πριν το τρέξεις, πάρε ένα χαρτί και ζωγράφισε τον Reeborg μπροστά σε ένα εμπόδιο ύψους 3. Ακολούθησε τον κώδικα με το δάχτυλο, γραμμή-γραμμή, και σημείωνε πού είναι το ρομπότ μετά από κάθε εντολή. Αυτό λέγεται <em>tracing</em>, και είναι ο τρόπος που οι προγραμματιστές βρίσκουν τα bugs χωρίς υπολογιστή.</p>
+
+      <div class="note note--key">
+        <p><b>Μέτρα τα επίπεδα.</b> Το <code>move()</code> μέσα στο πρώτο <code>while</code> της <code>jump()</code> είναι στο επίπεδο 2. Το <code>jump()</code> στο τέλος του προγράμματος είναι στο επίπεδο 2 επίσης — αλλά μέσα σε <em>άλλο</em> block. Ίδια εσοχή, διαφορετικός ιδιοκτήτης. Αν αυτό βγάζει νόημα, η §5 δούλεψε.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── QUIZ 2 ─── -->
+    <section id="quiz2">
+      <h2><span class="h2n">§8</span> Έλεγχος 2 — while</h2>
+      <p class="lead">Πρόβλεψε πρώτα, μετά επιβεβαίωσε στον υπολογιστή.</p>
+      <div class="quiz" data-quiz="q2"></div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── PROJECT ─── -->
+    <section id="project">
+      <h2><span class="h2n">§9</span> Project — ο λαβύρινθος</h2>
+      <p class="lead">Ο Reeborg σε έναν λαβύρινθο που αλλάζει κάθε φορά. Δεν ξέρεις τον χάρτη. Πρέπει να του δώσεις έναν <strong>κανόνα</strong> που δουλεύει σε όλους.</p>
+
+      <div class="note">
+        <p><b>Άνοιξε το:</b> <a href="https://reeborg.ca/reeborg.html?lang=en&amp;mode=python&amp;menu=worlds%2Fmenus%2Freeborg_intro_en.json&amp;name=Maze&amp;url=worlds%2Ftutorial_en%2Fmaze1.json" target="_blank" rel="noopener">Reeborg's World — Maze</a> (ή από το μενού World → <strong>Maze</strong>). Πάτα Play με άδειο κώδικα μερικές φορές και δες πώς αλλάζει ο λαβύρινθος.</p>
+      </div>
+
+      <h3>Βήμα 0 — το χέρι στον τοίχο</h3>
+      <p>Υπάρχει ένα κόλπο που ξέρουν όσοι έχουν μπει σε πραγματικό λαβύρινθο: <strong>βάλε το δεξί σου χέρι στον τοίχο και μην το σηκώσεις ποτέ.</strong> Θα κάνεις μεγάλη βόλτα, αλλά θα βγεις. Πάρε ένα χαρτί, ζωγράφισε έναν μικρό λαβύρινθο, και περπάτησέ τον με το δάχτυλο έτσι. Μετά γράψε τον κανόνα ως διάγραμμα ροής — τρεις περιπτώσεις.</p>
+
+      <h3>Βήμα 1 — οι τρεις περιπτώσεις</h3>
+      <p>Σε κάθε βήμα ο Reeborg ρωτάει, <em>με αυτή τη σειρά</em>: μπορώ δεξιά; Αν όχι, μπορώ μπροστά; Αν όχι, στρίψε αριστερά και ξαναρώτα.</p>
+      <div class="codewrap"><pre><code>def turn_right():
+    turn_left()
+    turn_left()
+    turn_left()
+
+while not at_goal():
+    if right_is_clear():
+        turn_right()
+        move()
+    elif front_is_clear():
+        move()
+    else:
+        turn_left()</code></pre></div>
+      <p>Τρέξ' το. Πατάς Play ξανά και ξανά, ο λαβύρινθος αλλάζει, ο Reeborg βγαίνει. Έντεκα γραμμές που λύνουν <em>άπειρους</em> λαβυρίνθους. Αυτό είναι ένας <strong>αλγόριθμος</strong> — μια διαδικασία που δουλεύει για κάθε περίπτωση, όχι μόνο για μία.</p>
+
+      <h3>Βήμα 2 — η παγίδα</h3>
+      <p>Τρέξ' το αρκετές φορές και κάποια στιγμή θα δεις τον Reeborg να γυρίζει σε έναν μικρό κύκλο, για πάντα. Πότε συμβαίνει; Όταν <em>ξεκινάει</em> σε ανοιχτό μέρος, χωρίς τοίχο δεξιά του — το δεξί χέρι δεν έχει πού να ακουμπήσει, κι έτσι στρίβει δεξιά, στρίβει δεξιά, στρίβει δεξιά…</p>
+      <p>Η λύση: πριν αρχίσει τον κανόνα, βρες πρώτα έναν τοίχο.</p>
+      <div class="codewrap"><pre><code>while front_is_clear():     # προχώρα μέχρι να βρεις τοίχο
+    move()
+turn_left()                 # τώρα ο τοίχος είναι στα δεξιά σου
+
+while not at_goal():
+    if right_is_clear():
+        turn_right()
+        move()
+    elif front_is_clear():
+        move()
+    else:
+        turn_left()</code></pre></div>
+
+      <div class="note note--key">
+        <p><b>Αυτό που μόλις έκανες έχει όνομα.</b> Βρήκες μια περίπτωση που ο κώδικάς σου αποτυγχάνει, κατάλαβες <em>γιατί</em>, και πρόσθεσες τον χειρισμό της. Λέγεται <em>edge case</em> — και το να τα ψάχνεις πριν τα βρει κάποιος άλλος είναι η μισή δουλειά του προγραμματιστή. Την Ημέρα 13 θα το κάνουμε συστηματικά.</p>
+      </div>
+
+      <div class="note">
+        <p><b>Δικό σου τώρα.</b> Δοκίμασε τον κανόνα του <em>αριστερού</em> χεριού — τι αλλάζει; Μέτρησε πόσα βήματα χρειάζεται κάθε φορά και σκέψου: υπάρχει λαβύρινθος που ο κανόνας του χεριού <em>δεν</em> λύνει; (Ναι — αν η έξοδος είναι σε ένα «νησί» που δεν ακουμπάει τον εξωτερικό τοίχο. Ζωγράφισέ τον.)</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΑΣΚΗΣΕΙΣ ─── -->
+    <section id="askiseis">
+      <h2><span class="h2n">§10</span> Ασκήσεις</h2>
+      <p class="lead">Οι Α0–Α3 είναι τα τέσσερα Hurdles του Reeborg με τη σειρά — κάνε όσα δεν έκανες ήδη στο μάθημα. Οι Α4 και Α5 είναι στον υπολογιστή σου.</p>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α0</span>
+          <div class="ex__b">
+            <h4>Hurdle 1 — έξι σταθερά εμπόδια</h4>
+            <p>Όρισε <code>turn_right()</code> και <code>jump()</code>. Πέρνα τα έξι εμπόδια με ένα <code>for</code>.</p>
+            <p class="ex__out">Reeborg: at_goal() → True</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Τρεις <code>turn_left()</code> = μία δεξιά. Το άλμα έχει οκτώ κινήσεις — γράψ' τες στο χαρτί πρώτα, περπατώντας με το δάχτυλο.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <p>Στην §3. Αν ο Reeborg σκοντάφτει στον τοίχο, κάποια στροφή είναι λάθος — κάνε tracing με το δάχτυλο.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α1</span>
+          <div class="ex__b">
+            <h4>Hurdle 2 — σημαία σε τυχαία θέση</h4>
+            <p>Ίδια εμπόδια, αλλά δεν ξέρεις πόσα πρέπει να περάσει. Άλλαξε <em>μόνο</em> το loop.</p>
+            <p class="ex__out">Δουλεύει όσες φορές κι αν πατήσεις Play</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Όταν δεν ξέρεις πόσες φορές, δεν θέλεις <code>for</code>. Ποια ερώτηση του Reeborg σου λέει αν τελείωσες;</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>while not at_goal():
+    jump()</code></pre></div>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α2</span>
+          <div class="ex__b">
+            <h4>Hurdle 3 — εμπόδια σε τυχαίες θέσεις</h4>
+            <p>Τώρα ούτε τα εμπόδια είναι σε σταθερά μέρη. Ο Reeborg πρέπει να <em>κοιτάει</em> πριν πηδήξει.</p>
+            <p class="ex__out">Δουλεύει όσες φορές κι αν πατήσεις Play</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p><code>while</code> απ' έξω, <code>if / else</code> από μέσα. Η ερώτηση είναι <code>wall_in_front()</code>.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <p>Στην §6, στο τέλος.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α3</span>
+          <div class="ex__b">
+            <h4>Hurdle 4 — εμπόδια με άγνωστο ύψος</h4>
+            <p>Ξαναγράψε τη <code>jump()</code> ώστε να ανεβαίνει και να κατεβαίνει όσο χρειάζεται.</p>
+            <p class="ex__out">Δουλεύει για εμπόδια ύψους 1, 2, 3…</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Δύο <code>while</code> μέσα στη <code>jump()</code>: ένα με <code>wall_on_right()</code> για το ανέβασμα, ένα με <code>front_is_clear()</code> για το κατέβασμα.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <p>Στην §7. Κάνε tracing σε εμπόδιο ύψους 2 πριν κοιτάξεις.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α4</span>
+          <div class="ex__b">
+            <h4>Μέχρι να πεις «stop»</h4>
+            <p>Ρώτα τον χρήστη ξανά και ξανά «Πες μου κάτι» και τύπωνέ το με κεφαλαία — μέχρι να γράψει <code>stop</code>. Μετά τύπωσε πόσες φορές απάντησε.</p>
+            <p class="ex__out">You said 4 things before stopping.</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p><code>while answer != "stop":</code> — αλλά η <code>answer</code> πρέπει να έχει μια αρχική τιμή <em>πριν</em> το loop, αλλιώς το <code>while</code> δεν έχει τι να ελέγξει. Ένας accumulator για το μέτρημα.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>count = 0
+answer = ""
+
+while answer != "stop":
+    answer = input("Tell me something (or 'stop'): ").lower()
+    if answer != "stop":
+        print(answer.upper())
+        count += 1
+
+print(f"You said {count} things before stopping.")</code></pre></div>
+          <p>Αυτό το σχήμα — <code>while</code> που περιμένει μια λέξη — είναι ο σκελετός κάθε παιχνιδιού με «θέλεις να ξαναπαίξεις;». Θα το ξαναδείς στο Hangman.</p>
+        </div></details>
+      </div>
+
+      <div class="ex">
+        <div class="ex__head">
+          <span class="ex__n">Α5</span>
+          <div class="ex__b">
+            <h4>Το σπίτι</h4>
+            <p>Με turtle: όρισε <code>square()</code> και <code>triangle()</code>. Μετά όρισε <code>house()</code> που καλεί και τις δύο — ένα τετράγωνο κι ένα τρίγωνο από πάνω. Μετά ζωγράφισε έναν δρόμο με πέντε σπίτια.</p>
+            <p class="ex__out">Πέντε σπίτια στη σειρά, από 3 συναρτήσεις και 1 loop</p>
+          </div>
+        </div>
+        <details><summary>Δείξε βοήθεια</summary><div class="body">
+          <p>Το τρίγωνο πρέπει να <em>ξεκινάει</em> από εκεί που τελειώνει το τετράγωνο. Μετά το τετράγωνο, η χελώνα είναι στην κάτω αριστερή γωνία κοιτώντας δεξιά — ανέβασέ τη πρώτα. Για τον δρόμο: <code>penup()</code>, <code>forward(120)</code>, <code>pendown()</code> ανάμεσα στα σπίτια.</p>
+        </div></details>
+        <details><summary>Δείξε λύση</summary><div class="body">
+          <div class="codewrap"><pre><code>import turtle
+pen = turtle.Turtle()
+pen.speed(0)
+
+def square():
+    for side in range(4):
+        pen.forward(80)
+        pen.left(90)
+
+def triangle():
+    for side in range(3):
+        pen.forward(80)
+        pen.left(120)
+
+def house():
+    square()
+    pen.left(90)
+    pen.forward(80)
+    pen.right(90)
+    triangle()
+    pen.right(90)          # γύρνα πίσω στην αρχική θέση
+    pen.forward(80)
+    pen.left(90)
+
+def move_right():
+    pen.penup()
+    pen.forward(120)
+    pen.pendown()
+
+pen.penup()
+pen.goto(-300, -50)
+pen.pendown()
+
+for i in range(5):
+    house()
+    move_right()
+
+turtle.done()</code></pre></div>
+          <p>Τέσσερα σκαλοπάτια: <code>forward</code> → <code>square</code> → <code>house</code> → ο δρόμος. Κάθε επίπεδο κρύβει τις λεπτομέρειες του προηγούμενου. Το <code>for</code> στο τέλος διαβάζεται σαν πρόταση: «πέντε φορές, σπίτι και μετακίνηση».</p>
+        </div></details>
+      </div>
+
+      <div class="note">
+        <p><b>Θέλεις κι άλλες;</b> Στο Reeborg's World, από το μενού World, υπάρχουν δεκάδες ακόμα κόσμοι — δοκίμασε <em>Around 1–4</em> και <em>Center 1–3</em>. Και στο <a href="https://codingbat.com/python/Warmup-1" target="_blank" rel="noopener">CodingBat → Warmup-1</a> κάθε άσκηση είναι μια συνάρτηση που γράφεις εσύ — τώρα ξέρεις τι είναι το <code>def</code> που έβλεπες εκεί.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── TURTLE ─── -->
+    <section id="turtle">
+      <h2><span class="h2n">§11</span> Turtle — πινέλα</h2>
+      <p class="lead">Μια συνάρτηση που ζωγραφίζει είναι ένα πινέλο. Φτιάχνεις τρία-τέσσερα, και μετά ζωγραφίζεις με λέξεις.</p>
+
+      <svg class="turtle" viewBox="0 0 260 200" role="img" aria-label="Λουλούδι από δώδεκα πέταλα, το καθένα δύο τόξα, σχεδιασμένο με turtle σε μαύρο φόντο">
+        <rect width="260" height="200" rx="6" fill="#111827"/>
+        <g transform="translate(130 100)">
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(0)" fill="none" stroke="#FF5A5F" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="0.30s" fill="freeze"/></path>
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(30)" fill="none" stroke="#FFB400" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="0.60s" fill="freeze"/></path>
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(60)" fill="none" stroke="#7CFF6B" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="0.90s" fill="freeze"/></path>
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(90)" fill="none" stroke="#38BDF8" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="1.20s" fill="freeze"/></path>
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(120)" fill="none" stroke="#A78BFA" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="1.50s" fill="freeze"/></path>
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(150)" fill="none" stroke="#FF7AB6" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="1.80s" fill="freeze"/></path>
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(180)" fill="none" stroke="#FFD166" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="2.10s" fill="freeze"/></path>
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(210)" fill="none" stroke="#F8FAFC" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="2.40s" fill="freeze"/></path>
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(240)" fill="none" stroke="#FF5A5F" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="2.70s" fill="freeze"/></path>
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(270)" fill="none" stroke="#FFB400" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="3.00s" fill="freeze"/></path>
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(300)" fill="none" stroke="#7CFF6B" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="3.30s" fill="freeze"/></path>
+          <path d="M0 0 A60.0 60.0 0 0 0 60.00 0 A60.0 60.0 0 0 0 0 0 Z" transform="rotate(330)" fill="none" stroke="#38BDF8" stroke-width="1.6" stroke-linejoin="round" stroke-dasharray="130" stroke-dashoffset="130"><animate attributeName="stroke-dashoffset" from="130" to="0" dur=".4s" begin="3.60s" fill="freeze"/></path>
+        </g>
+        <text x="130" y="190" text-anchor="middle" font-family="JetBrains Mono, monospace" font-size="11" fill="#CBD5E1" opacity="0">
+          <animate attributeName="opacity" from="0" to="1" dur=".5s" begin="4.4s" fill="freeze"/>petal() × 12 · left(30)</text>
+      </svg>
+
+      <div class="codewrap"><pre><code>import turtle
+import random
+
+colours = ["red", "orange", "gold", "lime", "deepskyblue", "blueviolet", "hotpink", "white"]
+
+screen = turtle.Screen()
+screen.bgcolor("black")
+pen = turtle.Turtle()
+pen.speed(0)
+pen.pensize(2)
+
+def petal():
+    pen.circle(60, 60)       # τόξο 60° σε κύκλο ακτίνας 60
+    pen.left(120)
+    pen.circle(60, 60)
+    pen.left(120)
+
+def flower():
+    for i in range(12):
+        pen.color(random.choice(colours))
+        petal()
+        pen.left(30)
+
+def jump_to(x, y):           # μικρή γεύση από την Ημέρα 8
+    pen.penup()
+    pen.goto(x, y)
+    pen.pendown()
+
+flower()
+jump_to(-180, 90)
+flower()
+jump_to(170, -100)
+flower()
+
+pen.hideturtle()
+turtle.done()</code></pre></div>
+
+      <p>Το <code>pen.circle(60, 60)</code> είναι καινούριο: το δεύτερο νούμερο λέει <em>πόσες μοίρες</em> κύκλου να ζωγραφίσει — όχι ολόκληρο, ένα τόξο. Δύο τόξα αντικριστά κάνουν ένα πέταλο. Δώδεκα πέταλα γυρισμένα 30° κάνουν λουλούδι. Τρία λουλούδια κάνουν κήπο.</p>
+
+      <div class="note note--key">
+        <p><b>Η σκάλα:</b> <code>circle</code> → <code>petal()</code> → <code>flower()</code> → κήπος. Κάθε σκαλοπάτι είναι μία λέξη που κρύβει το προηγούμενο. Όταν γράφεις <code>flower()</code>, δεν σκέφτεσαι τόξα. Αυτό ακριβώς είναι η δύναμη των συναρτήσεων: σου επιτρέπουν να <em>σταματήσεις να σκέφτεσαι</em> τα μικρά, για να σκεφτείς τα μεγάλα.</p>
+        <p>Η <code>jump_to(x, y)</code> έχει κάτι μέσα στις παρενθέσεις. Αυτό είναι η Ημέρα 8 — μια συνάρτηση που δέχεται <em>πληροφορία</em>. Για σήμερα, απλώς χρησιμοποίησέ τη.</p>
+      </div>
+
+      <div class="note">
+        <p><b>Δικό σου τώρα.</b> Φτιάξε το δικό σου πινέλο: <code>star()</code>, <code>leaf()</code>, <code>spiral()</code>. Μετά μια συνάρτηση που συνδυάζει δύο. Μετά ένα loop που γεμίζει την οθόνη. Κράτα το καλύτερο — μαζί με το <code>mandala.py</code> της Ημέρας 5, ξαναγραμμένο με συναρτήσεις. Σύγκρινε τα δύο αρχεία: ίδια εικόνα, πόσες γραμμές το καθένα;</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── AI ─── -->
+    <section id="ai">
+      <h2><span class="h2n">§12</span> AI Corner — μάθηση = while</h2>
+      <p>Την Ημέρα 5 είδες το training ως <code>for</code> πάνω σε πενήντα εκατομμύρια ζωγραφιές. Η πραγματική εικόνα είναι πιο κοντά σε αυτό που έμαθες σήμερα:</p>
+
+      <div class="codewrap"><pre><code># Αυτό ΔΕΝ είναι πραγματικός κώδικας — είναι η ιδέα.
+
+while not good_enough():
+    guess = network.try_something()
+    feedback = compare(guess, correct_answer)
+    network.adjust_a_little(feedback)</code></pre></div>
+
+      <p>Όχι «κάν' το Ν φορές», αλλά «<strong>όσο δεν είσαι αρκετά καλό, συνέχισε</strong>». Ακριβώς το <code>while not at_goal()</code> του Reeborg. Κανείς δεν ξέρει από πριν πόσοι γύροι θα χρειαστούν — μόνο τι σημαίνει «έφτασα».</p>
+
+      <h3>Ένα πρόγραμμα που μαθαίνει από feedback — σε 10 γραμμές</h3>
+      <p>Σκέψου έναν αριθμό από το 1 μέχρι το 100. Ο υπολογιστής θα τον βρει. Εσύ απαντάς μόνο «μεγαλύτερο» (<code>b</code>), «μικρότερο» (<code>s</code>) ή «σωστά» (<code>y</code>):</p>
+
+      <div class="codewrap"><pre><code>low = 1
+high = 100
+feedback = ""
+tries = 0
+
+while feedback != "y":
+    guess = (low + high) // 2
+    tries += 1
+    feedback = input(f"Is it {guess}? (b = bigger, s = smaller, y = yes) ").lower()
+    if feedback == "b":
+        low = guess + 1
+    elif feedback == "s":
+        high = guess - 1
+
+print(f"Found it in {tries} tries!")</code></pre></div>
+
+      <p>Παίξ' το πέντε φορές. Πόσες προσπάθειες χρειάζεται το πολύ; Επτά — <em>πάντα</em>. Γιατί κάθε απάντησή σου κόβει τις πιθανότητες στη μέση: 100 → 50 → 25 → 13 → 7 → 4 → 2 → 1. Αυτό λέγεται <strong>binary search</strong>, και είναι ένας από τους πιο σημαντικούς αλγορίθμους που υπάρχουν.</p>
+
+      <div class="note">
+        <p><b>Η ερώτηση που μετράει:</b> αν ο αριθμός ήταν από το 1 μέχρι το ένα εκατομμύριο, πόσες προσπάθειες; Σκέψου πόσες φορές πρέπει να διπλασιάσεις το 2 για να φτάσεις το εκατομμύριο — <code>2 ** 20</code> είναι περίπου ένα εκατομμύριο, άρα <strong>20</strong>. Από 100 σε 1.000.000, από 7 σε 20. Αυτός είναι ο λόγος που οι υπολογιστές βρίσκουν πράγματα τόσο γρήγορα: όχι γιατί είναι γρήγοροι, αλλά γιατί <em>ρωτάνε έξυπνα</em>. Και ένα νευρωνικό δίκτυο που εκπαιδεύεται κάνει κάτι παρόμοιο — μόνο που αντί για έναν αριθμό, ψάχνει εκατομμύρια μαζί.</p>
+      </div>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── ΛΑΘΗ ─── -->
+    <section id="lathi">
+      <h2><span class="h2n">§13</span> Συχνά λάθη</h2>
+      <p class="lead">Όταν σκάσει κάτι, ψάξ' το εδώ πρώτα.</p>
+      <table class="tbl">
+        <thead><tr><th>Error</th><th>Τι φταίει</th></tr></thead>
+        <tbody>
+          <tr><td>Όρισα τη συνάρτηση και δεν γίνεται τίποτα</td><td>Την όρισες αλλά δεν την <em>κάλεσες</em>. Το <code>def</code> είναι η συνταγή· το <code>greet()</code> είναι το μαγείρεμα.</td></tr>
+          <tr><td>Έγραψα <code>greet</code> και τυπώνει <code>&lt;function greet at 0x…&gt;</code></td><td>Ξέχασες τις παρενθέσεις. Χωρίς <code>()</code> η Python σου δείχνει τη συνάρτηση αντί να την τρέξει.</td></tr>
+          <tr><td><code>NameError: name 'jump' is not defined</code></td><td>Η κλήση είναι <em>πάνω</em> από τον ορισμό. Η Python διαβάζει από πάνω προς τα κάτω — πρώτα ορίζεις, μετά καλείς.</td></tr>
+          <tr><td><code>SyntaxError</code> στο <code>def</code></td><td>Λείπουν οι παρενθέσεις <code>()</code> ή η άνω-κάτω τελεία <code>:</code>. Το <code>def greet():</code> θέλει και τα δύο, πάντα.</td></tr>
+          <tr><td><code>IndentationError: expected an indented block</code></td><td>Η γραμμή κάτω από το <code>def</code> ή το <code>while</code> δεν έχει εσοχή. Κάθε <code>:</code> ανοίγει block.</td></tr>
+          <tr><td><code>TabError: inconsistent use of tabs and spaces</code></td><td>Ανακατεύτηκαν Tab και κενά — συνήθως από copy-paste. Σβήσε την εσοχή της γραμμής και ξαναβάλ' την.</td></tr>
+          <tr><td>Το πρόγραμμα «κόλλησε» / ο Reeborg γυρίζει γύρω-γύρω</td><td>Infinite loop. Stop, και ρώτα: τι έπρεπε να αλλάξει μέσα στο <code>while</code> και δεν άλλαξε; Λείπει το <code>+= 1</code>; Λείπει το <code>move()</code>;</td></tr>
+          <tr><td>Ο Reeborg σκοντάφτει σε τοίχο</td><td>Μια στροφή είναι λάθος ή λείπει. Tracing με το δάχτυλο στο χαρτί, εντολή-εντολή.</td></tr>
+          <tr><td><code>NameError: name 'turn_right' is not defined</code> στον Reeborg</td><td>Ο Reeborg δεν έχει <code>turn_right()</code>. Τη φτιάχνεις εσύ, με τρεις <code>turn_left()</code>, και πρέπει να είναι πρώτη στο αρχείο.</td></tr>
+        </tbody>
+      </table>
+    </section>
+
+    <hr class="rule">
+
+    <!-- ─── RECAP ─── -->
+    <section id="recap">
+      <h2><span class="h2n">§14</span> Ανακεφαλαίωση</h2>
+      <p class="lead">Κράτησέ το. Από εδώ και πέρα, κάθε project σου θα είναι συναρτήσεις που καλούν συναρτήσεις.</p>
+
+      <h3>Οι τρεις μεγάλες ιδέες</h3>
+      <div class="ideas">
+        <div class="idea"><span class="idea__n">1</span><p><code>def</code> <strong>ορίζει</strong>, οι παρενθέσεις <strong>καλούν</strong>. Ο ορισμός δεν τρέχει τίποτα — είναι συνταγή. Η κλήση <code>name()</code> μαγειρεύει.</p></div>
+        <div class="idea"><span class="idea__n">2</span><p>Συναρτήσεις χτίζονται από συναρτήσεις: <code>turn_left</code> → <code>turn_right</code> → <code>jump</code>. Κάθε σκαλοπάτι κρύβει το προηγούμενο, και σε αφήνει να σκεφτείς το επόμενο.</p></div>
+        <div class="idea"><span class="idea__n">3</span><p><code>for</code> όταν ξέρεις <strong>πόσες φορές</strong>. <code>while</code> όταν ξέρεις μόνο <strong>πότε να σταματήσεις</strong>. Και στο <code>while</code>, κάτι μέσα πρέπει να αλλάζει — αλλιώς δεν σταματάει ποτέ.</p></div>
+      </div>
+
+      <h3>Κάρτα αναφοράς</h3>
+      <div class="codewrap"><pre><code># ΟΡΙΣΜΟΣ — δεν τρέχει τίποτα
+def greet():
+    print("Hello!")
+
+# ΚΛΗΣΗ — τώρα τρέχει
+greet()
+
+# ΣΥΝΑΡΤΗΣΗ ΑΠΟ ΣΥΝΑΡΤΗΣΕΙΣ
+def turn_right():
+    turn_left()
+    turn_left()
+    turn_left()
+
+# WHILE — όσο ισχύει, συνέχισε
+while not at_goal():
+    move()
+
+n = 0
+while n &lt; 3:
+    print(n)
+    n += 1              # ΚΑΤΙ πρέπει να αλλάζει!
+
+# WHILE + IF
+while not at_goal():
+    if wall_in_front():
+        jump()
+    else:
+        move()
+
+# Ο ΚΑΝΟΝΑΣ ΤΗΣ ΕΣΟΧΗΣ
+# κάθε γραμμή που τελειώνει σε  :  ανοίγει block
+# 4 κενά μέσα · πίσω στο προηγούμενο επίπεδο = κλείνει
+
+# REEBORG — οι ερωτήσεις του
+at_goal()   wall_in_front()   front_is_clear()
+wall_on_right()   right_is_clear()</code></pre></div>
+
+      <h3>Μπορώ να…</h3>
+      <p>Τσέκαρε μόνο ό,τι μπορείς να κάνεις <strong>χωρίς</strong> να κοιτάξεις σημειώσεις. Η πρόοδος αποθηκεύεται σε αυτόν τον υπολογιστή.</p>
+      <div class="check" id="checklist">
+        <label><input type="checkbox" data-ck="c1"><span>…ορίσω μια συνάρτηση με <code>def</code> και να την καλέσω</span></label>
+        <label><input type="checkbox" data-ck="c2"><span>…εξηγήσω γιατί ο ορισμός δεν τρέχει τίποτα μόνος του</span></label>
+        <label><input type="checkbox" data-ck="c3"><span>…φτιάξω <code>turn_right()</code> από <code>turn_left()</code> και <code>jump()</code> από <code>turn_right()</code></span></label>
+        <label><input type="checkbox" data-ck="c4"><span>…πω σε ποιο επίπεδο εσοχής είναι κάθε γραμμή ενός προγράμματος</span></label>
+        <label><input type="checkbox" data-ck="c5"><span>…γράψω <code>while</code> που σταματάει, και πω τι το σταματάει</span></label>
+        <label><input type="checkbox" data-ck="c6"><span>…αναγνωρίσω infinite loop και πω τι λείπει</span></label>
+        <label><input type="checkbox" data-ck="c7"><span>…διαλέξω ανάμεσα σε <code>for</code> και <code>while</code> για ένα πρόβλημα</span></label>
+        <label><input type="checkbox" data-ck="c8"><span>…βγάλω τον Reeborg από τον λαβύρινθο, μαζί με την παγίδα της αρχής</span></label>
+      </div>
+
+      <h3>Λέξεις που έμαθα σήμερα</h3>
+      <p><code>function</code> <code>def</code> <code>define</code> <code>call</code> <code>code block</code> <code>while</code> <code>condition</code> <code>infinite loop</code> <code>algorithm</code> <code>edge case</code> <code>tracing</code> <code>binary search</code> <code>Reeborg</code> <code>at_goal()</code> <code>wall_in_front()</code> <code>circle(r, angle)</code></p>
+    </section>
+
+    <footer class="foot">
+      <span>Ημέρα 06 · Functions &amp; Karel</span>
+      <a href="#stoxoi">Πίσω στην αρχή</a>
+    </footer>
+
+  </div>
+</main>
+
+<script>
+'use strict';
+
+/* ── ασφαλής αποθήκευση: δουλεύει στο GitHub Pages, δεν σκάει πουθενά ── */
+var store = {
+  get: function(k){ try { return window.localStorage.getItem(k); } catch(e){ return null; } },
+  set: function(k,v){ try { window.localStorage.setItem(k,v); } catch(e){} }
+};
+
+/* ══════════════════ ΔΕΔΟΜΕΝΑ QUIZ ══════════════════ */
+var QUIZZES = {
+  q1: { title:'def & κλήση', questions:[
+    { p:'Τι κάνει η γραμμή <code>def greet():</code> από μόνη της;',
+      o:['Τυπώνει Hello','Τρέχει τη συνάρτηση μία φορά','Ορίζει τη συνάρτηση — δεν τρέχει τίποτα','Δίνει error αν δεν υπάρχει greet'], a:2,
+      h:'Συνταγή ή μαγείρεμα;',
+      e:'Ο ορισμός μαθαίνει στην Python τι σημαίνει <code>greet</code>. Δεν εκτελείται τίποτα μέχρι να γράψεις <code>greet()</code>.' },
+    { p:'Έγραψες <code>def greet():</code> με ένα <code>print</code> μέσα, έτρεξες το αρχείο, και δεν τυπώθηκε τίποτα. Τι ξέχασες;',
+      o:['Το <code>import</code>','Να καλέσεις τη συνάρτηση: <code>greet()</code>','Το <code>return</code>','Να βάλεις <code>print</code> έξω από τη συνάρτηση'], a:1,
+      h:'Η συνταγή είναι στο συρτάρι. Ποιος τη ζήτησε;',
+      e:'Χωρίς κλήση, η συνάρτηση υπάρχει αλλά δεν τρέχει ποτέ. Μία γραμμή <code>greet()</code> κάτω από τον ορισμό τη βάζει μπροστά.' },
+    { p:'Ο Reeborg ξέρει μόνο <code>turn_left()</code>. Πόσες φορές την καλείς για να στρίψει δεξιά;',
+      o:['1','2','3','4'], a:2,
+      h:'Στρίψε αριστερά με το σώμα σου και μέτρα.',
+      e:'Τρεις στροφές 90° αριστερά = 270° = μία στροφή δεξιά. Έτσι γεννιέται η <code>turn_right()</code>.' },
+    { p:'Ποια είναι η διαφορά ανάμεσα σε <code>greet</code> και <code>greet()</code>;',
+      o:['Καμία, είναι το ίδιο','Το πρώτο είναι το όνομα, το δεύτερο την τρέχει','Το πρώτο τρέχει, το δεύτερο την ορίζει','Το δεύτερο είναι για συναρτήσεις με πολλά print'], a:1,
+      h:'Οι παρενθέσεις είναι το κουμπί.',
+      e:'Το <code>greet</code> αναφέρεται στη συνάρτηση. Το <code>greet()</code> την εκτελεί. Αν γράψεις το πρώτο μόνο του, δεν γίνεται τίποτα.' }
+  ]},
+  q2: { title:'while', questions:[
+    { p:'Πότε διαλέγεις <code>while</code> αντί για <code>for</code>;',
+      o:['Όταν το loop είναι μεγάλο','Όταν δεν ξέρεις από πριν πόσες φορές — μόνο πότε να σταματήσεις','Όταν δεν έχεις λίστα','Πάντα — είναι πιο γρήγορο'], a:1,
+      h:'Έξι εμπόδια ή «μέχρι τη σημαία»;',
+      e:'Το <code>for</code> μετράει. Το <code>while</code> ρωτάει. Όταν η απάντηση στο «πόσες φορές;» είναι «μέχρι να…», θέλεις <code>while</code>.' },
+    { p:'<code>n = 0</code><br><code>while n &lt; 3:</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;print(n)</code><br><code>&nbsp;&nbsp;&nbsp;&nbsp;n += 1</code><br>Τι τυπώνει;',
+      o:['1 2 3','0 1 2','0 1 2 3','Δεν σταματάει ποτέ'], a:1,
+      h:'Ξεκινάει από 0 και σταματάει όταν το <code>n &lt; 3</code> γίνει ψευδές.',
+      e:'0, 1, 2 — και όταν το <code>n</code> γίνει 3, η συνθήκη <code>3 &lt; 3</code> είναι False και το loop τελειώνει.' },
+    { p:'Ίδιο loop, αλλά <strong>χωρίς</strong> τη γραμμή <code>n += 1</code>. Τι γίνεται;',
+      o:['Τυπώνει 0 και σταματάει','Τυπώνει 0 1 2','SyntaxError','Τυπώνει 0 για πάντα — infinite loop'], a:3,
+      h:'Τι αλλάζει μέσα στο loop τώρα;',
+      e:'Το <code>n</code> μένει 0, η συνθήκη <code>0 &lt; 3</code> μένει αληθής, το loop δεν σταματάει ποτέ. Πάτα Stop.' },
+    { p:'Πώς διαβάζεται το <code>while not at_goal():</code>;',
+      o:['Όταν φτάσεις στον στόχο, κάνε αυτό','Όσο ΔΕΝ είσαι στον στόχο, κάνε αυτό','Αν δεν υπάρχει στόχος, κάνε αυτό','Κάνε αυτό μέχρι να υπάρξει error'], a:1,
+      h:'Το <code>not</code> αντιστρέφει. Το <code>while</code> επαναλαμβάνει όσο ισχύει.',
+      e:'«Όσο το <code>at_goal()</code> είναι False, συνέχισε.» Μόλις ο Reeborg φτάσει, το <code>at_goal()</code> γίνεται True, το <code>not</code> το κάνει False, το loop σταματάει.' },
+    { p:'Στον λαβύρινθο, γιατί ο Reeborg καμιά φορά γυρίζει σε κύκλο για πάντα;',
+      o:['Ο λαβύρινθος δεν έχει έξοδο','Ξεκίνησε χωρίς τοίχο δεξιά του, οπότε στρίβει δεξιά συνέχεια','Το <code>while</code> είναι λάθος','Λείπει το <code>turn_right()</code>'], a:1,
+      h:'Ο κανόνας του δεξιού χεριού θέλει τοίχο για να ακουμπήσει.',
+      e:'Σε ανοιχτό χώρο, το <code>right_is_clear()</code> είναι πάντα True, άρα στρίβει δεξιά ξανά και ξανά. Λύση: πρώτα βρες έναν τοίχο, μετά ξεκίνα τον κανόνα.' }
+  ]}
+};
+
+/* ══════════════════ RENDER QUIZ ══════════════════ */
+var KEYS = ['Α','Β','Γ','Δ'];
+
+function buildQuiz(host, id){
+  var data = QUIZZES[id];
+  var total = data.questions.length;
+  var answered = 0, right = 0;
+
+  var head = document.createElement('div');
+  head.className = 'quiz__head';
+  head.innerHTML = '<h4>' + data.title + '</h4><span class="quiz__score">— / ' + total + '</span>';
+  host.appendChild(head);
+  var scoreEl = head.querySelector('.quiz__score');
+
+  data.questions.forEach(function(q, qi){
+    var wrap = document.createElement('div');
+    wrap.className = 'q';
+
+    var prompt = document.createElement('p');
+    prompt.className = 'q__p';
+    prompt.innerHTML = '<span class="qn">' + (qi+1) + '.</span>' + q.p;
+    wrap.appendChild(prompt);
+
+    var opts = document.createElement('div');
+    opts.className = 'opts';
+    wrap.appendChild(opts);
+
+    var fb = document.createElement('div');
+    fb.className = 'q__fb';
+
+    var hintBtn = document.createElement('button');
+    hintBtn.type = 'button';
+    hintBtn.className = 'q__hintbtn';
+    hintBtn.textContent = 'Θέλω μια βοήθεια';
+    var hint = document.createElement('p');
+    hint.className = 'q__hint';
+    hint.innerHTML = q.h;
+    hintBtn.addEventListener('click', function(){
+      hint.classList.add('show');
+      hintBtn.style.display = 'none';
+    });
+
+    q.o.forEach(function(text, oi){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'opt';
+      b.innerHTML = '<span class="opt__k">' + KEYS[oi] + '</span><span class="opt__t">' + text + '</span>';
+      b.addEventListener('click', function(){
+        if (wrap.dataset.done) return;
+        wrap.dataset.done = '1';
+        answered++;
+        var ok = (oi === q.a);
+        if (ok) right++;
+
+        Array.prototype.forEach.call(opts.children, function(el, i){
+          el.disabled = true;
+          if (i === q.a) el.classList.add('is-right');
+          else if (i === oi) el.classList.add('is-wrong');
+        });
+
+        fb.className = 'q__fb show ' + (ok ? 'good' : 'bad');
+        fb.innerHTML = '<b>' + (ok ? 'Σωστά. ' : 'Όχι ακόμα. ') + '</b>' + q.e;
+        hintBtn.style.display = 'none';
+        hint.classList.remove('show');
+        scoreEl.textContent = right + ' / ' + total;
+        if (answered === total) {
+          scoreEl.style.color = (right === total) ? 'var(--pen-green)' : 'var(--ink)';
+        }
+      });
+      opts.appendChild(b);
+    });
+
+    wrap.appendChild(hintBtn);
+    wrap.appendChild(hint);
+    wrap.appendChild(fb);
+    host.appendChild(wrap);
+  });
+}
+
+document.querySelectorAll('[data-quiz]').forEach(function(el){
+  buildQuiz(el, el.dataset.quiz);
+});
+
+/* ══════════════════ ΧΡΩΜΑΤΙΣΜΟΣ ΚΩΔΙΚΑ ══════════════════ */
+var KW = /^(False|None|True|and|as|assert|break|class|continue|def|del|elif|else|except|finally|for|from|global|if|import|in|is|lambda|nonlocal|not|or|pass|raise|return|try|while|with|yield)$/;
+var BI = /^(print|input|int|float|str|bool|type|len|round|range|abs|sum|min|max|list|dict|set|tuple|turtle|forward|left|right|color|write|goto|pensize|lower|upper|count|random|randint|choice|choices|shuffle|append|extend|split|join|index|dot|circle|speed|hideturtle|penup|pendown|bgcolor|setheading|Screen|Turtle|done|move|turn_left|at_goal|wall_in_front|front_is_clear|wall_on_right|right_is_clear)$/;
+
+function esc(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function highlight(src){
+  var re = /(#[^\n]*)|("(?:[^"\\\n]|\\.)*"|'(?:[^'\\\n]|\\.)*')|(\b\d+\.?\d*\b)|([A-Za-z_][A-Za-z0-9_]*)/g;
+  var out = '', last = 0, m;
+  while ((m = re.exec(src)) !== null) {
+    out += esc(src.slice(last, m.index));
+    if (m[1])      out += '<span class="tok-c">' + esc(m[1]) + '</span>';
+    else if (m[2]) out += '<span class="tok-s">' + esc(m[2]) + '</span>';
+    else if (m[3]) out += '<span class="tok-n">' + esc(m[3]) + '</span>';
+    else if (m[4]) {
+      if (KW.test(m[4]))      out += '<span class="tok-k">' + m[4] + '</span>';
+      else if (BI.test(m[4])) out += '<span class="tok-b">' + m[4] + '</span>';
+      else                    out += esc(m[4]);
+    }
+    last = re.lastIndex;
+  }
+  return out + esc(src.slice(last));
+}
+
+document.querySelectorAll('.codewrap pre code').forEach(function(code){
+  var raw = code.textContent;
+  code.innerHTML = highlight(raw);
+
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'copy';
+  btn.textContent = 'Αντιγραφή';
+  btn.addEventListener('click', function(){
+    var done = function(){
+      btn.textContent = 'Έγινε';
+      btn.classList.add('ok');
+      setTimeout(function(){ btn.textContent = 'Αντιγραφή'; btn.classList.remove('ok'); }, 1600);
+    };
+    if (navigator.clipboard && navigator.clipboard.writeText) {
+      navigator.clipboard.writeText(raw).then(done, function(){});
+    } else {
+      var ta = document.createElement('textarea');
+      ta.value = raw; document.body.appendChild(ta); ta.select();
+      try { document.execCommand('copy'); done(); } catch(e){}
+      document.body.removeChild(ta);
+    }
+  });
+  code.parentNode.parentNode.appendChild(btn);
+});
+
+/* ══════════════════ CHECKLIST + ΠΡΟΟΔΟΣ ══════════════════ */
+var boxes = document.querySelectorAll('#checklist input[type=checkbox]');
+var progBar = document.getElementById('progBar');
+var progText = document.getElementById('progText');
+
+function paintProgress(){
+  var done = 0;
+  boxes.forEach(function(b){ if (b.checked) done++; });
+  progText.textContent = done + ' / ' + boxes.length;
+  progBar.style.width = (done / boxes.length * 100) + '%';
+}
+
+boxes.forEach(function(b){
+  var key = 'day06.' + b.dataset.ck;
+  if (store.get(key) === '1') b.checked = true;
+  b.addEventListener('change', function(){
+    store.set(key, b.checked ? '1' : '0');
+    paintProgress();
+  });
+});
+paintProgress();
+
+/* ══════════════════ SCROLLSPY ══════════════════ */
+var links = Array.prototype.slice.call(document.querySelectorAll('.day--now li a'));
+var targets = links.map(function(a){ return document.querySelector(a.getAttribute('href')); });
+
+if ('IntersectionObserver' in window) {
+  var io = new IntersectionObserver(function(entries){
+    entries.forEach(function(en){
+      if (!en.isIntersecting) return;
+      var i = targets.indexOf(en.target);
+      if (i < 0) return;
+      links.forEach(function(a){ a.classList.remove('is-active'); });
+      links[i].classList.add('is-active');
+    });
+  }, { rootMargin: '-70px 0px -72% 0px', threshold: 0 });
+  targets.forEach(function(t){ if (t) io.observe(t); });
+}
+
+/* ══════════════════ ΜΕΝΟΥ ΓΙΑ ΚΙΝΗΤΟ ══════════════════ */
+var side = document.getElementById('side');
+var scrim = document.getElementById('scrim');
+var burger = document.getElementById('burger');
+
+function toggleSide(open){
+  side.classList.toggle('open', open);
+  scrim.classList.toggle('show', open);
+  burger.setAttribute('aria-expanded', String(open));
+}
+burger.addEventListener('click', function(){ toggleSide(!side.classList.contains('open')); });
+scrim.addEventListener('click', function(){ toggleSide(false); });
+side.addEventListener('click', function(e){
+  if (e.target.closest('a') && window.innerWidth <= 960) toggleSide(false);
+});
+document.addEventListener('keydown', function(e){
+  if (e.key === 'Escape' && side.classList.contains('open')) toggleSide(false);
+});
+
+/* ══════════════════ HERO: ΤΟ ΠΡΟΓΡΑΜΜΑ ΤΡΕΧΕΙ ══════════════════ */
+(function(){
+  var out = document.getElementById('termOut');
+  if (!out) return;
+
+  var script = [
+    { t:'def turn_right():\n    turn_left()\n    turn_left()\n    turn_left()\n\n', d:9 },
+    { t:'while not at_goal():\n    if right_is_clear():\n        turn_right()\n        move()\n    elif front_is_clear():\n        move()\n    else:\n        turn_left()\n\n', d:7 },
+    { t:'▶ Play\n', d:60, c:'u' },
+    { t:'Reeborg: 38 moves · at_goal() → True ✓\n', d:26, c:'r' }
+  ];
+
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  if (reduce) {
+    out.innerHTML = script.map(function(s){
+      var t = s.t.replace(/&/g,'&amp;').replace(/</g,'&lt;');
+      return s.c ? '<span class="' + s.c + '">' + t + '</span>' : t;
+    }).join('');
+    return;
+  }
+
+  var si = 0, ci = 0, buf = '';
+  var caret = '<span class="caret"></span>';
+
+  function step(){
+    if (si >= script.length) { out.innerHTML = buf; return; }
+    var seg = script[si];
+    if (ci === 0 && seg.c) buf += '<span class="' + seg.c + '">';
+    var ch = seg.t.charAt(ci);
+    buf += (ch === '<' ? '&lt;' : ch === '&' ? '&amp;' : ch);
+    ci++;
+    if (ci >= seg.t.length) {
+      if (seg.c) buf += '</span>';
+      si++; ci = 0;
+    }
+    out.innerHTML = buf + caret;
+    setTimeout(step, seg.d);
+  }
+  setTimeout(step, 380);
+})();
+</script>
+</body>
+</html>
