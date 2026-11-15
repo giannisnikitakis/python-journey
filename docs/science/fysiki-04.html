@@ -1,0 +1,548 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Εβδομάδα 4 · Ποιος είναι πιο γρήγορος; — Μαθήματα Φυσικής Β΄ Γυμνασίου</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#141e26; --ink-soft:#47555f; --ink-faint:#78868f;
+  --ground:#f0f3f6; --sheet:#ffffff; --rule:#d4dce3; --rule-strong:#b3bfc9;
+
+  /* Φυσική: μπλε = δομή · κεχριμπάρι = ασφάλεια · πράσινο = ψηφιακά */
+  --blue:#17456b; --blue-wash:#e5ecf3;
+  --amber:#a8571f; --amber-wash:#f8efe4;
+  --teal:#0f5d52; --teal-wash:#e7f0ec;
+
+  --serif:'Alegreya', Georgia, 'Times New Roman', serif;
+  --sans:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --nav-h:60px; --side-w:288px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0; background:var(--ground); color:var(--ink); font-family:var(--serif); font-size:18px; line-height:1.68; -webkit-font-smoothing:antialiased}
+
+.nav{position:fixed; inset:0 0 auto 0; height:var(--nav-h); z-index:50; display:flex; align-items:center; gap:16px; padding:0 20px; background:var(--blue); color:#e8eef4; border-bottom:1px solid #0e3252}
+.nav-title{font-family:var(--serif); font-weight:700; font-size:1.06rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.nav-title span{display:block; font-family:var(--sans); font-weight:400; font-size:.7rem; color:#9db9d0; line-height:1.2; margin-top:1px}
+.nav-title a{color:inherit; text-decoration:none}
+.nav-title a:hover{text-decoration:underline; text-underline-offset:3px}
+.burger{display:none; background:none; border:1px solid rgba(255,255,255,.28); color:inherit; border-radius:5px; width:36px; height:34px; cursor:pointer; font-size:1.05rem; line-height:1; flex:0 0 auto}
+.nav-spacer{flex:1}
+.timer{display:flex; align-items:center; gap:10px; font-family:var(--sans); flex:0 0 auto}
+.timer-read{min-width:132px; text-align:right; line-height:1.15}
+.timer-clock{font-size:1.02rem; font-weight:600; font-variant-numeric:tabular-nums; display:block}
+.timer-seg{font-size:.68rem; color:#9db9d0; display:block; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; max-width:210px}
+.timer-btn{font-family:var(--sans); font-size:.78rem; font-weight:500; background:#e8eef4; color:var(--blue); border:0; border-radius:5px; padding:8px 13px; cursor:pointer; text-decoration:none; display:inline-block}
+.timer-btn:hover{background:#fff}
+.timer-btn.reset{background:transparent; color:#9db9d0; border:1px solid rgba(255,255,255,.25)}
+.timer-btn.reset:hover{color:#e8eef4}
+:focus-visible{outline:2.5px solid #f0b27a; outline-offset:2px}
+
+.side{position:fixed; top:var(--nav-h); bottom:0; left:0; width:var(--side-w); z-index:40; overflow-y:auto; background:var(--sheet); border-right:1px solid var(--rule); font-family:var(--sans); padding:20px 0 48px}
+.side h2{font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--ink-faint); margin:22px 20px 8px; padding-top:14px; border-top:1px solid var(--rule)}
+.side h2:first-child{border-top:0; padding-top:0; margin-top:4px}
+.side ol{list-style:none; margin:0; padding:0}
+.side a{display:grid; grid-template-columns:30px 1fr; align-items:baseline; gap:4px; padding:6px 20px 6px 16px; text-decoration:none; color:var(--ink-soft); font-size:.83rem; line-height:1.35; border-left:3px solid transparent}
+.side a:hover{background:var(--blue-wash); color:var(--ink)}
+.side .num{font-variant-numeric:tabular-nums; font-size:.74rem; color:var(--ink-faint)}
+.side a[aria-current="page"]{border-left-color:var(--blue); background:var(--blue-wash); color:var(--blue); font-weight:600}
+.side a[aria-current="page"] .num{color:var(--blue)}
+.side a.pending{color:#9aa6ad}
+.side a.pending .ttl::after{content:''; display:inline-block; width:5px; height:5px; margin-left:7px; border:1px solid #c0cad2; border-radius:50%; vertical-align:.12em}
+.side-note{font-size:.72rem; color:var(--ink-faint); line-height:1.5; margin:20px 20px 0; padding-top:14px; border-top:1px solid var(--rule)}
+
+.wrap{margin-left:var(--side-w); padding-top:var(--nav-h)}
+main{max-width:830px; margin:0 auto; padding:0 32px 120px}
+
+.hero{padding:52px 0 34px; border-bottom:1px solid var(--rule)}
+.hero-week{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--blue); margin:0 0 10px}
+.hero h1{font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.6vw,2.9rem); line-height:1.14; margin:0 0 18px; letter-spacing:-.012em; max-width:16ch}
+.hero-lede{font-size:1.12rem; color:var(--ink-soft); max-width:60ch; margin:0 0 26px}
+.hero-lede em{color:var(--ink); font-style:italic}
+.facts{display:flex; flex-wrap:wrap; gap:0; font-family:var(--sans); font-size:.79rem; border:1px solid var(--rule); border-radius:7px; overflow:hidden; background:var(--sheet)}
+.fact{padding:11px 16px; border-right:1px solid var(--rule); flex:1 1 auto}
+.fact:last-child{border-right:0}
+.fact dt{color:var(--ink-faint); font-size:.71rem; margin-bottom:2px}
+.fact dd{margin:0; font-weight:500; color:var(--ink)}
+
+figure.boxes{margin:34px 0 0; padding:26px 22px 20px; background:var(--sheet); border:1px solid var(--rule); border-radius:8px}
+figure.boxes svg{display:block; width:100%; height:auto; max-width:520px; margin:0 auto}
+figure.boxes figcaption{font-family:var(--sans); font-size:.79rem; color:var(--ink-soft); margin-top:16px; text-align:center; line-height:1.55; max-width:56ch; margin-left:auto; margin-right:auto}
+figure.boxes figcaption b{color:var(--amber); font-weight:600}
+
+section{padding-top:46px}
+h2.sec{font-family:var(--serif); font-weight:700; font-size:1.62rem; line-height:1.2; margin:0 0 6px; letter-spacing:-.008em}
+.sec-sub{font-family:var(--sans); font-size:.79rem; color:var(--ink-faint); margin:0 0 22px}
+h3{font-family:var(--serif); font-weight:700; font-size:1.2rem; margin:30px 0 8px}
+h4{font-family:var(--sans); font-weight:600; font-size:.92rem; margin:22px 0 6px}
+p{margin:0 0 14px; max-width:68ch}
+a.link{color:var(--teal); text-underline-offset:3px; text-decoration-thickness:1px}
+a.link:hover{background:var(--teal-wash)}
+ul,ol.body{max-width:66ch; padding-left:22px; margin:0 0 16px}
+li{margin-bottom:7px}
+code{font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:.86em; background:#eef2f5; padding:1px 5px; border-radius:3px}
+
+table{width:100%; border-collapse:collapse; font-family:var(--sans); font-size:.83rem; background:var(--sheet); border:1px solid var(--rule); border-radius:8px; overflow:hidden; margin:16px 0 22px}
+th,td{padding:9px 13px; text-align:right; border-bottom:1px solid var(--rule); vertical-align:top}
+th{background:var(--blue-wash); color:var(--blue); font-weight:600; font-size:.76rem}
+tbody tr:last-child td{border-bottom:0}
+td.n{width:38px; color:var(--ink-faint); font-variant-numeric:tabular-nums}
+
+.rail{margin:22px 0 8px; border-left:2px solid var(--rule-strong)}
+.tick{position:relative; display:grid; grid-template-columns:74px 1fr; gap:16px; padding:13px 14px 13px 18px; border-radius:0 7px 7px 0}
+.tick::before{content:''; position:absolute; left:-2px; top:0; bottom:0; width:2px; background:transparent}
+.tick[data-active="true"]{background:var(--blue-wash)}
+.tick[data-active="true"]::before{background:var(--blue)}
+.tick .t{font-family:var(--sans); font-size:.78rem; font-weight:600; font-variant-numeric:tabular-nums; color:var(--ink-faint); padding-top:2px}
+.tick[data-active="true"] .t{color:var(--blue)}
+.tick .lab{font-family:var(--sans); font-size:.9rem; font-weight:500}
+.tick .lab small{display:block; font-weight:400; font-size:.79rem; color:var(--ink-soft); margin-top:2px; line-height:1.45}
+
+.box{border:1px solid var(--rule); border-left-width:4px; border-radius:0 8px 8px 0; background:var(--sheet); padding:16px 20px; margin:20px 0}
+.box p:last-child{margin-bottom:0}
+.box .bt{font-family:var(--sans); font-size:.78rem; font-weight:600; margin:0 0 6px}
+.box.safety{border-left-color:var(--amber); background:var(--amber-wash)}
+.box.safety .bt{color:var(--amber)}
+.box.digital{border-left-color:var(--teal); background:var(--teal-wash)}
+.box.digital .bt{color:var(--teal)}
+.box.key{border-left-color:var(--blue); background:var(--blue-wash)}
+.box.key .bt{color:var(--blue)}
+
+.ask{margin:16px 0; padding:0; list-style:none; max-width:66ch; border-top:1px solid var(--rule)}
+.ask li{margin:0; padding:12px 4px 12px 34px; border-bottom:1px solid var(--rule); position:relative; font-style:italic; font-size:1.02rem; line-height:1.55}
+.ask li::before{content:'?'; position:absolute; left:6px; top:12px; font-family:var(--sans); font-style:normal; font-weight:600; font-size:.86rem; color:var(--blue)}
+
+.dialogue{margin:18px 0; max-width:60ch}
+.dialogue p{margin:0 0 4px; padding-left:18px; border-left:2px solid var(--rule)}
+.dialogue p.you{font-weight:500}
+.dialogue p.him{color:var(--ink-soft); font-style:italic}
+
+pre{background:#13202b; color:#dce6ee; font-family:ui-monospace,'SF Mono',Menlo,Consolas,monospace; font-size:.82rem; line-height:1.6; padding:16px 18px; border-radius:8px; overflow-x:auto; margin:14px 0}
+pre .c{color:#7d94a6}
+pre .k{color:#8fc4e8}
+pre .s{color:#9ee0b6}
+
+.quiz{margin:18px 0}
+details.q{background:var(--sheet); border:1px solid var(--rule); border-radius:8px; margin-bottom:9px; overflow:hidden}
+details.q[open]{border-color:var(--rule-strong)}
+details.q summary{cursor:pointer; padding:14px 18px; font-size:1rem; font-weight:500; list-style:none; display:flex; gap:12px; align-items:baseline}
+details.q summary::-webkit-details-marker{display:none}
+details.q summary::after{content:'+'; margin-left:auto; font-family:var(--sans); color:var(--ink-faint); font-size:1.05rem; line-height:1}
+details.q[open] summary::after{content:'–'}
+details.q summary .qn{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--blue); flex:0 0 auto; padding-top:3px}
+.q-body{padding:14px 18px 16px 48px; border-top:1px solid var(--rule)}
+.q-body .opt{font-family:var(--sans); font-size:.85rem; color:var(--ink-soft); margin:0 0 4px}
+.q-body .opt.right{color:var(--blue); font-weight:600}
+.q-body .why{font-size:.97rem; color:var(--ink-soft); margin:12px 0 0; max-width:62ch}
+
+.foot{margin-top:64px; padding-top:22px; border-top:1px solid var(--rule); font-family:var(--sans); font-size:.82rem; color:var(--ink-faint); display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
+.foot a{color:var(--blue); text-decoration:none; font-weight:500}
+.foot a:hover{text-decoration:underline}
+.scrim{position:fixed; inset:var(--nav-h) 0 0 0; background:rgba(20,30,38,.42); z-index:35; display:none}
+.scrim.on{display:block}
+
+@media (max-width:1040px){
+  .burger{display:block}
+  .side{transform:translateX(-100%); transition:transform .22s ease; box-shadow:0 0 40px rgba(0,0,0,.14)}
+  .side.open{transform:translateX(0)}
+  .wrap{margin-left:0}
+  main{padding:0 22px 90px}
+  .timer-read{min-width:auto}
+  .timer-seg{display:none}
+  #studentLink{display:none}
+}
+@media (max-width:620px){
+  body{font-size:17px}
+  .nav{gap:10px; padding:0 12px}
+  .nav-title{font-size:.94rem}
+  .nav-title span{display:none}
+  .timer-btn{padding:7px 10px; font-size:.74rem}
+  .tick{grid-template-columns:56px 1fr; gap:10px; padding-left:12px}
+  table{font-size:.78rem}
+  th,td{padding:7px 9px}
+}
+@media print{
+  .nav,.side,.scrim,.timer{display:none!important}
+  .wrap{margin:0; padding:0}
+  main{max-width:none; padding:0}
+  body{background:#fff; font-size:11pt}
+  section{padding-top:22px}
+  h2.sec{page-break-after:avoid}
+  .box,figure.boxes,table,.tick,pre{page-break-inside:avoid}
+  details.q{page-break-inside:avoid}
+  details.q .q-body{display:block!important}
+  a.link::after{content:' (' attr(href) ')'; font-size:8pt; color:#555; word-break:break-all}
+}
+</style>
+</head>
+<body>
+<header class="nav">
+  <button class="burger" id="burger" aria-label="Άνοιγμα καταλόγου μαθημάτων" aria-expanded="false">☰</button>
+  <h1 class="nav-title"><a href="fysiki.html" title="Όλα τα μαθήματα Φυσικής">Μαθήματα Φυσικής Β΄ Γυμνασίου</a><span>Εμπλουτισμένο πρόγραμμα 30 εβδομάδων</span></h1>
+  <div class="nav-spacer"></div>
+  <a class="timer-btn reset" id="studentLink" href="fysiki-04-mathitis.html">Φύλλο μαθητή</a>
+  <div class="timer">
+    <div class="timer-read">
+      <span class="timer-clock" id="clock">00:00</span>
+      <span class="timer-seg" id="segname">Το μάθημα δεν έχει ξεκινήσει</span>
+    </div>
+    <button class="timer-btn" id="toggle">Έναρξη</button>
+    <button class="timer-btn reset" id="reset">Μηδενισμός</button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<nav class="side" id="side" aria-label="Κατάλογος μαθημάτων">
+  <h2>Κεφάλαιο 1 · Εισαγωγή</h2>
+  <ol>
+    <li><a href="fysiki-01.html"><span class="num">01</span><span class="ttl">Τι κάνει ο φυσικός;</span></a></li>
+    <li><a href="fysiki-02.html"><span class="num">02</span><span class="ttl">Μεγέθη &amp; μονάδες</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 2 · Κινήσεις</h2>
+  <ol>
+    <li><a href="fysiki-03.html"><span class="num">03</span><span class="ttl">Περιγραφή της κίνησης</span></a></li>
+    <li><a href="fysiki-04.html" aria-current="page"><span class="num">04</span><span class="ttl">Η έννοια της ταχύτητας</span></a></li>
+    <li><a href="fysiki-05.html" class="pending"><span class="num">05</span><span class="ttl">Κίνηση με σταθερή ταχύτητα</span></a></li>
+    <li><a href="fysiki-06.html" class="pending"><span class="num">06</span><span class="ttl">Μεταβαλλόμενη ταχύτητα</span></a></li>
+    <li><a href="fysiki-07.html" class="pending"><span class="num">07</span><span class="ttl">Ελεύθερη πτώση</span></a></li>
+    <li><a href="fysiki-08.html" class="pending"><span class="num">08</span><span class="ttl">Ολοκλήρωση: ανάλυση βίντεο</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 3 · Δυνάμεις</h2>
+  <ol>
+    <li><a href="fysiki-09.html" class="pending"><span class="num">09</span><span class="ttl">Η έννοια της δύναμης</span></a></li>
+    <li><a href="fysiki-10.html" class="pending"><span class="num">10</span><span class="ttl">Βάρος &amp; τριβή</span></a></li>
+    <li><a href="fysiki-11.html" class="pending"><span class="num">11</span><span class="ttl">Ελατήρια &amp; νόμος του Χουκ</span></a></li>
+    <li><a href="fysiki-12.html" class="pending"><span class="num">12</span><span class="ttl">Σύνθεση &amp; ανάλυση δυνάμεων</span></a></li>
+    <li><a href="fysiki-13.html" class="pending"><span class="num">13</span><span class="ttl">Ισορροπία υλικού σημείου</span></a></li>
+    <li><a href="fysiki-14.html" class="pending"><span class="num">14</span><span class="ttl">Πρώτος νόμος — αδράνεια</span></a></li>
+    <li><a href="fysiki-15.html" class="pending"><span class="num">15</span><span class="ttl">Δεύτερος νόμος — F = m·a</span></a></li>
+    <li><a href="fysiki-16.html" class="pending"><span class="num">16</span><span class="ttl">Τρίτος νόμος — αλληλεπίδραση</span></a></li>
+    <li><a href="fysiki-17.html" class="pending"><span class="num">17</span><span class="ttl">Βολή, μέρος 1</span></a></li>
+    <li><a href="fysiki-18.html" class="pending"><span class="num">18</span><span class="ttl">Βολή, μέρος 2</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 4 · Πίεση</h2>
+  <ol>
+    <li><a href="fysiki-19.html" class="pending"><span class="num">19</span><span class="ttl">Πίεση</span></a></li>
+    <li><a href="fysiki-20.html" class="pending"><span class="num">20</span><span class="ttl">Υδροστατική πίεση</span></a></li>
+    <li><a href="fysiki-21.html" class="pending"><span class="num">21</span><span class="ttl">Ατμοσφαιρική πίεση</span></a></li>
+    <li><a href="fysiki-22.html" class="pending"><span class="num">22</span><span class="ttl">Αρχή του Πασκάλ</span></a></li>
+    <li><a href="fysiki-23.html" class="pending"><span class="num">23</span><span class="ttl">Άνωση — Αρχή του Αρχιμήδη</span></a></li>
+    <li><a href="fysiki-24.html" class="pending"><span class="num">24</span><span class="ttl">Πλεύση &amp; πρόκληση σχεδιασμού</span></a></li>
+  </ol>
+  <h2>Κεφάλαιο 5 · Ενέργεια</h2>
+  <ol>
+    <li><a href="fysiki-25.html" class="pending"><span class="num">25</span><span class="ttl">Έργο και ενέργεια</span></a></li>
+    <li><a href="fysiki-26.html" class="pending"><span class="num">26</span><span class="ttl">Δυναμική &amp; κινητική ενέργεια</span></a></li>
+    <li><a href="fysiki-27.html" class="pending"><span class="num">27</span><span class="ttl">Διατήρηση της ενέργειας</span></a></li>
+    <li><a href="fysiki-28.html" class="pending"><span class="num">28</span><span class="ttl">Εκκρεμές με αισθητήρες</span></a></li>
+    <li><a href="fysiki-29.html" class="pending"><span class="num">29</span><span class="ttl">Βαρύτητα &amp; τροχιές</span></a></li>
+  </ol>
+  <h2>Κλείσιμο</h2>
+  <ol>
+    <li><a href="fysiki-30.html" class="pending"><span class="num">30</span><span class="ttl">Έκθεση φακέλου</span></a></li>
+  </ol>
+  <p class="side-note">Ο κύκλος δίπλα σε ένα μάθημα σημαίνει ότι η σελίδα του δεν έχει γραφτεί ακόμη.</p>
+</nav>
+
+<div class="wrap">
+<main>
+
+  <div class="hero">
+    <p class="hero-week">Εβδομάδα 4 · Κεφάλαιο 2.2 · 60 λεπτά</p>
+    <h1>Ποιος είναι πιο γρήγορος, και πώς το αποδεικνύεις;</h1>
+    <p class="hero-lede">Την περασμένη εβδομάδα είδε ότι μια x–t μπορεί να ανεβαίνει πιο απότομα ή πιο ήπια. Σήμερα αυτή η κλίση παίρνει όνομα. Το μάθημα ξεκινάει από ένα πρόβλημα σύγκρισης που <em>δεν λύνεται</em> χωρίς διαίρεση, και κλείνει με τα πραγματικά δεδομένα από το 9,58 του Bolt.</p>
+
+    <dl class="facts">
+      <div class="fact"><dt>Ερώτημα-οδηγός</dt><dd>Ποιος είναι πιο γρήγορος, και πώς το αποδεικνύεις;</dd></div>
+      <div class="fact"><dt>Παρανόηση-στόχος</dt><dd>«Πιο γρήγορος = τερμάτισε πρώτος» · «μέση ταχύτητα = μέσος όρος ταχυτήτων»</dd></div>
+      <div class="fact"><dt>Ψηφιακά</dt><dd>Κοντέρ μέσα στο φύλλο · phyphox · Τετράδιο Colab</dd></div>
+    </dl>
+
+    <figure class="boxes">
+      <svg viewBox="0 0 520 168" role="img" aria-label="Τρεις δρομείς με διαφορετικές αποστάσεις και χρόνους">
+        <g font-family="'IBM Plex Sans',sans-serif">
+          <rect x="10" y="14" width="156" height="112" rx="8" fill="#fff" stroke="#d4dce3"/>
+          <rect x="182" y="14" width="156" height="112" rx="8" fill="#fff" stroke="#d4dce3"/>
+          <rect x="354" y="14" width="156" height="112" rx="8" fill="#fff" stroke="#d4dce3"/>
+          <text x="88" y="42" text-anchor="middle" font-size="13" font-weight="600" fill="#17456b">Νίκος</text>
+          <text x="260" y="42" text-anchor="middle" font-size="13" font-weight="600" fill="#17456b">Μαρία</text>
+          <text x="432" y="42" text-anchor="middle" font-size="13" font-weight="600" fill="#17456b">Ο σκύλος</text>
+          <text x="88" y="78" text-anchor="middle" font-size="22" font-family="Alegreya,serif" fill="#141e26">60 m</text>
+          <text x="260" y="78" text-anchor="middle" font-size="22" font-family="Alegreya,serif" fill="#141e26">100 m</text>
+          <text x="432" y="78" text-anchor="middle" font-size="22" font-family="Alegreya,serif" fill="#141e26">25 m</text>
+          <text x="88" y="108" text-anchor="middle" font-size="15" fill="#47555f">σε 10 s</text>
+          <text x="260" y="108" text-anchor="middle" font-size="15" fill="#47555f">σε 20 s</text>
+          <text x="432" y="108" text-anchor="middle" font-size="15" fill="#47555f">σε 5 s</text>
+          <text x="88" y="152" text-anchor="middle" font-size="12" fill="#a8571f" font-weight="600">6 m/s</text>
+          <text x="260" y="152" text-anchor="middle" font-size="12" fill="#a8571f" font-weight="600">5 m/s</text>
+          <text x="432" y="152" text-anchor="middle" font-size="12" fill="#a8571f" font-weight="600">5 m/s</text>
+        </g>
+      </svg>
+      <figcaption>Το ίδιο σχήμα ανοίγει το φύλλο του μαθητή, <b>χωρίς</b> την κάτω γραμμή. Ο Νίκος κερδίζει· η Μαρία και ο σκύλος ισοβαθμούν — και αυτή η ισοπαλία είναι το σημείο του μαθήματος.</figcaption>
+    </figure>
+  </div>
+
+  <section id="prep">
+    <h2 class="sec">Πριν το μάθημα</h2>
+    <p class="sec-sub">Προετοιμασία δέκα λεπτών</p>
+    <table>
+      <thead><tr><th>Τι</th><th>Γιατί</th></tr></thead>
+      <tbody>
+        <tr><td>Διάδρομος ή αυλή με 10 m μετρημένα, ταινία στην αρχή και στο τέλος</td><td>Η πίστα. Με 5 m τα λάθη χρονομέτρησης τρώνε το αποτέλεσμα.</td></tr>
+        <tr><td>Κινητό με <a class="link" href="https://phyphox.org/">phyphox</a> → <em>Acoustic Stopwatch</em></td><td>Ξεκινάει με παλαμάκι, σταματάει με δεύτερο παλαμάκι. Χωρίς χρόνο αντίδρασης — το θυμάται από την Εβδομάδα 2.</td></tr>
+        <tr><td>Δεύτερο χρονόμετρο (απλό, στο χέρι)</td><td>Για σύγκριση με το phyphox σε μία μέτρηση</td></tr>
+        <tr><td>Το φύλλο μαθητή ανοιχτό σε laptop</td><td>Ο πίνακας υπολογίζει μόνος του μέσους χρόνους· το κοντέρ τρέχει μέσα στη σελίδα</td></tr>
+        <tr><td>Το τετράδιο Colab της εβδομάδας, ανοιγμένο και αποθηκευμένο στο Drive του</td><td>Για να μη χαθούν λεπτά σε login στο τελευταίο κομμάτι</td></tr>
+      </tbody>
+    </table>
+
+    <div class="box safety">
+      <p class="bt">Ασφάλεια στην πίστα</p>
+      <p>Ο «αγώνας» θέλει ελεύθερο χώρο <em>μετά</em> τη γραμμή τερματισμού — τουλάχιστον 3 m για φρενάρισμα. Το τρέξιμο προς τα πίσω γίνεται μόνο περπατώντας. Όχι κάλτσες σε πλακάκι.</p>
+    </div>
+
+    <h3>Τι αλλάζει σε σχέση με το βιβλίο</h3>
+    <p>Το σχολικό 2.2 ορίζει τη μέση ταχύτητα ως πηλίκο και δίνει τη μετατροπή km/h ↔ m/s. Εδώ το πηλίκο <em>γεννιέται</em> από το πρόβλημα του hero: δύο δρομείς με διαφορετικές αποστάσεις και χρόνους δεν συγκρίνονται αλλιώς. Το 3,6 δεν απομνημονεύεται — παράγεται στον πίνακα σε μία γραμμή. Και η διάκριση μέση ταχύτητα / ταχύτητα με πρόσημο έρχεται κατευθείαν από την περασμένη εβδομάδα: διάστημα και μετατόπιση.</p>
+  </section>
+
+  <section id="roi">
+    <h2 class="sec">Η ροή των 60 λεπτών</h2>
+    <p class="sec-sub">Πάτα «Έναρξη» πάνω δεξιά και το τρέχον τμήμα θα φωτίζεται μόνο του</p>
+    <div class="rail" id="rail">
+      <div class="tick" data-from="0" data-to="5"><span class="t">0΄ – 5΄</span><span class="lab">Ανάκληση<small>Τρεις ερωτήσεις από την Εβδομάδα 3</small></span></div>
+      <div class="tick" data-from="5" data-to="12"><span class="t">5΄ – 12΄</span><span class="lab">Ποιος είναι πιο γρήγορος;<small>Νίκος, Μαρία, σκύλος — η ανάγκη για διαίρεση</small></span></div>
+      <div class="tick" data-from="12" data-to="27"><span class="t">12΄ – 27΄</span><span class="lab">Ο αγώνας των 10 μέτρων<small>Τέσσερα στυλ, τρεις μετρήσεις το καθένα</small></span></div>
+      <div class="tick" data-from="27" data-to="35"><span class="t">27΄ – 35΄</span><span class="lab">Οι λέξεις και το 3,6<small>Μέση ταχύτητα, ταχύτητα με πρόσημο, στιγμιαία</small></span></div>
+      <div class="tick" data-from="35" data-to="45"><span class="t">35΄ – 45΄</span><span class="lab">Το κοντέρ<small>Προσομοίωση με x–t και υ–t, τρεις αποστολές</small></span></div>
+      <div class="tick" data-from="45" data-to="55"><span class="t">45΄ – 55΄</span><span class="lab">Τετράδιο: ο Bolt<small>Τα πραγματικά 10-μετρα του 9,58 σε Python</small></span></div>
+      <div class="tick" data-from="55" data-to="60"><span class="t">55΄ – 60΄</span><span class="lab">Exit ticket<small>Πέντε ερωτήσεις</small></span></div>
+    </div>
+  </section>
+
+  <section id="s1">
+    <h2 class="sec">Ανάκληση</h2>
+    <p class="sec-sub">0΄ – 5΄</p>
+    <ul class="ask">
+      <li>Από το 1 m στο 4 m και πίσω στο 2 m: διάστημα και μετατόπιση;</li>
+      <li>Οριζόντια γραμμή στο x–t: τι κάνει το σώμα;</li>
+      <li>Δύο ευθείες στο x–t, η μία πιο απότομη. Τι διαφέρει στις δύο κινήσεις;</li>
+    </ul>
+    <p>Την τρίτη την άφησε ανοιχτή η Εβδομάδα 3 («μην απαντήσεις στην κλίση»). Αν πει «η απότομη είναι πιο γρήγορη», μην επιβεβαιώσεις ακόμη: «Πώς θα το αποδείκνυες σε κάποιον που διαφωνεί;» Αυτή η ερώτηση είναι ο τίτλος του σημερινού.</p>
+  </section>
+
+  <section id="s2">
+    <h2 class="sec">Ποιος είναι πιο γρήγορος;</h2>
+    <p class="sec-sub">5΄ – 12΄</p>
+    <p>Το φύλλο ανοίγει με τις τρεις κάρτες (χωρίς τις απαντήσεις). Τον αφήνεις να διαλέξει νικητή <em>πριν</em> υπολογίσει τίποτα. Τα συνηθισμένα πρώτα ένστικτα:</p>
+    <ul>
+      <li><strong>«Η Μαρία, γιατί έτρεξε τα περισσότερα μέτρα.»</strong> Ταχύτητα = απόσταση. Ρώτα: «Αν τρέχει 100 m σε μία ώρα;»</li>
+      <li><strong>«Ο σκύλος, γιατί τελείωσε πρώτος.»</strong> Ταχύτητα = λιγότερος χρόνος. Ρώτα: «Αν ο σκύλος έτρεχε μόνο 1 m σε 5 s;»</li>
+    </ul>
+    <p>Και τα δύο ένστικτα κρατάνε το μισό. Η έξοδος από το αδιέξοδο είναι η ερώτηση <em>«πόσα μέτρα σε κάθε ένα δευτερόλεπτο;»</em> — ένα κοινό «νόμισμα» σύγκρισης. Αν την προτείνει μόνος του, τέλεια· αν όχι, δώσ' την και άσ' τον να κάνει τις τρεις διαιρέσεις.</p>
+    <div class="box key">
+      <p class="bt">Πες το ακριβώς έτσι</p>
+      <p>«Δεν μπορείς να συγκρίνεις 60 m με 100 m, ούτε 10 s με 20 s. Μπορείς όμως να συγκρίνεις <em>μέτρα ανά δευτερόλεπτο</em>. Η διαίρεση φέρνει όλους στην ίδια αφετηρία: τι κάνει ο καθένας σε ένα δευτερόλεπτο. Αυτό το "ανά" είναι η ταχύτητα.»</p>
+    </div>
+    <p>Η ισοπαλία Μαρίας–σκύλου (5 m/s) είναι το καλύτερο εύρημα: ο ένας έτρεξε τέσσερις φορές περισσότερα μέτρα, ο άλλος τελείωσε τέσσερις φορές νωρίτερα, και είναι το ίδιο γρήγοροι. Αν χαμογελάσει εδώ, έχει πιάσει το πηλίκο.</p>
+  </section>
+
+  <section id="s3">
+    <h2 class="sec">Ο αγώνας των 10 μέτρων</h2>
+    <p class="sec-sub">12΄ – 27΄ · η καρδιά του μαθήματος</p>
+    <p>Τέσσερα στυλ, τρεις μετρήσεις το καθένα: <strong>κανονικό περπάτημα</strong>, <strong>γρήγορο περπάτημα</strong>, <strong>προς τα πίσω</strong> (περπατώντας), <strong>ελεύθερο</strong> — ό,τι διαλέξει (πιγκουίνος, σκουπόξυλο, κουτσό). Το τέταρτο υπάρχει για να είναι διασκεδαστικό· μην το κόψεις.</p>
+    <p>Ποιος κρατάει χρόνο: <strong>εσύ με το phyphox</strong> (παλαμάκι εκκίνησης από εσένα, παλαμάκι τερματισμού από εσένα όταν περνάει τη γραμμή). Στο κανονικό περπάτημα κάνε μία μέτρηση <em>ταυτόχρονα</em> και με το χέρι, για να δει τη διαφορά — αυτό είναι η Εβδομάδα 2 να ξαναεμφανίζεται, και αξίζει μία φράση: «γι' αυτό δεν εμπιστευόμαστε το χέρι σε μικρούς χρόνους».</p>
+    <p>Ο πίνακας στο φύλλο βγάζει μόνος του μέσο χρόνο και ταχύτητα. <strong>Πριν</strong> τον αφήσεις να το δει, ζήτα του την πρώτη γραμμή με το χέρι στο πεδίο από κάτω. Το μηχάνημα επιβεβαιώνει, δεν αντικαθιστά.</p>
+    <ul class="ask">
+      <li>Γιατί τρεις μετρήσεις και όχι μία;</li>
+      <li>Ποιο στυλ είχε τη μεγαλύτερη διαφορά ανάμεσα στις τρεις μετρήσεις; Γιατί λες;</li>
+      <li>Η ταχύτητά σου ήταν ίδια σε όλα τα 10 μέτρα; Πού ήταν μικρότερη;</li>
+    </ul>
+    <p>Η τρίτη είναι η γέφυρα για το «μέση». Τα πρώτα 2 μέτρα επιταχύνει· η ταχύτητα που υπολόγισε είναι ο <em>μέσος</em> ρυθμός ολόκληρης της διαδρομής, όχι αυτό που έκανε σε κάθε σημείο.</p>
+  </section>
+
+  <section id="s4">
+    <h2 class="sec">Οι λέξεις και το 3,6</h2>
+    <p class="sec-sub">27΄ – 35΄</p>
+    <p>Τρία ονόματα, με τη σειρά που τα χρειάστηκε:</p>
+    <ul>
+      <li><strong>Μέση ταχύτητα</strong> υ<sub>μ</sub> = διάστημα ÷ χρόνος. Είναι αυτό που υπολόγισε. Πάντα θετική.</li>
+      <li><strong>Ταχύτητα με κατεύθυνση</strong> υ = Δx ÷ Δt. Το ίδιο πηλίκο, αλλά με μετατόπιση — άρα έχει πρόσημο. Στο «προς τα πίσω» με τον άξονα προς τα εμπρός: αρνητική. Αυτό είναι το νήμα από την Εβδομάδα 3.</li>
+      <li><strong>Στιγμιαία ταχύτητα</strong>: αυτό που δείχνει το κοντέρ <em>τώρα</em>. Η μέση ταχύτητα σε ένα πολύ μικρό Δt.</li>
+    </ul>
+    <p><strong>Το 3,6</strong> στον πίνακα, σε μία γραμμή: 1 m/s σημαίνει 1 m κάθε δευτερόλεπτο → 3.600 m κάθε ώρα → 3,6 km/h. Άρα <em>m/s × 3,6 = km/h</em>. Ρώτα ποιο από τα δύο είναι «μεγαλύτερη μονάδα» — αν θυμηθεί από το τεστ μονάδων ότι διαιρείς για να πας σε μεγαλύτερη μονάδα, θα το βρει μόνος του ότι εδώ οι αριθμοί βγαίνουν ανάποδα (m/s είναι μεγαλύτερη μονάδα ταχύτητας, γι' αυτό ο αριθμός μικραίνει).</p>
+    <div class="box key">
+      <p class="bt">Η παρανόηση της ημέρας, για το τετράδιο</p>
+      <p>«Η μισή διαδρομή με 80, η μισή με 40 — άρα μέση 60.» Λάθος, και θα το λύσει στο τετράδιο Colab (άσκηση Α2). Το έχεις στο μυαλό σου για να <em>μην</em> το προλάβεις τώρα: θέλουμε να το πέσει και μετά να το ελέγξει ο κώδικας.</p>
+    </div>
+  </section>
+
+  <section id="s5">
+    <h2 class="sec">Το κοντέρ</h2>
+    <p class="sec-sub">35΄ – 45΄</p>
+    <div class="box digital">
+      <p class="bt">Η προσομοίωση στο φύλλο</p>
+      <p>Ίδιος άνθρωπος με την Εβδομάδα 3, αλλά τώρα ο μαθητής δεν σέρνει τη θέση — γυρίζει το <em>κοντέρ</em>, την ταχύτητα. Η θέση προκύπτει μόνη της. Από κάτω δύο γραφικές: x–t και υ–t. Δίπλα: στιγμιαία ταχύτητα, μέση ταχύτητα (διάστημα/χρόνος) και Δx/Δt.</p>
+    </div>
+    <ol class="body">
+      <li><strong>Σταθερό κοντέρ στο +2.</strong> Η x–t γίνεται ευθεία που ανεβαίνει, η υ–t οριζόντια στο 2. Ρώτα: «Πόσο ανεβαίνει η x–t σε κάθε δευτερόλεπτο;» — αυτό είναι το κλείσιμο του κύκλου: <em>κλίση της x–t = ταχύτητα</em>.</li>
+      <li><strong>Πήγαινε-έλα.</strong> +2 για 5 s, −2 για 5 s. Μέση ταχύτητα 2 m/s, Δx/Δt = 0. Ακριβώς ό,τι διάστημα/μετατόπιση της περασμένης εβδομάδας, διαιρεμένο με τον χρόνο.</li>
+      <li><strong>x–t που κατεβαίνει.</strong> Πρέπει να βρει ότι αρκεί αρνητικό κοντέρ. «Το αυτοκίνητο κινείται με −15 m/s. Πάει πιο αργά από ένα με +10;» Όχι — πάει πιο γρήγορα, προς την άλλη μεριά.</li>
+    </ol>
+    <ul class="ask">
+      <li>Τι σχήμα έχει η υ–t όταν το κοντέρ αλλάζει απότομα; Γίνεται αυτό στην πραγματικότητα;</li>
+    </ul>
+    <p>Η τελευταία ανοίγει την Εβδομάδα 6 (επιτάχυνση). Ένα «όχι, χρειάζεται χρόνος να αλλάξεις ταχύτητα» αρκεί.</p>
+  </section>
+
+  <section id="s6">
+    <h2 class="sec">Τετράδιο: ο Bolt</h2>
+    <p class="sec-sub">45΄ – 55΄ · Colab</p>
+    <p>Το τετράδιο της εβδομάδας (<code>notebooks/fysiki-04-taxytita.ipynb</code>, το ανοίγει από το φύλλο με ένα κλικ) έχει δύο μέρη. Το <strong>Μέρος Α</strong> λύνεται στο χαρτί — μετατροπές, το ταξίδι 80/40, μια x–t σε τρία κομμάτια — και μετά ελέγχεται με ένα κελί κώδικα. Το <strong>Μέρος Β</strong> είναι Python.</p>
+    <p>Στο μάθημα κάνετε μόνο τη <strong>Β2 — Usain Bolt</strong>. Τα χρονικά του περάσματα ανά 10 m στον παγκόσμιο του Βερολίνου (2009) έχουν δημοσιευθεί από την ομάδα εμβιομηχανικής ανάλυσης της IAAF. Με αυτά ο κώδικας βγάζει την ταχύτητα σε κάθε δεκάμετρο και ζωγραφίζει ραβδόγραμμα. Τρία ευρήματα που θέλεις να δει:</p>
+    <ul>
+      <li>Η μέση ταχύτητα της κούρσας είναι 100/9,58 ≈ 10,4 m/s ≈ 37,6 km/h.</li>
+      <li>Η μέγιστη, ανάμεσα στα 60 και 70 m, είναι 10/0,81 ≈ 12,3 m/s ≈ <strong>44 km/h</strong> — σχεδόν όσο το όριο ταχύτητας μέσα στην πόλη (50 km/h).</li>
+      <li>Το πρώτο δεκάμετρο είναι το πιο αργό από όλα (≈ 5,3 m/s). Ο ταχύτερος άνθρωπος της ιστορίας περνάει σχεδόν δύο δευτερόλεπτα επιταχύνοντας.</li>
+    </ul>
+    <p>Οι υπόλοιπες ασκήσεις μένουν για το σπίτι. Ο βρόχος (<code>for</code>) στον κώδικα είναι έτοιμος· την επόμενη εβδομάδα στην Python θα μάθει τι κάνει. Μέχρι τότε συμπληρώνει μόνο τον τύπο μέσα του — όπως με το <code>while True</code> στο Πέτρα-Ψαλίδι-Χαρτί.</p>
+  </section>
+
+  <section id="quiz">
+    <h2 class="sec">Exit ticket</h2>
+    <p class="sec-sub">55΄ – 60΄ · πέντε ερωτήσεις, χωρίς βαθμό</p>
+    <div class="quiz">
+      <details class="q">
+        <summary><span class="qn">1</span><span>Α: 40 m σε 8 s. Β: 90 m σε 15 s. Ποιος είναι πιο γρήγορος;</span></summary>
+        <div class="q-body"><p class="opt">Ο Α, γιατί τελείωσε νωρίτερα</p><p class="opt right">Ο Β</p><p class="opt">Είναι ίσοι</p><p class="opt">Δεν μπορούμε να πούμε</p>
+        <p class="why">5 m/s έναντι 6 m/s. Αν διαλέξει «τελείωσε νωρίτερα», γύρνα στον σκύλο του hero.</p></div>
+      </details>
+      <details class="q">
+        <summary><span class="qn">2</span><span>72 km/h σε m/s;</span></summary>
+        <div class="q-body"><p class="opt right">20 m/s</p><p class="opt">259,2 m/s</p><p class="opt">72 m/s</p><p class="opt">7,2 m/s</p>
+        <p class="why">72 ÷ 3,6. Το 259,2 σημαίνει ότι πολλαπλασίασε — ρώτα «ποια μονάδα είναι μεγαλύτερη;».</p></div>
+      </details>
+      <details class="q">
+        <summary><span class="qn">3</span><span>4 m μπροστά και 4 m πίσω σε 8 s. Μέση ταχύτητα και Δx/Δt;</span></summary>
+        <div class="q-body"><p class="opt right">1 m/s και 0</p><p class="opt">0 και 1 m/s</p><p class="opt">1 m/s και 1 m/s</p><p class="opt">0 και 0</p>
+        <p class="why">Η αποστολή 2 του κοντέρ. Το «0 και 1» σημαίνει ότι τα ονόματα μπερδεύτηκαν — σύνδεσέ τα ξανά με διάστημα/μετατόπιση.</p></div>
+      </details>
+      <details class="q">
+        <summary><span class="qn">4</span><span>Δύο ευθείες στο x–t. Η πιο απότομη σημαίνει…</span></summary>
+        <div class="q-body"><p class="opt">Μεγαλύτερη απόσταση</p><p class="opt right">Μεγαλύτερη ταχύτητα</p><p class="opt">Μεγαλύτερο χρόνο</p><p class="opt">Επιτάχυνση</p>
+        <p class="why">Κλίση = ταχύτητα. Το «επιτάχυνση» είναι συχνό· μια ευθεία έχει σταθερή κλίση, άρα σταθερή ταχύτητα.</p></div>
+      </details>
+      <details class="q">
+        <summary><span class="qn">5</span><span>Το κοντέρ του αυτοκινήτου δείχνει…</span></summary>
+        <div class="q-body"><p class="opt">Τη μέση ταχύτητα της διαδρομής</p><p class="opt right">Τη στιγμιαία ταχύτητα</p><p class="opt">Την απόσταση που διανύθηκε</p><p class="opt">Τη μετατόπιση</p>
+        <p class="why">Το «οδόμετρο» δίπλα του δείχνει το διάστημα. Αξίζει να του το δείξεις στο αυτοκίνητο.</p></div>
+      </details>
+    </div>
+  </section>
+
+  <section id="lyseis">
+    <h2 class="sec">Λύσεις του τετραδίου</h2>
+    <p class="sec-sub">Για σένα — δεν υπάρχουν στο αρχείο που ανοίγει ο μαθητής</p>
+    <table>
+      <thead><tr><th>Άσκηση</th><th>Απάντηση</th></tr></thead>
+      <tbody>
+        <tr><td>Α1</td><td>36 km/h = 10 m/s · 90 km/h = 25 m/s · 5 m/s = 18 km/h · 12 m/s = 43,2 km/h</td></tr>
+        <tr><td>Α2</td><td>40 km με 80 km/h → 0,5 h· 40 km με 40 km/h → 1 h. Μέση = 80 ÷ 1,5 ≈ <strong>53,3 km/h</strong>, όχι 60. Πιο πολύ χρόνο περνάς στο αργό κομμάτι, άρα «μετράει» περισσότερο.</td></tr>
+        <tr><td>Α3</td><td>0–2 s: (6−0)/2 = +3 m/s · 2–5 s: 0 · 5–8 s: (0−6)/3 = −2 m/s. Διάστημα 12 m, Δx = 0. Μέση ταχύτητα 12/8 = 1,5 m/s.</td></tr>
+        <tr><td>Β1</td><td><code>sum(kanoniko) / len(kanoniko)</code> και <code>apostasi / mesos_kanoniko</code>. Τα νούμερα εξαρτώνται από τις μετρήσεις του. Κανονικό περπάτημα συνήθως 1,2–1,5 m/s (≈ 4,5–5,5 km/h).</td></tr>
+        <tr><td>Β2</td><td><code>speed = 10 / dt</code>. Ταχύτητες ανά 10 m: 5,29 · 10,10 · 11,11 · 11,63 · 12,05 · 12,20 · 12,35 · 12,20 · 12,05 · 12,05 m/s. Μέγιστη 12,35 m/s ≈ 44,4 km/h (60–70 m). Μέση 10,44 m/s.</td></tr>
+        <tr><td>Β3</td><td>Συνθήκη: <code>elif thesi_2 &gt; thesi_1:</code>. Μέση ταχύτητα: <code>mesi_1 = thesi_1 / t</code>. Τυχαίο κάθε φορά, αλλά πέφτει γύρω στα 2 m/s — η «μέση ζαριά» του <code>randint(1, 3)</code>. Στην πρόκληση, το <code>randint(0, 4)</code> έχει τον ίδιο μέσο όρο (2): κανένα πλεονέκτημα, μόνο περισσότερη τύχη.</td></tr>
+        <tr><td>Β4</td><td><code>(2 * d) / (d / u_a + d / u_b)</code>. Μέσος όρος ταχυτήτων 60, μέση ταχύτητα 53,3. Είναι ίσα μόνο όταν περνάς <em>ίσο χρόνο</em> σε κάθε κομμάτι (όχι ίση απόσταση).</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section id="meta">
+    <h2 class="sec">Μετά το μάθημα</h2>
+    <p class="sec-sub">Εργασία, επεκτάσεις, και τι να προσέξεις</p>
+
+    <h3>Εργασία για το σπίτι — προαιρετική</h3>
+    <p>Στο επόμενο ταξίδι με το αυτοκίνητο: σημειώνει χιλιόμετρα του οδόμετρου και ώρα στην αρχή και στο τέλος, και υπολογίζει μέση ταχύτητα. Μετά τη συγκρίνει με ό,τι έδειχνε το κοντέρ τις περισσότερες φορές που κοίταξε. Γιατί βγαίνει μικρότερη; (Φανάρια.)</p>
+    <p>Στο τετράδιο: ένα κοντέρ ζωγραφισμένο, με τη βελόνα στα 50 km/h, και δίπλα το ίδιο νούμερο σε m/s. Και οι ασκήσεις Α1–Α3, Β1, Β3, Β4 του Colab.</p>
+
+    <h3>Going further</h3>
+    <p>Ο κώδικας GlowScript της Εβδομάδας 3 με ένα <code>gcurve</code> ακόμα: <code>gv = gcurve(color=color.red)</code> και <code>gv.plot(t, v.x)</code>. Δύο γραφικές δίπλα δίπλα από τον δικό του κώδικα — η μία η κλίση της άλλης.</p>
+
+    <h3>Τι να προσέξεις</h3>
+    <ul>
+      <li><strong>Αν το phyphox δεν πιάνει τα παλαμάκια</strong> (θόρυβος, ανοιχτός χώρος): ανέβασε το «threshold» στις ρυθμίσεις του πειράματος, ή χτύπα δύο ξύλα μεταξύ τους.</li>
+      <li><strong>Αν τα κλάσματα τον κουράζουν:</strong> άφησε τον πίνακα του φύλλου να υπολογίζει, και κράτα μόνο μία γραμμή με το χέρι. Ο στόχος είναι το «ανά», όχι η αριθμητική.</li>
+      <li><strong>Αν βιάζεται να πει «υ = s/t» από το σχολείο:</strong> ρώτα «και τι σημαίνει το s σε αυτόν τον τύπο — διάστημα ή μετατόπιση;». Το βιβλίο χρησιμοποιεί και τα δύο σύμβολα· η ερώτηση τον αναγκάζει να ξέρει τι διαιρεί.</li>
+    </ul>
+
+    <div class="box key">
+      <p class="bt">Το σημάδι ότι πέτυχε</p>
+      <p>Αν σε κάποιον αγώνα ή διαφήμιση ακούσει έναν αριθμό σε km/h και τον μετατρέψει μόνος του σε m/s — ή το αντίστροφο.</p>
+    </div>
+
+    <div class="foot">
+      <span>Εβδομάδα 4 από 30 · Κεφάλαιο 2.2</span>
+      <a href="fysiki-05.html">Επόμενο: Κίνηση με σταθερή ταχύτητα</a>
+    </div>
+  </section>
+
+
+</main>
+</div>
+
+<script>
+(function(){
+  var NS='http://www.w3.org/2000/svg';
+  var g=document.getElementById('strobe');
+  if(g){
+    function mk(tag,attrs){var e=document.createElementNS(NS,tag);for(var k in attrs)e.setAttribute(k,attrs[k]);g.appendChild(e);return e;}
+    function row(y,xs,label){
+      mk('line',{x1:40,y1:y,x2:480,y2:y,stroke:'#c0cad2','stroke-width':1});
+      for(var m=0;m<=5;m++){var x=60+m*84;mk('line',{x1:x,y1:y-5,x2:x,y2:y+5,stroke:'#b3bfc9','stroke-width':1});
+        var tt=mk('text',{x:x,y:y+20,'text-anchor':'middle','font-family':"'IBM Plex Sans',sans-serif",'font-size':9,fill:'#78868f'});tt.textContent=m+' m';}
+      xs.forEach(function(px,i){
+        mk('circle',{cx:60+px*84,cy:y,r:6,fill:i===0?'#a8571f':'#17456b'});
+        var t=mk('text',{x:60+px*84,y:y-13,'text-anchor':'middle','font-family':"'IBM Plex Sans',sans-serif",'font-size':9,fill:'#47555f'});t.textContent=i+' s';
+      });
+      var l=mk('text',{x:40,y:y-30,'font-family':"'IBM Plex Sans',sans-serif",'font-size':11,fill:'#17456b','font-weight':600});l.textContent=label;
+    }
+    row(52,[0,0.8,1.6,2.4,3.2,4.0],'Σταθερός ρυθμός');
+    row(122,[0,0.3,0.8,1.6,2.7,4.2],'Ρυθμός που μεγαλώνει');
+  }
+
+  var side=document.getElementById('side'),burger=document.getElementById('burger'),scrim=document.getElementById('scrim');
+  function setDrawer(o){side.classList.toggle('open',o);scrim.classList.toggle('on',o);burger.setAttribute('aria-expanded',o?'true':'false');}
+  burger.addEventListener('click',function(){setDrawer(!side.classList.contains('open'));});
+  scrim.addEventListener('click',function(){setDrawer(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setDrawer(false);});
+
+  var ticks=[].slice.call(document.querySelectorAll('.tick'));
+  var clock=document.getElementById('clock'),segname=document.getElementById('segname');
+  var toggle=document.getElementById('toggle'),reset=document.getElementById('reset');
+  var started=null, elapsed=0, id=null;
+  function fmt(s){var m=Math.floor(s/60),r=Math.floor(s%60);return (m<10?'0':'')+m+':'+(r<10?'0':'')+r;}
+  function paint(){
+    var secs=elapsed+(started?(Date.now()-started)/1000:0), mins=secs/60;
+    clock.textContent=fmt(secs);
+    var found=null;
+    ticks.forEach(function(t){var a=+t.dataset.from,b=+t.dataset.to,on=mins>=a&&mins<b;t.setAttribute('data-active',on?'true':'false');if(on)found=t;});
+    if(!started&&elapsed===0) segname.textContent='Το μάθημα δεν έχει ξεκινήσει';
+    else if(found) segname.textContent=found.querySelector('.lab').firstChild.textContent.trim();
+    else segname.textContent='Το μάθημα ολοκληρώθηκε';
+  }
+  toggle.addEventListener('click',function(){
+    if(started){elapsed+=(Date.now()-started)/1000;started=null;clearInterval(id);id=null;toggle.textContent='Συνέχεια';}
+    else{started=Date.now();toggle.textContent='Παύση';id=setInterval(paint,1000);}
+    paint();
+  });
+  reset.addEventListener('click',function(){clearInterval(id);id=null;started=null;elapsed=0;toggle.textContent='Έναρξη';paint();});
+  paint();
+})();
+</script>
+</body>
+</html>

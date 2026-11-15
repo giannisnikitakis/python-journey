@@ -1,0 +1,721 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Φύλλο μαθητή · Εβδομάδα 3 — Γιατί κάτι επιπλέει;</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16211f;
+  --ink-soft:#4a5a56;
+  --ink-faint:#7c8d88;
+  --ground:#f1f4f0;
+  --sheet:#ffffff;
+  --rule:#d5ded7;
+  --rule-strong:#b6c3ba;
+
+  --green:#0f5d52;
+  --green-wash:#e7f0ec;
+  --amber:#a8571f;
+  --amber-wash:#f8efe4;
+  --indigo:#31456b;
+  --indigo-wash:#e8ecf4;
+  --wrong:#9c3535;
+  --wrong-wash:#f7e9e9;
+
+  --serif:'Alegreya', Georgia, 'Times New Roman', serif;
+  --sans:'IBM Plex Sans', system-ui, -apple-system, 'Segoe UI', sans-serif;
+
+  --nav-h:60px;
+  --side-w:288px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth; scroll-padding-top:calc(var(--nav-h) + 20px)}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}*{animation:none!important;transition:none!important}}
+body{margin:0; background:var(--ground); color:var(--ink); font-family:var(--serif); font-size:18.5px; line-height:1.68; -webkit-font-smoothing:antialiased}
+
+/* Nav */
+.nav{position:fixed; inset:0 0 auto 0; height:var(--nav-h); z-index:50; display:flex; align-items:center; gap:16px; padding:0 20px; background:var(--green); color:#eaf2ef; border-bottom:1px solid #0a463e}
+.nav-title{font-family:var(--serif); font-weight:700; font-size:1.06rem; margin:0; white-space:nowrap; overflow:hidden; text-overflow:ellipsis}
+.nav-title span{display:block; font-family:var(--sans); font-weight:400; font-size:.7rem; color:#9dc4b9; line-height:1.2; margin-top:1px}
+.nav-title a{color:inherit; text-decoration:none}
+.nav-title a:hover{text-decoration:underline; text-underline-offset:3px}
+.burger{display:none; background:none; border:1px solid rgba(255,255,255,.28); color:inherit; border-radius:5px; width:36px; height:34px; cursor:pointer; font-size:1.05rem; line-height:1; flex:0 0 auto}
+.nav-spacer{flex:1}
+.nav-actions{display:flex; gap:8px; font-family:var(--sans); flex:0 0 auto}
+.nav-btn{font-family:var(--sans); font-size:.78rem; font-weight:500; background:transparent; color:#c9e0d8; border:1px solid rgba(255,255,255,.25); border-radius:5px; padding:8px 13px; cursor:pointer; text-decoration:none; display:inline-block}
+.nav-btn:hover{background:rgba(255,255,255,.1); color:#fff}
+.nav-btn.solid{background:#eaf2ef; color:var(--green); border-color:#eaf2ef}
+.nav-btn.solid:hover{background:#fff}
+:focus-visible{outline:2.5px solid #f0b27a; outline-offset:2px}
+
+/* Sidebar */
+.side{position:fixed; top:var(--nav-h); bottom:0; left:0; width:var(--side-w); z-index:40; overflow-y:auto; background:var(--sheet); border-right:1px solid var(--rule); font-family:var(--sans); padding:20px 0 48px}
+.side h2{font-family:var(--sans); font-size:.72rem; font-weight:600; color:var(--ink-faint); margin:22px 20px 8px; padding-top:14px; border-top:1px solid var(--rule)}
+.side h2:first-child{border-top:0; padding-top:0; margin-top:4px}
+.side ol{list-style:none; margin:0; padding:0}
+.side a{display:grid; grid-template-columns:30px 1fr; align-items:baseline; gap:4px; padding:6px 20px 6px 16px; text-decoration:none; color:var(--ink-soft); font-size:.83rem; line-height:1.35; border-left:3px solid transparent}
+.side a:hover{background:var(--green-wash); color:var(--ink)}
+.side .num{font-variant-numeric:tabular-nums; font-size:.74rem; color:var(--ink-faint)}
+.side a[aria-current="page"]{border-left-color:var(--green); background:var(--green-wash); color:var(--green); font-weight:600}
+.side a[aria-current="page"] .num{color:var(--green)}
+.side a.pending{color:#9aa8a3}
+.side a.pending .ttl::after{content:''; display:inline-block; width:5px; height:5px; margin-left:7px; border:1px solid #c2cec8; border-radius:50%; vertical-align:.12em}
+.side-note{font-size:.72rem; color:var(--ink-faint); line-height:1.5; margin:20px 20px 0; padding-top:14px; border-top:1px solid var(--rule)}
+
+/* Layout */
+.wrap{margin-left:var(--side-w); padding-top:var(--nav-h)}
+main{max-width:800px; margin:0 auto; padding:0 32px 120px}
+
+/* Hero */
+.hero{padding:52px 0 32px; border-bottom:1px solid var(--rule)}
+.kicker{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--green); margin:0 0 10px}
+.hero h1{font-family:var(--serif); font-weight:700; font-size:clamp(2rem,4.8vw,3rem); line-height:1.12; margin:0 0 18px; letter-spacing:-.012em; max-width:15ch}
+.hero-lede{font-size:1.14rem; color:var(--ink-soft); max-width:58ch; margin:0}
+
+figure.vials{margin:32px 0 0; padding:24px 20px 18px; background:var(--sheet); border:1px solid var(--rule); border-radius:8px}
+figure.vials svg{display:block; width:100%; height:auto; max-width:620px; margin:0 auto}
+figure.vials figcaption{font-family:var(--sans); font-size:.8rem; color:var(--ink-soft); margin-top:14px; text-align:center}
+
+/* Sections */
+section{padding-top:48px}
+h2.sec{font-family:var(--serif); font-weight:700; font-size:1.66rem; line-height:1.2; margin:0 0 6px; letter-spacing:-.008em}
+.sec-sub{font-family:var(--sans); font-size:.8rem; color:var(--ink-faint); margin:0 0 22px}
+h3{font-family:var(--serif); font-weight:700; font-size:1.22rem; margin:30px 0 8px}
+p{margin:0 0 14px; max-width:66ch}
+a.link{color:var(--indigo); text-underline-offset:3px}
+a.link:hover{background:var(--indigo-wash)}
+ul,ol.body{max-width:64ch; padding-left:22px; margin:0 0 16px}
+li{margin-bottom:7px}
+
+/* Rule box */
+.rulebox{border:2px solid var(--green); border-radius:9px; background:var(--green-wash); padding:20px 24px; margin:22px 0}
+.rulebox p{margin:0; font-size:1.16rem; font-weight:500; font-style:italic; max-width:none}
+.rulebox .bt{font-family:var(--sans); font-size:.76rem; font-weight:600; font-style:normal; color:var(--green); margin-bottom:8px; display:block}
+
+.box{border:1px solid var(--rule); border-left-width:4px; border-radius:0 8px 8px 0; background:var(--sheet); padding:16px 20px; margin:20px 0}
+.box p:last-child{margin-bottom:0}
+.box .bt{font-family:var(--sans); font-size:.78rem; font-weight:600; margin:0 0 6px}
+.box.safety{border-left-color:var(--amber); background:var(--amber-wash)}
+.box.safety .bt{color:var(--amber)}
+.box.digital{border-left-color:var(--indigo); background:var(--indigo-wash)}
+.box.digital .bt{color:var(--indigo)}
+
+/* Worksheet fields */
+.sheet{background:var(--sheet); border:1px solid var(--rule); border-radius:9px; padding:20px 22px; margin:20px 0}
+table.obs{width:100%; border-collapse:collapse; font-family:var(--sans); font-size:.82rem}
+table.obs th{background:var(--green-wash); color:var(--green); font-weight:600; font-size:.73rem; padding:8px 8px; text-align:right; border:1px solid var(--rule)}
+table.obs td{border:1px solid var(--rule); padding:0}
+table.obs td.n{width:34px; text-align:center; color:var(--ink-faint); font-variant-numeric:tabular-nums; padding:6px 0; background:#fafcfa}
+table.obs input{width:100%; border:0; background:transparent; font-family:var(--sans); font-size:.83rem; color:var(--ink); padding:9px 8px; min-width:0}
+table.obs input:focus{background:#fffbf0; outline:2px solid var(--green); outline-offset:-2px}
+
+.field{margin:16px 0}
+.field label{display:block; font-family:var(--sans); font-size:.83rem; font-weight:500; margin-bottom:6px; color:var(--ink)}
+.field .hintline{font-family:var(--sans); font-size:.78rem; color:var(--ink-faint); margin:-2px 0 7px}
+textarea, input.line{
+  width:100%; font-family:var(--serif); font-size:1rem; color:var(--ink);
+  background:#fdfefd; border:1px solid var(--rule); border-radius:6px; padding:10px 12px; line-height:1.6;
+}
+textarea{resize:vertical; min-height:88px}
+textarea:focus, input.line:focus{outline:2px solid var(--green); outline-offset:-1px; background:#fffbf0}
+ol.rules{list-style:none; counter-reset:r; padding:0; margin:12px 0 0; max-width:none}
+ol.rules li{counter-increment:r; display:grid; grid-template-columns:26px 1fr; gap:10px; align-items:center; margin-bottom:9px}
+ol.rules li::before{content:counter(r) '.'; font-family:var(--sans); font-size:.85rem; color:var(--green); font-weight:600}
+.signrow{display:flex; gap:22px; margin-top:20px; flex-wrap:wrap}
+.signrow div{flex:1 1 200px}
+.signrow span{display:block; font-family:var(--sans); font-size:.74rem; color:var(--ink-faint); margin-top:5px}
+.signline{border-bottom:1.5px solid var(--rule-strong); height:34px}
+
+/* Questions to think about */
+.ask{margin:16px 0; padding:0; list-style:none; max-width:64ch; border-top:1px solid var(--rule)}
+.ask li{margin:0; padding:12px 4px 12px 34px; border-bottom:1px solid var(--rule); position:relative; font-style:italic; font-size:1.03rem; line-height:1.55}
+.ask li::before{content:'?'; position:absolute; left:6px; top:12px; font-family:var(--sans); font-style:normal; font-weight:600; font-size:.86rem; color:var(--green)}
+
+/* Glossary */
+table.gloss{width:100%; border-collapse:collapse; font-family:var(--sans); font-size:.85rem; margin-top:6px}
+table.gloss th{background:var(--green-wash); color:var(--green); font-size:.73rem; font-weight:600; padding:8px 10px; text-align:right; border:1px solid var(--rule)}
+table.gloss td{border:1px solid var(--rule); padding:8px 10px; text-align:right}
+table.gloss td.en{font-style:italic; color:var(--ink-soft)}
+table.gloss td.blank{height:34px; background:#fafcfa}
+
+/* ── Quiz ── */
+.qcard{background:var(--sheet); border:1px solid var(--rule); border-radius:10px; padding:20px 22px; margin-bottom:14px}
+.qhead{display:flex; gap:12px; align-items:baseline; margin-bottom:14px}
+.qnum{font-family:var(--sans); font-size:.76rem; font-weight:600; color:var(--green); flex:0 0 auto; padding-top:2px}
+.qtext{font-size:1.07rem; font-weight:500; margin:0; max-width:none}
+.opts{display:flex; flex-direction:column; gap:8px}
+.opt{
+  display:flex; gap:11px; align-items:flex-start; width:100%; text-align:right;
+  font-family:var(--sans); font-size:.92rem; line-height:1.5; color:var(--ink);
+  background:#fbfdfb; border:1.5px solid var(--rule); border-radius:7px;
+  padding:11px 14px; cursor:pointer; transition:border-color .12s ease, background .12s ease;
+}
+.opt:hover:not([disabled]){border-color:var(--rule-strong); background:#fff}
+.opt .mark{
+  flex:0 0 auto; width:20px; height:20px; border-radius:50%; border:1.5px solid var(--rule-strong);
+  display:flex; align-items:center; justify-content:center; font-size:.8rem; line-height:1; margin-top:1px;
+  font-weight:600; color:transparent;
+}
+.opt[disabled]{cursor:default}
+.opt.correct{border-color:var(--green); background:var(--green-wash); color:var(--green); font-weight:500}
+.opt.correct .mark{border-color:var(--green); background:var(--green); color:#fff}
+.opt.incorrect{border-color:var(--wrong); background:var(--wrong-wash); color:var(--wrong)}
+.opt.incorrect .mark{border-color:var(--wrong); background:var(--wrong); color:#fff}
+.opt.dim{opacity:.5}
+.verdict{margin-top:14px; padding-top:13px; border-top:1px solid var(--rule); display:none}
+.verdict.show{display:block}
+.verdict .vt{font-family:var(--sans); font-size:.86rem; font-weight:600; margin:0 0 5px}
+.verdict.ok .vt{color:var(--green)}
+.verdict.no .vt{color:var(--wrong)}
+.verdict p.why{margin:0; font-size:1rem; color:var(--ink-soft); max-width:60ch}
+.hintbtn{
+  font-family:var(--sans); font-size:.76rem; background:transparent; border:1px solid var(--rule);
+  border-radius:5px; color:var(--ink-faint); padding:5px 10px; cursor:pointer; margin-top:12px;
+}
+.hintbtn:hover{color:var(--green); border-color:var(--green)}
+.hinttext{font-family:var(--sans); font-size:.84rem; color:var(--ink-soft); margin:10px 0 0; display:none; font-style:italic}
+.hinttext.show{display:block}
+
+.score{
+  background:var(--sheet); border:2px solid var(--green); border-radius:10px;
+  padding:22px 24px; margin-top:18px; display:none;
+}
+.score.show{display:block}
+.score h3{margin:0 0 6px; font-size:1.3rem}
+.score p{margin:0; color:var(--ink-soft); max-width:58ch}
+.score .big{font-family:var(--sans); font-size:2.4rem; font-weight:600; color:var(--green); line-height:1; margin-bottom:10px; font-variant-numeric:tabular-nums}
+
+.toolbar{display:flex; gap:9px; flex-wrap:wrap; margin:18px 0 0; font-family:var(--sans)}
+.tool{font-family:var(--sans); font-size:.8rem; font-weight:500; background:var(--sheet); color:var(--green); border:1.5px solid var(--green); border-radius:6px; padding:8px 15px; cursor:pointer}
+.tool:hover{background:var(--green); color:#fff}
+.tool.ghost{border-color:var(--rule-strong); color:var(--ink-soft)}
+.tool.ghost:hover{background:var(--ink-soft); color:#fff; border-color:var(--ink-soft)}
+
+.foot{margin-top:60px; padding-top:22px; border-top:1px solid var(--rule); font-family:var(--sans); font-size:.82rem; color:var(--ink-faint); display:flex; justify-content:space-between; gap:20px; flex-wrap:wrap}
+.foot a{color:var(--green); text-decoration:none; font-weight:500}
+.foot a:hover{text-decoration:underline}
+
+.scrim{position:fixed; inset:var(--nav-h) 0 0 0; background:rgba(22,33,31,.42); z-index:35; display:none}
+.scrim.on{display:block}
+
+@media (max-width:1040px){
+  .burger{display:block}
+  .side{transform:translateX(-100%); transition:transform .22s ease; box-shadow:0 0 40px rgba(0,0,0,.14)}
+  .side.open{transform:translateX(0)}
+  .wrap{margin-left:0}
+  main{padding:0 22px 90px}
+  .nav-btn.hideable{display:none}
+}
+@media (max-width:620px){
+  body{font-size:17.5px}
+  .nav{gap:10px; padding:0 12px}
+  .nav-title{font-size:.94rem}
+  .nav-title span{display:none}
+  table.obs{font-size:.75rem}
+  table.obs input{font-size:.76rem; padding:8px 5px}
+  .sheet{padding:14px}
+}
+@media print{
+  .nav,.side,.scrim,.toolbar,.hintbtn{display:none!important}
+  .wrap{margin:0; padding:0}
+  main{max-width:none; padding:0}
+  body{background:#fff; font-size:11pt}
+  section{page-break-inside:auto; padding-top:20px}
+  h2.sec{page-break-after:avoid}
+  .sheet,.box,.qcard,figure.vials,.rulebox{page-break-inside:avoid}
+  textarea,input.line{min-height:64px; background:#fff}
+  .verdict{display:none!important}
+  a.link::after{content:' (' attr(href) ')'; font-size:8pt; color:#555}
+}
+.meas{width:100%; border-collapse:collapse; font-family:var(--sans); font-size:.84rem}
+.meas th{background:var(--green-wash); color:var(--green); font-size:.73rem; font-weight:600; padding:8px; text-align:right; border:1px solid var(--rule); position:sticky; top:0}
+.meas td{border:1px solid var(--rule); padding:0}
+.meas td.lbl{padding:8px 10px; text-align:right; background:#fafcfb; color:var(--ink-soft)}
+.meas input{width:100%; border:0; background:transparent; font-family:var(--sans); font-size:.84rem; padding:9px 10px}
+.meas input:focus{background:#fffbf0; outline:2px solid var(--green); outline-offset:-2px}
+@media print{ .meas th{position:static} #pbox .toolbar{display:none} }
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <button class="burger" id="burger" aria-label="Άνοιγμα καταλόγου μαθημάτων" aria-expanded="false">☰</button>
+  <h1 class="nav-title"><a href="ximeia.html" title="Όλα τα μαθήματα">Μαθήματα Χημείας Β΄ Γυμνασίου</a><span>Φύλλο μαθητή</span></h1>
+  <div class="nav-spacer"></div>
+  <div class="nav-actions">
+    <a class="nav-btn hideable" href="mathima-03.html">Οδηγός καθηγητή</a>
+    <button class="nav-btn solid" id="printBtn">Εκτύπωση</button>
+  </div>
+</header>
+
+<div class="scrim" id="scrim"></div>
+
+<nav class="side" id="side" aria-label="Κατάλογος μαθημάτων">
+  <h2>Ενότητα 1 · Εισαγωγή στη Χημεία</h2>
+  <ol>
+    <li><a href="mathima-01-mathitis.html"><span class="num">01</span><span class="ttl">Τι είναι η Χημεία &amp; το εργαστήριο</span></a></li>
+    <li><a href="mathima-02-mathitis.html"><span class="num">02</span><span class="ttl">Καταστάσεις των υλικών</span></a></li>
+    <li><a href="mathima-03-mathitis.html" aria-current="page"><span class="num">03</span><span class="ttl">Φυσικές ιδιότητες — πυκνότητα</span></a></li>
+  </ol>
+  <h2>Ενότητα 2 · Από το νερό στο άτομο</h2>
+  <ol>
+    <li><a href="mathima-04-mathitis.html"><span class="num">04</span><span class="ttl">Το νερό στη ζωή μας</span></a></li>
+    <li><a href="mathima-05-mathitis.html" class="pending"><span class="num">05</span><span class="ttl">Το νερό ως διαλύτης — Μείγματα</span></a></li>
+    <li><a href="mathima-06-mathitis.html" class="pending"><span class="num">06</span><span class="ttl">Διαλύματα — η διάλυση</span></a></li>
+    <li><a href="mathima-07-mathitis.html" class="pending"><span class="num">07</span><span class="ttl">Περιεκτικότητα % w/w</span></a></li>
+    <li><a href="mathima-08-mathitis.html" class="pending"><span class="num">08</span><span class="ttl">Περιεκτικότητα % w/v</span></a></li>
+    <li><a href="mathima-09-mathitis.html" class="pending"><span class="num">09</span><span class="ttl">% v/v και αραίωση</span></a></li>
+    <li><a href="mathima-10-mathitis.html" class="pending"><span class="num">10</span><span class="ttl">Ρύπανση του νερού</span></a></li>
+    <li><a href="mathima-11-mathitis.html" class="pending"><span class="num">11</span><span class="ttl">Διαχωρισμός μειγμάτων Ι</span></a></li>
+    <li><a href="mathima-12-mathitis.html" class="pending"><span class="num">12</span><span class="ttl">Διαχωρισμός μειγμάτων ΙΙ</span></a></li>
+    <li><a href="mathima-13-mathitis.html" class="pending"><span class="num">13</span><span class="ttl">Εμπέδωση &amp; έρευνα νερού</span></a></li>
+    <li><a href="mathima-14-mathitis.html" class="pending"><span class="num">14</span><span class="ttl">Ηλεκτρόλυση του νερού</span></a></li>
+    <li><a href="mathima-15-mathitis.html" class="pending"><span class="num">15</span><span class="ttl">Φυσικές σταθερές των ουσιών</span></a></li>
+    <li><a href="mathima-16-mathitis.html" class="pending"><span class="num">16</span><span class="ttl">Χημική αντίδραση</span></a></li>
+    <li><a href="mathima-17-mathitis.html" class="pending"><span class="num">17</span><span class="ttl">Άτομα &amp; μόρια</span></a></li>
+    <li><a href="mathima-18-mathitis.html" class="pending"><span class="num">18</span><span class="ttl">Υποατομικά σωματίδια — ιόντα</span></a></li>
+    <li><a href="mathima-19-mathitis.html" class="pending"><span class="num">19</span><span class="ttl">Σύμβολα &amp; Περιοδικός Πίνακας</span></a></li>
+    <li><a href="mathima-20-mathitis.html" class="pending"><span class="num">20</span><span class="ttl">Χημική εξίσωση — διατήρηση μάζας</span></a></li>
+    <li><a href="mathima-21-mathitis.html" class="pending"><span class="num">21</span><span class="ttl">Εμπέδωση &amp; project ατόμου</span></a></li>
+  </ol>
+  <h2>Ενότητα 3 · Ατμοσφαιρικός αέρας</h2>
+  <ol>
+    <li><a href="mathima-22-mathitis.html" class="pending"><span class="num">22</span><span class="ttl">Σύσταση του ατμοσφαιρικού αέρα</span></a></li>
+    <li><a href="mathima-23-mathitis.html" class="pending"><span class="num">23</span><span class="ttl">Οξυγόνο</span></a></li>
+    <li><a href="mathima-24-mathitis.html" class="pending"><span class="num">24</span><span class="ttl">Διοξείδιο του άνθρακα</span></a></li>
+    <li><a href="mathima-25-mathitis.html" class="pending"><span class="num">25</span><span class="ttl">Ρύπανση του αέρα — αιθαλομίχλη</span></a></li>
+    <li><a href="mathima-26-mathitis.html" class="pending"><span class="num">26</span><span class="ttl">Project ποιότητας αέρα</span></a></li>
+  </ol>
+  <h2>Ενότητα 4 · Έδαφος</h2>
+  <ol>
+    <li><a href="mathima-27-mathitis.html" class="pending"><span class="num">27</span><span class="ttl">Έδαφος &amp; υπέδαφος</span></a></li>
+    <li><a href="mathima-28-mathitis.html" class="pending"><span class="num">28</span><span class="ttl">Ρύπανση του εδάφους</span></a></li>
+    <li><a href="mathima-29-mathitis.html" class="pending"><span class="num">29</span><span class="ttl">Project εδάφους &amp; ολοκλήρωση</span></a></li>
+  </ol>
+  <h2>Κλείσιμο</h2>
+  <ol>
+    <li><a href="mathima-30-mathitis.html" class="pending"><span class="num">30</span><span class="ttl">Τελική σύνθεση &amp; portfolio</span></a></li>
+  </ol>
+  <p class="side-note">Ο κύκλος σημαίνει ότι το φύλλο αυτού του μαθήματος δεν έχει γραφτεί ακόμη.</p>
+</nav>
+
+<div class="wrap">
+<main>
+
+  <div class="hero">
+    <p class="kicker">Εβδομάδα 3 · Φύλλο μαθητή</p>
+    <h1>Γιατί κάτι επιπλέει;</h1>
+    <p class="hero-lede">Δύο κουτάκια αναψυκτικού. Ίδιο μέγεθος, ίδιο αλουμίνιο, ίδια μάρκα. Το ένα είναι κανονικό, το άλλο «zero». Τα ρίχνεις σε έναν κουβά με νερό. Τι θα γίνει;</p>
+
+    <figure class="vials">
+      <svg viewBox="0 0 520 170" role="img" aria-label="Δύο κλειστά κουτάκια αναψυκτικού στο τραπέζι, κανονικό και zero">
+        <line x1="40" y1="150" x2="480" y2="150" stroke="#b6c3ba" stroke-width="2"/>
+        <g><rect x="150" y="60" width="56" height="88" rx="8" fill="#a8571f"/><rect x="155" y="54" width="46" height="8" rx="3" fill="#8e9aa0"/>
+        <text x="178" y="110" text-anchor="middle" font-family="'IBM Plex Sans',sans-serif" font-size="11" fill="#fff" font-weight="600">κανονικό</text></g>
+        <g><rect x="314" y="60" width="56" height="88" rx="8" fill="#16211f"/><rect x="319" y="54" width="46" height="8" rx="3" fill="#8e9aa0"/>
+        <text x="342" y="110" text-anchor="middle" font-family="'IBM Plex Sans',sans-serif" font-size="11" fill="#fff" font-weight="600">zero</text></g>
+        <text x="260" y="30" text-anchor="middle" font-family="Alegreya,serif" font-size="22" fill="#0f5d52">?</text>
+      </svg>
+      <figcaption>330 mL το καθένα. Ποιο θα βυθιστεί — αν βυθιστεί κάποιο;</figcaption>
+    </figure>
+  </div>
+
+  <section id="kamfora">
+    <h2 class="sec">Πρώτα: το βάζο της περασμένης εβδομάδας</h2>
+    <p class="sec-sub">Άνοιξε το βάζο της καμφοράς</p>
+    <div class="sheet">
+      <div class="field" style="margin-top:0"><label for="k1">Τι βλέπεις, τι μυρίζεις, πόσο ζυγίζουν τώρα οι ταμπλέτες;</label><input class="line" id="k1" type="text"></div>
+      <div class="field" style="margin-bottom:0"><label for="k2">Είδες ποτέ υγρό στο βάζο; Από ποια κατάσταση σε ποια πέρασε η καμφορά; Πώς λέγεται αυτό;</label><textarea id="k2"></textarea></div>
+    </div>
+  </section>
+
+  <section id="koutakia">
+    <h2 class="sec">Τα δύο κουτάκια</h2>
+    <p class="sec-sub">Πρόβλεψη πριν τον κουβά</p>
+    <div class="sheet">
+      <div class="field" style="margin-top:0"><label for="c1">Τι πιστεύεις ότι θα γίνει; Γιατί;</label><textarea id="c1"></textarea></div>
+      <div class="field"><label for="c2">Τι έγινε;</label><input class="line" id="c2" type="text"></div>
+      <div class="field" style="margin-bottom:0"><label for="c3">Ο όγκος είναι ίδιος. Τι άλλο μπορεί να διαφέρει; Πώς θα το έλεγχες;</label><textarea id="c3"></textarea></div>
+    </div>
+    <div class="rulebox">
+      <span class="bt">Πυκνότητα</span>
+      <p>Πόση μάζα χωράει σε κάθε μονάδα όγκου: <strong>ρ = m ÷ V</strong>. Σε g/mL — ή, το ίδιο πράγμα, g/cm³.</p>
+    </div>
+  </section>
+
+  <section id="metriseis">
+    <h2 class="sec">Μετράμε πυκνότητες</h2>
+    <p class="sec-sub">Υγρά με σύριγγα, στερεά με εκτόπιση</p>
+    <div class="box safety">
+      <p class="bt">Ασφάλεια</p>
+      <p>Το <strong>οινόπνευμα είναι εύφλεκτο</strong>: καμία φλόγα κοντά, και κλείνει αμέσως μετά. <strong>Δεν δοκιμάζεις κανένα υγρό</strong> — ούτε το μέλι. Ό,τι χυθεί σκουπίζεται αμέσως, γιατί η γλυκερίνη και το λάδι γλιστράνε.</p>
+    </div>
+
+    <h3>Υγρά</h3>
+    <p>Ποτηράκι στη ζυγαριά, μηδενισμός. Με τη σύριγγα ρίχνεις τον όγκο, διαβάζεις τη μάζα. Η πυκνότητα συμπληρώνεται μόνη της.</p>
+    <div class="sheet">
+      <table class="meas" id="liqTable">
+        <thead><tr><th style="width:30%">Υγρό</th><th>Όγκος (mL)</th><th>Μάζα (g)</th><th>Πυκνότητα (g/mL)</th></tr></thead>
+        <tbody>
+          <tr><td class="lbl">Νερό</td><td><input type="text" inputmode="decimal" value="20" aria-label="όγκος νερού"></td><td><input type="text" inputmode="decimal" aria-label="μάζα νερού"></td><td class="lbl out"></td></tr>
+          <tr><td class="lbl">Αλατόνερο</td><td><input type="text" inputmode="decimal" value="20" aria-label="όγκος αλατόνερου"></td><td><input type="text" inputmode="decimal" aria-label="μάζα αλατόνερου"></td><td class="lbl out"></td></tr>
+          <tr><td class="lbl">Ελαιόλαδο</td><td><input type="text" inputmode="decimal" value="20" aria-label="όγκος λαδιού"></td><td><input type="text" inputmode="decimal" aria-label="μάζα λαδιού"></td><td class="lbl out"></td></tr>
+          <tr><td class="lbl">Οινόπνευμα</td><td><input type="text" inputmode="decimal" value="20" aria-label="όγκος οινοπνεύματος"></td><td><input type="text" inputmode="decimal" aria-label="μάζα οινοπνεύματος"></td><td class="lbl out"></td></tr>
+          <tr><td class="lbl">Γλυκερίνη</td><td><input type="text" inputmode="decimal" value="20" aria-label="όγκος γλυκερίνης"></td><td><input type="text" inputmode="decimal" aria-label="μάζα γλυκερίνης"></td><td class="lbl out"></td></tr>
+          <tr><td class="lbl">Μέλι</td><td><input type="text" inputmode="decimal" value="10" aria-label="όγκος μελιού"></td><td><input type="text" inputmode="decimal" aria-label="μάζα μελιού"></td><td class="lbl out"></td></tr>
+        </tbody>
+      </table>
+      <div class="field" style="margin-bottom:0"><label for="byhand">Κάνε τον υπολογισμό για το <strong>νερό με το χέρι</strong>, πριν δεις τι βγάζει ο πίνακας. Τι νούμερο περίμενες για το νερό, και γιατί;</label><textarea id="byhand"></textarea></div>
+    </div>
+
+    <h3>Στερεά</h3>
+    <p>Ογκομετρικός κύλινδρος με νερό. Ζυγίζεις το στερεό, το βυθίζεις, και ο όγκος του είναι πόσο ανέβηκε η στάθμη.</p>
+    <div class="sheet">
+      <table class="meas" id="solTable">
+        <thead><tr><th style="width:24%">Στερεό</th><th>Μάζα (g)</th><th>Στάθμη πριν (mL)</th><th>Στάθμη μετά (mL)</th><th>Όγκος (cm³)</th><th>Πυκνότητα (g/cm³)</th></tr></thead>
+        <tbody>
+          <tr><td class="lbl">Πέτρα</td><td><input type="text" inputmode="decimal" aria-label="μάζα πέτρας"></td><td><input type="text" inputmode="decimal" aria-label="στάθμη πριν πέτρα"></td><td><input type="text" inputmode="decimal" aria-label="στάθμη μετά πέτρα"></td><td class="lbl out"></td><td class="lbl out"></td></tr>
+          <tr><td class="lbl">10 κέρματα</td><td><input type="text" inputmode="decimal" aria-label="μάζα κερμάτων"></td><td><input type="text" inputmode="decimal" aria-label="στάθμη πριν κέρματα"></td><td><input type="text" inputmode="decimal" aria-label="στάθμη μετά κέρματα"></td><td class="lbl out"></td><td class="lbl out"></td></tr>
+          <tr><td class="lbl">Κερί</td><td><input type="text" inputmode="decimal" aria-label="μάζα κεριού"></td><td><input type="text" inputmode="decimal" aria-label="στάθμη πριν κερί"></td><td><input type="text" inputmode="decimal" aria-label="στάθμη μετά κερί"></td><td class="lbl out"></td><td class="lbl out"></td></tr>
+        </tbody>
+      </table>
+      <div class="field"><label for="coins">Γιατί μετράμε <strong>δέκα</strong> κέρματα μαζί και όχι ένα;</label><input class="line" id="coins" type="text"></div>
+      <div class="field" style="margin-bottom:0"><label for="wax">Το κερί επιπλέει. Πώς κατάφερες να μετρήσεις τον όγκο του;</label><input class="line" id="wax" type="text"></div>
+    </div>
+  </section>
+
+  <section id="pyrgos">
+    <h2 class="sec">Ο πύργος</h2>
+    <p class="sec-sub">Πρώτα πρόβλεψη από τον πίνακά σου, μετά χτίσιμο</p>
+    <div class="sheet">
+      <div class="field" style="margin-top:0"><label for="order">Με βάση τις πυκνότητες που μέτρησες, με ποια σειρά θα στρωθούν μέλι, γλυκερίνη, νερό, λάδι και οινόπνευμα, <strong>από κάτω προς τα πάνω</strong>;</label><input class="line" id="order" type="text"></div>
+      <div class="field"><label for="ice">Ρίξε ένα παγάκι σε ένα ποτήρι με σκέτο οινόπνευμα. Τι γίνεται; Γιατί σε εκπλήσσει — ή γιατί όχι;</label><textarea id="ice"></textarea></div>
+      <table class="meas" style="margin-top:10px">
+        <thead><tr><th style="width:30%">Πλωτήρας</th><th>Πού σταμάτησε στον πύργο;</th></tr></thead>
+        <tbody>
+          <tr><td class="lbl">Φελλός</td><td><input type="text" aria-label="φελλός"></td></tr>
+          <tr><td class="lbl">Κερί</td><td><input type="text" aria-label="κερί"></td></tr>
+          <tr><td class="lbl">Σταφύλι</td><td><input type="text" aria-label="σταφύλι"></td></tr>
+          <tr><td class="lbl">Παγάκι</td><td><input type="text" aria-label="παγάκι"></td></tr>
+          <tr><td class="lbl">Κέρμα</td><td><input type="text" aria-label="κέρμα"></td></tr>
+        </tbody>
+      </table>
+      <div class="field" style="margin-bottom:0"><label for="rule">Γράψε τον κανόνα με δικά σου λόγια: πότε ένα σώμα επιπλέει σε ένα υγρό;</label><textarea id="rule"></textarea></div>
+    </div>
+  </section>
+
+  <section id="dexameni">
+    <h2 class="sec">Η δεξαμενή</h2>
+    <p class="sec-sub">Διάλεξε υγρό και σώμα — και δες πόσο βυθίζεται</p>
+    <div class="box digital">
+      <p class="bt">Πώς δουλεύει</p>
+      <p>Διάλεξε ένα υγρό και ένα υλικό, ή φτιάξε δικό σου σώμα με τους ρυθμιστές μάζας και όγκου. Πάτα <em>Ρίξ' το</em>. Το σώμα πέφτει και ισορροπεί.</p>
+    </div>
+    <div class="sheet" id="tankbox">
+      <div style="display:flex;flex-wrap:wrap;gap:10px 18px;font-family:var(--sans);font-size:.82rem;color:var(--ink-soft);margin-bottom:12px">
+        <label>Υγρό <select id="liqSel" style="font:inherit;padding:4px 6px;border:1px solid var(--rule);border-radius:4px"></select></label>
+        <label>Υλικό <select id="matSel" style="font:inherit;padding:4px 6px;border:1px solid var(--rule);border-radius:4px"></select></label>
+      </div>
+      <canvas id="tankCv" width="700" height="300" aria-label="Δεξαμενή με υγρό και σώμα" style="display:block;width:100%;border:1px solid var(--rule);border-radius:6px;background:#fbfdfc"></canvas>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px 24px;margin-top:12px;font-family:var(--sans);font-size:.82rem;color:var(--ink-soft)">
+        <label>Μάζα: <b id="mLab" style="color:var(--green)">100</b> g<input type="range" id="mSl" min="10" max="1000" step="10" value="100" style="width:100%;accent-color:var(--green)"></label>
+        <label>Όγκος: <b id="vLab" style="color:var(--green)">100</b> cm³<input type="range" id="vSl" min="10" max="500" step="5" value="100" style="width:100%;accent-color:var(--green)"></label>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:6px 22px;font-family:var(--sans);font-size:.82rem;color:var(--ink-soft);margin-top:8px">
+        <span>ρ σώματος = <b id="rObj" style="color:var(--green)">–</b> g/cm³</span>
+        <span>ρ υγρού = <b id="rLiq" style="color:var(--green)">–</b> g/cm³</span>
+        <span>κάτω από την επιφάνεια: <b id="sub" style="color:var(--green)">–</b></span>
+      </div>
+      <div class="toolbar" style="margin-top:12px"><button class="tool" id="dropBtn">Ρίξ' το</button></div>
+    </div>
+
+    <h3>Τέσσερις αποστολές</h3>
+    <div class="sheet">
+      <div class="field" style="margin-top:0"><label for="t1">Με τους ρυθμιστές, φτιάξε σώμα που <strong>μόλις και μετά βίας</strong> επιπλέει στο νερό. Τι σχέση έχουν οι αριθμοί μάζας και όγκου;</label><textarea id="t1"></textarea></div>
+      <div class="field"><label for="t2">Πάγος σε θαλασσινό νερό. Τι ποσοστό είναι κάτω από την επιφάνεια; Τι σημαίνει «η κορυφή του παγόβουνου»;</label><textarea id="t2"></textarea></div>
+      <div class="field"><label for="t3">Ξύλο σε νερό, μετά σε οινόπνευμα, μετά σε μέλι. Πού κάθεται ψηλότερα; Γιατί;</label><textarea id="t3"></textarea></div>
+      <div class="field" style="margin-bottom:0"><label for="t4">Σίδηρος σε υδράργυρο. Τι έγινε; Είναι ο σίδηρος «βαρύς» ή «ελαφρύς»;</label><textarea id="t4"></textarea></div>
+    </div>
+    <div class="box digital">
+      <p class="bt">Και με πραγματικούς κύβους</p>
+      <p>Η <a class="link" href="https://phet.colorado.edu/el/simulations/density">PhET — Πυκνότητα</a> έχει κύβους από ξύλο, πάγο, τούβλο και αλουμίνιο, μια ζυγαριά και μια πισίνα που ανεβαίνει όταν βυθίζεις κάτι.</p>
+    </div>
+  </section>
+
+  <section id="taftotita">
+    <h2 class="sec">Ταυτότητα μιας ουσίας</h2>
+    <p class="sec-sub">Οι φυσικές ιδιότητες που ξέρεις μέχρι τώρα</p>
+    <div class="sheet">
+      <table class="meas">
+        <thead><tr><th style="width:34%">Ιδιότητα</th><th>Νερό</th><th>Οινόπνευμα</th></tr></thead>
+        <tbody>
+          <tr><td class="lbl">Χρώμα</td><td><input type="text" aria-label="χρώμα νερού"></td><td><input type="text" aria-label="χρώμα οινοπνεύματος"></td></tr>
+          <tr><td class="lbl">Οσμή</td><td><input type="text" aria-label="οσμή νερού"></td><td><input type="text" aria-label="οσμή οινοπνεύματος"></td></tr>
+          <tr><td class="lbl">Κατάσταση στους 20 °C</td><td><input type="text" aria-label="κατάσταση νερού"></td><td><input type="text" aria-label="κατάσταση οινοπνεύματος"></td></tr>
+          <tr><td class="lbl">Σημείο βρασμού (Εβδ. 2)</td><td><input type="text" aria-label="σημείο βρασμού νερού"></td><td><input type="text" aria-label="σημείο βρασμού οινοπνεύματος"></td></tr>
+          <tr><td class="lbl">Πυκνότητα (σήμερα)</td><td><input type="text" aria-label="πυκνότητα νερού"></td><td><input type="text" aria-label="πυκνότητα οινοπνεύματος"></td></tr>
+        </tbody>
+      </table>
+      <div class="field" style="margin-bottom:0"><label for="unknown">Σου δίνουν ένα διάφανο, άχρωμο υγρό χωρίς ετικέτα. Ποιες από αυτές τις ιδιότητες θα σε βοηθούσαν να βρεις τι είναι; Ποιες δεν θα βοηθούσαν;</label><textarea id="unknown"></textarea></div>
+    </div>
+    <div class="rulebox">
+      <span class="bt">Ο Αρχιμήδης και το στέμμα</span>
+      <p>Ο βασιλιάς των Συρακουσών υποψιαζόταν ότι ο χρυσοχόος είχε ανακατέψει ασήμι στο χρυσό στέμμα του. Το στέμμα ζύγιζε σωστά. Ο Αρχιμήδης βρήκε πώς να το ελέγξει χωρίς να το χαλάσει — με κάτι που έκανες κι εσύ σήμερα. Τι θα έκανες στη θέση του; (Λύνεται με νούμερα στο τετράδιο.)</p>
+    </div>
+  </section>
+
+  <section id="tetradio">
+    <h2 class="sec">Το τετράδιο της εβδομάδας</h2>
+    <p class="sec-sub">Μαθηματικά στο χαρτί, συναρτήσεις και βρόχοι σε Python</p>
+    <div class="box digital">
+      <p class="bt">Άνοιξέ το στο Colab</p>
+      <p><a class="link" href="https://colab.research.google.com/github/giannisnikitakis/python-journey/blob/main/notebooks/ximeia-03-pyknotita.ipynb">ximeia-03-pyknotita.ipynb</a> — πρώτη δουλειά: <em>Αρχείο → Αποθήκευση αντιγράφου στο Drive</em>.</p>
+    </div>
+    <p>Στο <strong>Μέρος Α</strong>: πυκνότητες, το λάδι σε ένα μπουκάλι, και το στέμμα του Αρχιμήδη με αριθμούς. Στο <strong>Μέρος Β</strong> γράφεις τις δικές σου συναρτήσεις — μία που υπολογίζει πυκνότητα και μία που αποφασίζει αν κάτι επιπλέει — και με αυτές φτιάχνεις έναν πίνακα «τι επιπλέει πού», βρίσκεις πόσο βυθίζεται ένα παγόβουνο, και παίζεις ένα παιχνίδι πρόβλεψης με το <code>random</code>.</p>
+  </section>
+
+  <section id="kouiz">
+    <h2 class="sec">Έλεγξε τον εαυτό σου</h2>
+    <p class="sec-sub">Πέντε ερωτήσεις. Κάνε κλικ σε μια απάντηση και θα δεις αμέσως αν είναι σωστή. Δεν μπαίνει βαθμός πουθενά.</p>
+    <div id="quiz"></div>
+    <div class="score" id="score" role="status" aria-live="polite">
+      <div class="big" id="scoreBig">0 / 5</div>
+      <h3 id="scoreTitle"></h3>
+      <p id="scoreText"></p>
+    </div>
+    <div class="toolbar"><button class="tool ghost" id="quizReset">Ξαναπροσπάθησε</button></div>
+  </section>
+
+  <section id="apostoli">
+    <h2 class="sec">Η αποστολή σου</h2>
+    <p class="sec-sub">Για το σπίτι, αν σου αρέσει</p>
+    <p>Ένα ωμό αυγό σε ποτήρι με νερό. Βυθίζεται; Πρόσθεσε αλάτι μία κουταλιά τη φορά, ανακατεύοντας, μέχρι να αλλάξει κάτι. Πόσες κουταλιές χρειάστηκαν; Τι άλλαξε — το αυγό ή το νερό;</p>
+    <div class="box">
+      <p class="bt" style="color:var(--green)">Στο τετράδιο</p>
+      <p>Ζωγράφισε τον πύργο σου με τα χρώματα των στρωμάτων, γράψε δίπλα σε κάθε στρώμα την πυκνότητα που μέτρησες, και βάλε τους πλωτήρες εκεί που σταμάτησαν. Από κάτω: τα δύο κουτάκια στον κουβά.</p>
+    </div>
+    <div class="toolbar">
+      <button class="tool" id="printBtn2">Εκτύπωση φύλλου</button>
+      <button class="tool ghost" id="clearAll">Καθάρισε τι έγραψα</button>
+    </div>
+    <div class="foot">
+      <span>Εβδομάδα 3 από 30</span>
+      <a href="mathima-04-mathitis.html">Επόμενο: Το νερό στη ζωή μας</a>
+    </div>
+  </section>
+
+
+</main>
+</div>
+
+<script>
+(function(){
+  function num(s){ s=(s||'').trim().replace(',','.'); var v=parseFloat(s); return isFinite(v)?v:null; }
+  function fmt(v,d){ return v.toFixed(d).replace('.',','); }
+  function fmtr(v){ return String(Number(v.toFixed(3))).replace('.',','); }
+  function fitc(cv){var dpr=window.devicePixelRatio||1,w=cv.clientWidth||cv.width,h=parseInt(cv.getAttribute('height'),10);
+    cv.width=Math.round(w*dpr);cv.height=Math.round(h*dpr);cv.style.height=h+'px';var c=cv.getContext('2d');c.setTransform(dpr,0,0,dpr,0,0);return {c:c,w:w,h:h};}
+
+  /* ── Πίνακες πυκνότητας ── */
+  function liq(){
+    [].slice.call(document.querySelectorAll('#liqTable tbody tr')).forEach(function(tr){
+      var ins=tr.querySelectorAll('input'), out=tr.querySelector('td.out'), V=num(ins[0].value), m=num(ins[1].value);
+      out.textContent=(V&&V>0&&m!==null)?fmt(m/V,2):'';
+    });
+  }
+  function sol(){
+    [].slice.call(document.querySelectorAll('#solTable tbody tr')).forEach(function(tr){
+      var ins=tr.querySelectorAll('input'), outs=tr.querySelectorAll('td.out'),
+          m=num(ins[0].value), a=num(ins[1].value), b=num(ins[2].value);
+      if(a!==null&&b!==null&&b>a){ var V=b-a; outs[0].textContent=fmt(V,1); outs[1].textContent=(m!==null)?fmt(m/V,2):''; }
+      else { outs[0].textContent=''; outs[1].textContent=''; }
+    });
+  }
+  document.getElementById('liqTable').addEventListener('input',liq);
+  document.getElementById('solTable').addEventListener('input',sol);
+
+  /* ── Η δεξαμενή ── */
+  var LIQ=[['Νερό',1.00,'#cfe5ee'],['Θαλασσινό νερό',1.025,'#c2dde6'],['Ελαιόλαδο',0.92,'#e9dc9a'],['Οινόπνευμα',0.79,'#f3e6ea'],
+           ['Γλυκερίνη',1.26,'#e6eef0'],['Μέλι',1.42,'#e2b35a'],['Υδράργυρος',13.6,'#b9c0c6']];
+  var MAT=[['Δικό μου σώμα (ρυθμιστές)',null,'#0f5d52'],['Φελλός',0.24,'#c49a6c'],['Ξύλο πεύκου',0.50,'#b98b52'],['Πάγος',0.92,'#e8f4fa'],
+           ['Αλουμίνιο',2.70,'#b9c2c9'],['Σίδηρος',7.87,'#6b7279'],['Χρυσός',19.3,'#d4a72c']];
+  var liqSel=document.getElementById('liqSel'), matSel=document.getElementById('matSel');
+  LIQ.forEach(function(l,i){var o=document.createElement('option');o.value=i;o.textContent=l[0];liqSel.appendChild(o);});
+  MAT.forEach(function(m,i){var o=document.createElement('option');o.value=i;o.textContent=m[0];matSel.appendChild(o);});
+  var mSl=document.getElementById('mSl'), vSl=document.getElementById('vSl');
+  var tankCv=document.getElementById('tankCv');
+  var st={y:null,target:null,vy:0,dropping:false};
+
+  function bodyRho(){
+    var m=MAT[+matSel.value];
+    if(m[1]===null) return (+mSl.value)/(+vSl.value);
+    return m[1];
+  }
+  function syncSliders(){
+    var m=MAT[+matSel.value], custom=(m[1]===null);
+    mSl.disabled=!custom; mSl.style.opacity=custom?1:.4;
+    if(!custom){ var V=+vSl.value; var mass=Math.round(m[1]*V); document.getElementById('mLab').textContent=mass; }
+    else document.getElementById('mLab').textContent=mSl.value;
+    document.getElementById('vLab').textContent=vSl.value;
+  }
+  function geom(w,h){
+    var tx=w*0.22, tw=w*0.56, top=40, bottom=h-18, surf=top+70;
+    var side=Math.max(18, Math.min(110, Math.cbrt(+vSl.value)*12.5));
+    return {tx:tx,tw:tw,top:top,bottom:bottom,surf:surf,side:side};
+  }
+  function eqY(g){ /* y της πάνω πλευράς του σώματος σε ισορροπία */
+    var ro=bodyRho(), rl=LIQ[+liqSel.value][1];
+    if(ro<rl){ var f=ro/rl; return g.surf - g.side*(1-f); }
+    return g.bottom - g.side;
+  }
+  function readouts(){
+    var ro=bodyRho(), rl=LIQ[+liqSel.value][1];
+    document.getElementById('rObj').textContent=fmt(ro,2);
+    document.getElementById('rLiq').textContent=fmtr(rl);
+    var s=document.getElementById('sub');
+    if(!st.dropping||st.y===null){ s.textContent='–'; return; }
+    s.textContent= ro<rl ? Math.round(ro/rl*100)+'% — επιπλέει' : (ro===rl?'100% — αιωρείται':'100% — βυθίζεται');
+  }
+  function drawTank(){
+    var o=fitc(tankCv), c=o.c, w=o.w, h=o.h, g=geom(w,h), L=LIQ[+liqSel.value], M=MAT[+matSel.value];
+    c.clearRect(0,0,w,h);
+    c.fillStyle=L[2]; c.fillRect(g.tx,g.surf,g.tw,g.bottom-g.surf);
+    c.strokeStyle='#7fa79a'; c.lineWidth=1.5; c.beginPath(); c.moveTo(g.tx,g.surf); c.lineTo(g.tx+g.tw,g.surf); c.stroke();
+    c.strokeStyle='#8fa59a'; c.lineWidth=3; c.beginPath(); c.moveTo(g.tx,g.top); c.lineTo(g.tx,g.bottom); c.lineTo(g.tx+g.tw,g.bottom); c.lineTo(g.tx+g.tw,g.top); c.stroke();
+    c.font='600 11px "IBM Plex Sans",sans-serif'; c.fillStyle='#4a5a56'; c.textAlign='left';
+    c.fillText(L[0]+' · ρ = '+fmtr(L[1])+' g/cm³', g.tx+8, g.bottom-8);
+    var y = st.y===null ? 4 : st.y, x = g.tx+g.tw/2-g.side/2;
+    c.fillStyle=M[2]; c.strokeStyle='#16211f'; c.lineWidth=1.2;
+    c.fillRect(x,y,g.side,g.side); c.strokeRect(x,y,g.side,g.side);
+    /* το τμήμα κάτω από την επιφάνεια, πιο σκούρο */
+    if(y+g.side>g.surf){ var yy=Math.max(y,g.surf); c.fillStyle='rgba(15,93,82,.18)'; c.fillRect(x,yy,g.side,y+g.side-yy); }
+    c.fillStyle='#16211f'; c.textAlign='center'; c.font='600 10px "IBM Plex Sans",sans-serif';
+    c.fillText('ρ = '+fmt(bodyRho(),2), x+g.side/2, y-5);
+  }
+  var raf=null;
+  function anim(){
+    var g=geom(tankCv.clientWidth||700,300), target=eqY(g);
+    var inLiquid = st.y+g.side>g.surf;
+    var acc = inLiquid ? (target-st.y)*0.02 : 0.9;   /* ελεύθερη πτώση στον αέρα, ελατήριο-απόσβεση στο υγρό */
+    st.vy = (st.vy+acc)*(inLiquid?0.86:1);
+    st.y += st.vy;
+    if(st.y+g.side>g.bottom){ st.y=g.bottom-g.side; st.vy=0; }
+    drawTank(); readouts();
+    if(Math.abs(st.vy)<0.02 && Math.abs(st.y-target)<0.3){ st.y=target; drawTank(); readouts(); raf=null; return; }
+    raf=requestAnimationFrame(anim);
+  }
+  function drop(){ st.y=4; st.vy=0; st.dropping=true; if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(anim); }
+  function changed(){ syncSliders(); if(st.dropping){ if(raf) cancelAnimationFrame(raf); raf=requestAnimationFrame(anim);} else { drawTank(); readouts(); } }
+  document.getElementById('dropBtn').addEventListener('click',drop);
+  [liqSel,matSel].forEach(function(e){e.addEventListener('change',changed);});
+  [mSl,vSl].forEach(function(e){e.addEventListener('input',changed);});
+  window.addEventListener('resize',function(){drawTank();});
+  syncSliders(); drawTank(); readouts();
+
+  /* Quiz data */
+  var QS=[
+    {q:'Ένας κορμός δέντρου 500 kg επιπλέει. Ένα κέρμα 5 g βουλιάζει. Γιατί;',
+     hint:'Δεν είναι θέμα του πόσο βαρύ είναι κάτι. Θέμα τίνος είναι;',
+     opts:['Ο κορμός είναι πιο μεγάλος','Το ξύλο έχει μικρότερη πυκνότητα από το νερό, το μέταλλο μεγαλύτερη','Το κέρμα είναι πιο βαρύ','Το νερό σπρώχνει μόνο τα μεγάλα αντικείμενα'],
+     a:1, ok:'Σωστά.', no:'Όχι ακόμα.',
+     why:'Επιπλέει ό,τι έχει μικρότερη πυκνότητα από το υγρό — λιγότερη μάζα στον ίδιο όγκο. Το ξύλο έχει πόρους με αέρα, γι\' αυτό η πυκνότητά του είναι μικρή. Το μέταλλο του κέρματος είναι πολύ πυκνότερο από το νερό.'},
+    {q:'20 mL ενός υγρού ζυγίζουν 25 g. Ποια είναι η πυκνότητά του;',
+     hint:'Μάζα διά όγκο. Ποιο πάει πάνω;',
+     opts:['0,8 g/mL','1,25 g/mL','500 g/mL','45 g/mL'],
+     a:1, ok:'Ακριβώς.', no:'Ξαναδές τη διαίρεση.',
+     why:'ρ = m ÷ V = 25 ÷ 20 = 1,25 g/mL. Το 0,8 βγαίνει αν διαιρέσεις ανάποδα (V ÷ m).'},
+    {q:'Τι κάνει ένα παγάκι μέσα σε οινόπνευμα;',
+     hint:'Θυμήσου το ποτήρι.',
+     opts:['Επιπλέει, όπως πάντα','Βυθίζεται','Λιώνει αμέσως','Μένει ακριβώς στη μέση'],
+     a:1, ok:'Ναι.', no:'Δεν είναι πάντα το ίδιο.',
+     why:'Ο πάγος (περίπου 0,92 g/cm³) είναι αραιότερος από το νερό αλλά πυκνότερος από το οινόπνευμα (περίπου 0,80). Το «ο πάγος επιπλέει» ισχύει στο νερό, όχι παντού.'},
+    {q:'Πώς βρίσκεις τον όγκο μιας πέτρας με ακανόνιστο σχήμα;',
+     hint:'Τι έκανες με τον κύλινδρο;',
+     opts:['Με χάρακα','Ζυγίζοντάς την','Από το πόσο ανεβαίνει το νερό όταν τη βυθίσεις','Δεν γίνεται'],
+     a:2, ok:'Σωστά.', no:'Θυμήσου τον κύλινδρο.',
+     why:'Η πέτρα παίρνει τη θέση τόσου νερού όσος είναι ο όγκος της. Η διαφορά στη στάθμη είναι ο όγκος. Αυτό λέγεται εκτόπιση — η ιδέα του Αρχιμήδη.'},
+    {q:'Έχεις δύο διάφανα, άχρωμα υγρά χωρίς ετικέτα. Ποια μέτρηση σε βοηθάει να τα ξεχωρίσεις;',
+     hint:'Ποια από αυτές δεν αλλάζει αν έχεις λίγο ή πολύ υγρό;',
+     opts:['Το χρώμα τους','Ο όγκος τους','Η πυκνότητά τους','Η μάζα τους'],
+     a:2, ok:'Ναι.', no:'Σκέψου τι εξαρτάται από το πόσο υγρό έχεις.',
+     why:'Η μάζα και ο όγκος εξαρτώνται από το πόσο υγρό έχεις. Η πυκνότητα όχι: ένα ποτήρι και μια σταγόνα νερό έχουν την ίδια. Γι\' αυτό είναι ιδιότητα της ουσίας — μέρος της «ταυτότητάς» της.'}
+  ];
+  var FINISH=[
+    ['Αξίζει μια δεύτερη ματιά.','Ξαναπαίξε με τη δεξαμενή και ξαναδιάβασε τις εξηγήσεις. Η ιδέα είναι μία: μάζα σε σύγκριση με όγκο.'],
+    ['Αξίζει μια δεύτερη ματιά.','Ξαναπαίξε με τη δεξαμενή και ξαναδιάβασε τις εξηγήσεις. Η ιδέα είναι μία: μάζα σε σύγκριση με όγκο.'],
+    ['Αξίζει μια δεύτερη ματιά.','Ξαναπαίξε με τη δεξαμενή και ξαναδιάβασε τις εξηγήσεις. Η ιδέα είναι μία: μάζα σε σύγκριση με όγκο.'],
+    ['Καλή αρχή.','Οι μισές ιδέες είναι εκεί. Ξαναδές τις εξηγήσεις των υπολοίπων.'],
+    ['Πολύ καλά.','Ένα σου ξέφυγε. Διάβασε την εξήγησή του και θα κάτσει αμέσως.'],
+    ['Πλήρες.','Πυκνότητα, εκτόπιση, ταυτότητα ουσίας. Την επόμενη εβδομάδα: το νερό — πόσο υπάρχει μέσα σου, στο φαγητό σου και στον πλανήτη.']
+  ];
+  /* Drawer */
+  var side=document.getElementById('side'),burger=document.getElementById('burger'),scrim=document.getElementById('scrim');
+  function setDrawer(o){side.classList.toggle('open',o);scrim.classList.toggle('on',o);burger.setAttribute('aria-expanded',o?'true':'false');}
+  burger.addEventListener('click',function(){setDrawer(!side.classList.contains('open'));});
+  scrim.addEventListener('click',function(){setDrawer(false);});
+  document.addEventListener('keydown',function(e){if(e.key==='Escape')setDrawer(false);});
+
+  /* Quiz */
+  var answered=0,right=0;
+  var quiz=document.getElementById('quiz');
+  var scoreEl=document.getElementById('score'),scoreBig=document.getElementById('scoreBig'),
+      scoreTitle=document.getElementById('scoreTitle'),scoreText=document.getElementById('scoreText');
+  function build(){
+    quiz.innerHTML=''; answered=0; right=0; scoreEl.classList.remove('show');
+    QS.forEach(function(item,qi){
+      var card=document.createElement('div'); card.className='qcard';
+      var head='<div class="qhead"><span class="qnum">'+(qi+1)+'</span><p class="qtext">'+item.q+'</p></div>';
+      var opts='<div class="opts" role="group" aria-label="Επιλογές ερώτησης '+(qi+1)+'">';
+      item.opts.forEach(function(o,oi){
+        opts+='<button class="opt" data-q="'+qi+'" data-o="'+oi+'"><span class="mark" aria-hidden="true"></span><span>'+o+'</span></button>';
+      });
+      opts+='</div>';
+      var extra='<button class="hintbtn" data-hint="'+qi+'">Δώσε μου μια βοήθεια</button>'+
+                '<p class="hinttext" id="hint'+qi+'">'+item.hint+'</p>'+
+                '<div class="verdict" id="v'+qi+'"><p class="vt"></p><p class="why">'+item.why+'</p></div>';
+      card.innerHTML=head+opts+extra;
+      quiz.appendChild(card);
+    });
+  }
+  quiz.addEventListener('click',function(e){
+    var hb=e.target.closest('.hintbtn');
+    if(hb){document.getElementById('hint'+hb.dataset.hint).classList.add('show'); hb.remove(); return;}
+    var btn=e.target.closest('.opt');
+    if(!btn||btn.disabled) return;
+    var qi=+btn.dataset.q, oi=+btn.dataset.o, item=QS[qi], card=btn.closest('.qcard');
+    card.querySelectorAll('.opt').forEach(function(b){b.disabled=true;b.classList.add('dim');});
+    var ok=card.querySelector('.opt[data-o="'+item.a+'"]');
+    ok.classList.remove('dim'); ok.classList.add('correct'); ok.querySelector('.mark').textContent='✓';
+    var v=document.getElementById('v'+qi);
+    if(oi===item.a){right++; v.classList.add('ok'); v.querySelector('.vt').textContent=item.ok;}
+    else{btn.classList.remove('dim'); btn.classList.add('incorrect'); btn.querySelector('.mark').textContent='✕';
+         v.classList.add('no'); v.querySelector('.vt').textContent=item.no;}
+    v.classList.add('show');
+    answered++; if(answered===QS.length) finish();
+  });
+  function finish(){
+    scoreBig.textContent=right+' / '+QS.length;
+    var m=FINISH[Math.min(right,5)]||FINISH[0];
+    scoreTitle.textContent=m[0]; scoreText.textContent=m[1];
+    scoreEl.classList.add('show'); scoreEl.scrollIntoView({block:'nearest'});
+  }
+  document.getElementById('quizReset').addEventListener('click',function(){build();document.getElementById('kouiz').scrollIntoView();});
+
+  function doPrint(){window.print();}
+  document.getElementById('printBtn').addEventListener('click',doPrint);
+  document.getElementById('printBtn2').addEventListener('click',doPrint);
+  document.getElementById('clearAll').addEventListener('click',function(){
+    if(!confirm('Να σβηστούν όλα όσα έγραψες σε αυτό το φύλλο;')) return;
+    document.querySelectorAll('main input[type="text"], main textarea').forEach(function(f){f.value='';});
+    document.querySelectorAll('main input[type="text"]').forEach(function(f){f.dispatchEvent(new Event('input',{bubbles:true}));});
+  });
+  build();
+
+})();
+</script>
+</body>
+</html>
