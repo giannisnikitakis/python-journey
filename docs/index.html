@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="el">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Τα μαθήματα</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Alegreya:ital,wght@0,400;0,500;0,700;1,400;1,500&family=IBM+Plex+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16211f; --ink-soft:#4a5a56; --ink-faint:#7c8d88;
+  --ground:#f1f4f0; --sheet:#ffffff; --rule:#d5ded7; --rule-strong:#b6c3ba;
+  --serif:'Alegreya',Georgia,'Times New Roman',serif;
+  --sans:'IBM Plex Sans',system-ui,-apple-system,'Segoe UI',sans-serif;
+}
+*{box-sizing:border-box}
+@media (prefers-reduced-motion:reduce){*{transition:none!important}}
+body{margin:0;background:var(--ground);color:var(--ink);font-family:var(--serif);font-size:18px;line-height:1.66;-webkit-font-smoothing:antialiased}
+main{max-width:1000px;margin:0 auto;padding:76px 28px 110px}
+
+.kicker{font-family:var(--sans);font-size:.78rem;font-weight:600;color:var(--ink-faint);margin:0 0 14px}
+h1{font-family:var(--serif);font-weight:700;font-size:clamp(2.2rem,5.4vw,3.6rem);line-height:1.06;letter-spacing:-.018em;margin:0 0 20px;max-width:16ch}
+.lede{font-size:1.14rem;color:var(--ink-soft);max-width:60ch;margin:0 0 48px}
+.lede em{color:var(--ink);font-style:italic}
+
+.grid{display:grid;grid-template-columns:repeat(2,1fr);gap:18px}
+.card{
+  position:relative;display:flex;flex-direction:column;gap:0;
+  text-decoration:none;color:inherit;background:var(--sheet);
+  border:1px solid var(--rule);border-radius:10px;overflow:hidden;
+  transition:transform .14s ease,box-shadow .14s ease;
+}
+.card:hover{transform:translateY(-3px);box-shadow:0 12px 30px rgba(22,33,31,.08)}
+.card:focus-visible{outline:3px solid var(--c);outline-offset:3px}
+.card__band{height:7px;background:var(--c)}
+.card__body{padding:24px 26px 22px;flex:1;display:flex;flex-direction:column}
+.card__eyebrow{font-family:var(--sans);font-size:.74rem;font-weight:600;color:var(--c);margin:0 0 8px}
+.card h2{font-family:var(--serif);font-weight:700;font-size:1.9rem;line-height:1.1;letter-spacing:-.012em;margin:0 0 10px}
+.card p{margin:0 0 20px;color:var(--ink-soft);font-size:1.02rem;max-width:44ch}
+.card__foot{margin-top:auto;padding-top:16px;border-top:1px solid var(--rule)}
+.prog{display:flex;align-items:baseline;justify-content:space-between;gap:12px;font-family:var(--sans);font-size:.8rem;color:var(--ink-faint);margin-bottom:8px}
+.prog b{color:var(--ink);font-weight:600;font-variant-numeric:tabular-nums}
+.bar{height:6px;border-radius:3px;background:var(--ground);overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--c);border-radius:3px;transition:width .5s cubic-bezier(.4,0,.2,1)}
+.card__go{position:absolute;right:22px;top:22px;font-family:var(--sans);font-size:.78rem;font-weight:500;color:var(--c);opacity:0;transition:opacity .14s}
+.card:hover .card__go{opacity:1}
+
+.card--soon{pointer-events:none}
+.card--soon .card__band{background:repeating-linear-gradient(90deg,var(--c) 0 10px,transparent 10px 16px)}
+.card--soon h2,.card--soon p{opacity:.55}
+.card--soon .card__foot{opacity:.7}
+
+.how{margin-top:64px;padding-top:26px;border-top:1px solid var(--rule)}
+.how h3{font-family:var(--serif);font-size:1.35rem;margin:0 0 8px}
+.how p{color:var(--ink-soft);max-width:66ch;margin:0 0 10px}
+.how a{color:var(--ink);text-underline-offset:3px}
+
+@media (max-width:720px){
+  main{padding:52px 20px 80px}
+  .grid{grid-template-columns:1fr}
+  .card h2{font-size:1.6rem}
+}
+</style>
+</head>
+<body>
+<main>
+  <p class="kicker">Β΄ Γυμνασίου · σχολική χρονιά 2026–27</p>
+  <h1>Τα μαθήματα</h1>
+  <p class="lede">Τέσσερα μαθήματα, μία ώρα την εβδομάδα το καθένα, χτισμένα γύρω από <em>ερωτήματα, πειράματα, προσομοιώσεις και κώδικα</em>. Κάθε εβδομάδα έχει έναν οδηγό για αυτόν που διδάσκει και ένα φύλλο για αυτόν που μαθαίνει. Διάλεξε μάθημα.</p>
+
+  <div class="grid" id="grid"></div>
+
+  <div class="how">
+    <h3>Πώς δουλεύει</h3>
+    <p>Οι σελίδες είναι απλά αρχεία HTML — ανοίγουν σε οποιονδήποτε browser, τυπώνονται καθαρά, και τα κουίζ βαθμολογούν επί τόπου χωρίς να αποθηκεύουν τίποτα πουθενά. Ό,τι γράφεται στα φύλλα μαθητή μένει στον υπολογιστή που το έγραψε.</p>
+    <p>Από τη Φυσική 4 και τη Χημεία 2 και μετά, κάθε εβδομάδα έχει και ένα <em>τετράδιο Python</em> (Jupyter notebook) με ασκήσεις μαθηματικών και κώδικα. Ανοίγει με ένα κλικ στο Google Colab από το φύλλο μαθητή, χωρίς εγκατάσταση.</p>
+    <p>Το εικονογραφημένο τετράδιο είναι το κεντρικό έργο της χρονιάς σε όλα τα μαθήματα. Οι σελίδες είναι το σκαλωσιά· το τετράδιο είναι το κτίριο.</p>
+  </div>
+</main>
+
+<script>
+(function(){
+  /* ─────────────────────────────────────────────────────────
+     Ο ΜΟΝΑΔΙΚΟΣ ΠΙΝΑΚΑΣ ΠΟΥ ΣΥΝΤΗΡΕΙΣ
+     done = πόσα μαθήματα είναι έτοιμα · total = πόσα έχει η σειρά
+     ready:false → η κάρτα εμφανίζεται ως «Σύντομα»
+     ───────────────────────────────────────────────────────── */
+  var COURSES=[
+    {name:'Python', eyebrow:'Προγραμματισμός · 100 Days of Code',
+     blurb:'Από τις μεταβλητές μέχρι τα παιχνίδια και την τεχνητή νοημοσύνη. Κάθε ημέρα τελειώνει με κάτι που τρέχει — και κάτι που είναι δικό σου.',
+     href:'python/index.html', color:'#17263B', done:7, total:14, unit:'ημέρες', ready:true},
+    {name:'Χημεία', eyebrow:'Από το νερό στο άτομο',
+     blurb:'Πραγματικά αντιδραστήρια, το τρίγωνο του Johnstone, και το μάτι που μαθαίνει να μην εμπιστεύεται μόνο τον εαυτό του.',
+     href:'science/ximeia.html', color:'#0f5d52', done:4, total:30, unit:'εβδομάδες', ready:true},
+    {name:'Φυσική', eyebrow:'Κινήσεις, δυνάμεις, πίεση, ενέργεια',
+     blurb:'Το κινητό ως εργαστήριο, προσομοιώσεις μέσα στη σελίδα, και κώδικας που δηλώνει ρητά τη φυσική.',
+     href:'science/fysiki.html', color:'#17456b', done:4, total:30, unit:'εβδομάδες', ready:true},
+    {name:'Βιολογία', eyebrow:'Από το μόριο στο οικοσύστημα',
+     blurb:'Μικροσκόπιο, μοντέλα πρακτόρων, και η σκάλα της κλίμακας — να ξέρεις πάντα σε ποιο σκαλί στέκεσαι.',
+     href:'#', color:'#5a6b2a', done:0, total:30, unit:'εβδομάδες', ready:false}
+  ];
+
+  var grid=document.getElementById('grid');
+  COURSES.forEach(function(c){
+    var a=document.createElement(c.ready?'a':'div');
+    a.className='card'+(c.ready?'':' card--soon');
+    a.style.setProperty('--c',c.color);
+    if(c.ready){a.href=c.href;a.setAttribute('aria-label',c.name+' — άνοιγμα μαθήματος');}
+    var pct=c.total?Math.round(c.done/c.total*100):0;
+    a.innerHTML=
+      '<div class="card__band"></div>'+
+      '<div class="card__body">'+
+        '<p class="card__eyebrow">'+c.eyebrow+'</p>'+
+        (c.ready?'<span class="card__go">Άνοιγμα →</span>':'')+
+        '<h2>'+c.name+'</h2>'+
+        '<p>'+c.blurb+'</p>'+
+        '<div class="card__foot">'+
+          '<div class="prog"><span><b>'+c.done+'</b> από '+c.total+' '+c.unit+'</span><span>'+(c.ready?pct+'%':'Σύντομα')+'</span></div>'+
+          '<div class="bar"><i data-w="'+pct+'"></i></div>'+
+        '</div>'+
+      '</div>';
+    grid.appendChild(a);
+  });
+  requestAnimationFrame(function(){requestAnimationFrame(function(){
+    document.querySelectorAll('.bar i').forEach(function(i){i.style.width=i.dataset.w+'%';});
+  });});
+})();
+</script>
+</body>
+</html>
